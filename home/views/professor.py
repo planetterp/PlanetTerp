@@ -2,7 +2,6 @@ from django.shortcuts import render
 from django.views import View
 from django.http import HttpResponse
 from django.db.models import Sum, Count
-from django.core.serializers import serialize
 from django.http import JsonResponse
 from django.template.context_processors import csrf
 from crispy_forms.utils import render_crispy_form
