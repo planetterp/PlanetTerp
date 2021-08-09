@@ -22,31 +22,3 @@ class BcryptBackend(BaseBackend):
 
     def get_user(self, user_id):
         return User.objects.filter(pk=user_id).first()
-
-class BcryptPasswordHasher(BasePasswordHasher):
-    algorithm = "bcrypt_sha256"
-
-    def salt(self):
-        return bcrypt.gensalt(13)
-
-    def encode(self, password, salt):
-        password = bcrypt.hashpw(password.encode(), salt)
-        return password.decode("ascii")
-
-    def decode(self, encoded):
-        hash_, salt = encoded.split("$")
-        return {
-            "algorithm": self.algorithm,
-            "hash": hash_,
-            "salt": salt
-        }
-
-    def verify(self, password, encoded):
-        return bcrypt.checkpw(password, encoded)
-
-    def safe_summary(self, encoded):
-        decoded = self.decode(encoded)
-        return {
-            "algorithm": self.algorithm,
-            "salt": decoded["salt"],
-        }
