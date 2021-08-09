@@ -1,5 +1,4 @@
 from django.contrib.auth.backends import BaseBackend
-from django.contrib.auth.hashers import BasePasswordHasher
 import bcrypt
 
 from home.models import User
