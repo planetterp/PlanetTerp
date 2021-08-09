@@ -167,7 +167,6 @@ class Section(Model):
     def __str__(self):
         return f"{self.course} ({self.section_number}) taught by {self.professors}"
 
-# TODO add validation to username/password/email somewhere
 # TODO use User.send_email() instead of our custom email methods
 # TODO replace login/permission decorators with appropriate mixins
 class User(AbstractUser):
@@ -176,9 +175,21 @@ class User(AbstractUser):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         email_field = self._meta.get_field('email')
+        username_field = self._meta.get_field('username')
+        password_field = self._meta.get_field('password')
+
         email_field.null = True
-        email_field.validators = [
+        email_field.validators = email_field.validators + [
             validators.validate_email
+        ]
+
+        username_field.validators = username_field.validators + [
+            validators.MaxLengthValidator(20, "Username must be less than 20 characters"),
+            validators.MinLengthValidator(2, "Username must be at least 2 characters")
+        ]
+
+        password_field.validators = password_field.validators + [
+            validators.MinLengthValidator(8, "Password must be at least 8 characters")
         ]
 
 

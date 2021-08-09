@@ -1,50 +1,49 @@
 import secrets
 from datetime import datetime, timedelta
 
+from django.template.context_processors import csrf
+from crispy_forms.utils import render_crispy_form
 from django.shortcuts import redirect, render
 from django.views import View
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
-from django.http.response import HttpResponseBadRequest, HttpResponse
+from django.http.response import HttpResponseBadRequest, HttpResponse, JsonResponse
 
 from home.mail import send_email
 from home.models import User, ResetCode
-
+from home.forms.basic import LoginForm, RegisterForm
 
 class Login(View):
     template = "login_register.html"
 
     def get(self, request):
-        if request.session.get("logged_in", False):
-            return redirect('/')
+        if request.user.is_authenticated:
+            return redirect("/")
 
-        return render(request, self.template)
+        context = {
+            "login_form": LoginForm(),
+            "register_form": RegisterForm()
+        }
+
+        return render(request, self.template, context=context)
 
     def post(self, request):
-        if request.session.get("logged_in", False):
-            return redirect('/')
+        login_form = LoginForm(data=request.POST)
+        context = {
+            "success": True
+        }
 
-        data = request.POST
-        context = {"error_msg": None}
+        if login_form.is_valid():
+            login(request, login_form.cleaned_data['user'])
+        else:
+            ctx = {}
+            ctx.update(csrf(request))
+            login_form_html = render_crispy_form(login_form, login_form.helper, context=ctx)
+            context["login_form"] = login_form_html
+            context["success"] = False
 
-        if not data.get('username'):
-            context["error_msg"] = "You must enter a username."
-            return render(request, self.template, context)
-        if not data.get('password'):
-            context["error_msg"] = "You must enter a password."
-            return render(request, self.template, context)
-
-        username = data.get("username")
-        password = data.get("password")
-
-        user = authenticate(request, username=username, password=password)
-        if not user:
-            context["error_msg"] = "Incorrect username/password combination."
-            return render(request, self.template, context)
-
-        login(request, user)
-        return redirect("/profile")
+        return JsonResponse(context)
 
 
 class Logout(View):
@@ -87,29 +86,27 @@ class Register(View):
     template = "login_register.html"
 
     def post(self, request):
-        if request.session.get("logged_in", False):
-            return redirect('/')
+        register_form = RegisterForm(data=request.POST)
+        context = {
+            "success": True
+        }
 
-        data = request.POST
+        if register_form.is_valid():
+            data = register_form.cleaned_data
+            username = data['username']
+            email = data['email']
+            password = data['password']
+            user = User.objects.create_user(
+                username=username,
+                email=email,
+                password=password
+            )
+            login(request, user, backend='django.contrib.auth.backends.ModelBackend')
+        else:
+            ctx = {}
+            ctx.update(csrf(request))
+            register_form_html = render_crispy_form(register_form, register_form.helper, context=ctx)
+            context["register_form"] = register_form_html
+            context["success"] = False
 
-        context = {"error_msg": None }
-
-        if 'username' not in data or not data["username"]:
-            context["error_msg"] = "You must enter a username."
-            return render(request, self.template, context)
-        if 'email' not in data:
-            context["error_msg"] = "Did you remove the email input?"
-            return render(request, self.template, context)
-        if 'password' not in data or not data["password"]:
-            context["error_msg"] = "You must enter a password."
-            return render(request, self.template, context)
-
-        username = data["username"].strip()
-        email = data["email"].strip()
-        password = data["password"].strip()
-
-        user = User.objects.create_user(username=username, email=email,
-            password=password)
-        login(request, user)
-
-        return redirect("profile")
+        return JsonResponse(context)

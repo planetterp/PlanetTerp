@@ -1,5 +1,7 @@
+from django.core.exceptions import ValidationError
 from django.forms import CharField, DateTimeField
 from django.utils.safestring import mark_safe
+from django.contrib.auth import authenticate
 from django.forms.widgets import DateInput
 from django.forms import ModelForm
 
@@ -126,3 +128,136 @@ class ProfileForm(ModelForm):
         )
 
         return layout
+
+class LoginForm(ModelForm):
+    username = CharField()
+
+    class Meta:
+        model = User
+        fields = ["password"]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.field_errors = self.create_field_errors()
+
+        self.helper = FormHelper()
+        self.helper.form_id = "login-form"
+        self.helper.form_show_errors = False
+        self.helper.field_class = 'w-75'
+        self.helper.label_class = 'mt-2'
+
+        self.helper.layout = Layout(
+            Div(
+                Field('username', placeholder="Username", wrapper_class='mb-0'),
+                self.field_errors['username'],
+                css_class="username-container mb-1"
+            ),
+            Div(
+                Field('password', placeholder="Password", wrapper_class='mb-0'),
+                self.field_errors['password'],
+                css_class="password-container mb-1"
+            ),
+            Div(
+                Div(
+                    HTML('<a href="javascript:void(0);" onclick="showForgotPassword()" style="color: blue;">Forgot password?</a>')
+                ),
+                css_class="forgot-password-link pb-2"
+            ),
+            Button(
+                'submit',
+                'Login',
+                css_class="btn-primary",
+                onClick='submitLoginForm()'
+            )
+        )
+
+    def create_field_errors(self):
+        field_errors = {}
+
+        for field in self.fields:
+            if_condition = f'{{% if form.{field}.errors %}} '
+            error_html = (
+                f'<div id="{{{{ form.{field}.name }}}}_errors"'
+                ' class="invalid-feedback login-error" style="font-size: 15px">'
+                f' {{{{ form.{field}.errors|striptags }}}}</div>'
+            )
+            endif = ' {% endif %}'
+            field_errors[field] = HTML(if_condition + error_html + endif)
+
+        return field_errors
+
+
+    def clean(self):
+        super().clean()
+
+        if 'username' in self.cleaned_data and 'password' in self.cleaned_data:
+            credentials = {
+                "username": self.cleaned_data['username'],
+                "password": self.cleaned_data['password']
+            }
+
+            user = authenticate(request=None, **credentials)
+            if not user:
+                message = "Username or password is incorrect"
+                self.add_error('username', ValidationError(message, code="BAD_CREDENTIALS"))
+                self.add_error('password', ValidationError(message, code="BAD_CREDENTIALS"))
+            else:
+                self.cleaned_data['user'] = user
+
+        return self.cleaned_data
+
+class RegisterForm(ModelForm):
+    class Meta:
+        model = User
+        fields = ["username", "email", "password"]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['username'].help_text = None
+        self.fields['email'].label = "Email"
+        self.field_errors = self.create_field_errors()
+
+        self.helper = FormHelper()
+        self.helper.form_id = "register-form"
+        self.helper.form_show_errors = False
+        self.helper.field_class = 'w-75'
+        self.helper.label_class = 'mt-2'
+
+        self.helper.layout = Layout(
+            Div(
+                Field('username', placeholder="Username", wrapper_class='mb-0'),
+                self.field_errors['username'],
+                css_class="username-container mb-1"
+            ),
+            Div(
+                Field('email', placeholder="Email (optional)", wrapper_class='mb-0'),
+                self.field_errors['email'],
+                css_class="email-container mb-1"
+            ),
+            Div(
+                Field('password', placeholder="Password", wrapper_class='mb-0'),
+                self.field_errors['password'],
+                css_class="password-container mb-1"
+            ),
+            Button(
+                'submit',
+                'Register',
+                css_class="btn-primary",
+                onClick='submitRegisterForm()'
+            )
+        )
+
+    def create_field_errors(self):
+        field_errors = {}
+
+        for field in self.fields:
+            if_condition = f'{{% if form.{field}.errors %}} '
+            error_html = (
+                f'<div id="{{{{ form.{field}.name }}}}_errors"'
+                ' class="invalid-feedback register-error" style="font-size: 15px">'
+                f' {{{{ form.{field}.errors|first|striptags }}}}</div>'
+            )
+            endif = ' {% endif %}'
+            field_errors[field] = HTML(if_condition + error_html + endif)
+
+        return field_errors

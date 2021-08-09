@@ -16,12 +16,15 @@ from pathlib import Path, PurePath
 from planetterp import config
 
 AUTH_USER_MODEL = "home.User"
-PASSWORD_HASHERS = ["home.backend.BcryptPasswordHasher"]
-AUTHENTICATION_BACKENDS = ["home.backend.BcryptBackend"]
-# TODO see if we can remove these later when things are working properly
-LOGIN_REDIRECT_URL = "profile"
-LOGIN_URL = "login"
-LOGOUT_REDIRECT_URL = ""
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'home.backend.BcryptBackend'
+]
+# https://docs.djangoproject.com/en/3.2/topics/auth/passwords/#using-bcrypt-with-django
+PASSWORD_HASHERS = [
+    'django.contrib.auth.hashers.BCryptSHA256PasswordHasher'
+]
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
