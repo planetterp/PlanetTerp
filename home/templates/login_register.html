@@ -14,25 +14,10 @@
 			<div id="login-form-container">
 				{% crispy login_form %}
 			</div>
-			<form id="forgot-password-form" style="display: none;">
-				<h2>Reset Password</h2>
-				<div class="form-group row">
-					<div class="col-sm-10">
-						<label class="col-form-label" for="forgot-password-email"><strong>Enter your email for reset password instructions</strong></label>
-					</div>
-				</div>
-				<div class="form-group row">
-					<div class="col-sm-10">
-						<input class="form-control" type="email" name="email" id="forgot-password-email" placeholder="Email">
-					</div>
-				</div>
-				<div class="form-group row">
-					<div class="col-sm-10">
-						<button class="btn btn-primary" type="submit">Send Reset Email</button>
-					</div>
-				</div>
-			</form>
-			<div id="forgot-password-form-response" class="pt-2"></div>
+
+			<div id="reset-password-form-container">
+				{% crispy reset_password_form %}
+			</div>
 		</div>
 		<div class="col">
 			<h2 class="d-inline">Register</h2> <i class="fas fa-info-circle" data-toggle="tooltip" data-placement="right" title="Registering will allow you to keep track of the reviews you post and give you a choice of displaying your name next to your reviews."></i>
@@ -43,12 +28,6 @@
 	</div>
 </div>
 <script>
-	function showForgotPassword() {
-		if (document.getElementById('forgot-password-form').style.display == 'none') {
-			document.getElementById('forgot-password-form').style.display = 'block';
-		}
-	}
-
 	function submitLoginForm() {
 		$.ajax({
 			type: "POST",
@@ -81,25 +60,19 @@
 		});
 	}
 
-
-	$("#forgot-password-form").submit(
-		function(e) {
-			var data = {"email": $("#forgot-password-email").val()};
-			$.post("/passwordreset", data)
-			.done(function(data) {
-				var successText = "<div class=\"alert alert-success text-center\" style=\"width: 100%;\">";
-				successText += "<strong>Password reset email sent.</strong> Check your email for further instructions."
-				successText += "</div><br />"
-				$("#forgot-password-form-response").html(successText);
-			})
-			.fail(function(xhr, textStatus, errorThrown) {
-				var errorText = "<div class=\"alert alert-danger text-center\" style=\"width: %100;\">"
-				errorText += "<strong>Error:</strong> ";
-				errorText += xhr.responseText;
-				errorText += "</div><br />";
-				$("#forgot-password-form-response").html(errorText);
-			});
-			e.preventDefault();
-		});
+	function submitResetPasswordForm() {
+		$.ajax({
+			type: "POST",
+			url: "{% url 'password-reset' %}",
+			data: $("#reset_password_form").serialize(),
+			success: function(data) {
+				$(`#reset-password-modal`).modal('hide');
+				$(".modal-backdrop").remove();
+				$("#reset-password-form-container").html(data['form']);
+				$("#email_response").show();
+				$(`#reset-password-modal`).modal('show');
+			}
+		})
+	}
 </script>
 {% endblock %}

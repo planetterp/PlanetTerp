@@ -1,14 +1,15 @@
 from django.core.exceptions import ValidationError
-from django.forms import CharField, DateTimeField
+from django.forms import CharField, DateTimeField, EmailField
 from django.utils.safestring import mark_safe
 from django.contrib.auth import authenticate
 from django.forms.widgets import DateInput
-from django.forms import ModelForm
+from django.forms import ModelForm, Form
 
 from crispy_forms.layout import Layout, Div, Field, HTML, Button
 from crispy_forms.helper import FormHelper
 from crispy_forms.bootstrap import AppendedText
 
+from home.forms.layout_objects.bootstrap_modal import BootstrapModal
 from planetterp.settings import DATE_FORMAT
 from home.models import User
 
@@ -159,9 +160,9 @@ class LoginForm(ModelForm):
             ),
             Div(
                 Div(
-                    HTML('<a href="javascript:void(0);" onclick="showForgotPassword()" style="color: blue;">Forgot password?</a>')
+                    HTML('<a id="forgot-password-btn" data-toggle="modal" data-target="#reset-password-modal" style="color: blue;">Forgot password?</a>')
                 ),
-                css_class="forgot-password-link pb-2"
+                css_class="pb-2"
             ),
             Button(
                 'submit',
@@ -261,3 +262,55 @@ class RegisterForm(ModelForm):
             field_errors[field] = HTML(if_condition + error_html + endif)
 
         return field_errors
+
+class ResetPasswordForm(Form):
+    email = EmailField(
+        required=True,
+        label=None,
+        help_text="Enter your email for instructions on how to reset your password"
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.helper = FormHelper()
+        self.helper.form_id = "reset_password_form"
+        self.helper.form_show_labels = False
+        self.helper.form_show_errors = False
+        self.helper.layout = Layout(
+            BootstrapModal(
+                Field('email', placeholder="Email", wrapper_class="mb-0"),
+                HTML('''
+                    {% if form.email.errors %}
+                        <div id="email_response" class="invalid-feedback" style="font-size: 15px">
+                            {{ form.email.errors|striptags }}
+                        </div>
+                    {% else %}
+                        <div id="email_response" class="valid-feedback" style="font-size: 15px; display: none;">
+                            Email sent successfully
+                        </div>
+                    {% endif %}
+                '''),
+                Button(
+                    "submit",
+                    "Send Reset Email",
+                    id="reset-password-form-submit",
+                    css_class="btn-primary mt-3",
+                    onClick='submitResetPasswordForm()'
+                ),
+                css_id="reset-password-modal",
+                title_id="reset-password-title",
+                title="Reset Password"
+            )
+        )
+    def clean(self):
+        super().clean()
+        if 'email' in self.cleaned_data:
+            clean_email = self.cleaned_data['email']
+            user = User.objects.filter(email=clean_email).first()
+            if not user:
+                message = "There is no account assoicated with that email"
+                self.add_error('email', ValidationError(message, "DNE"))
+
+            self.cleaned_data['user'] = user
+        return self.cleaned_data

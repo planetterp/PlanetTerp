@@ -8,22 +8,23 @@ from django.views import View
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
-from django.http.response import HttpResponseBadRequest, HttpResponse, JsonResponse
+from django.http.response import JsonResponse
 
 from home.mail import send_email
 from home.models import User, ResetCode
-from home.forms.basic import LoginForm, RegisterForm
+from home.forms.basic import LoginForm, RegisterForm, ResetPasswordForm
 
 class Login(View):
     template = "login_register.html"
 
     def get(self, request):
         if request.user.is_authenticated:
-            return redirect("/")
+            return redirect("/profile")
 
         context = {
             "login_form": LoginForm(),
-            "register_form": RegisterForm()
+            "register_form": RegisterForm(),
+            "reset_password_form": ResetPasswordForm()
         }
 
         return render(request, self.template, context=context)
@@ -58,28 +59,36 @@ class PasswordReset(View):
     RESET_LINK_LENGTH = 80
 
     def post(self, request):
-        user_email = request.POST["email"]
-        user = User.objects.filter(email=user_email).first()
-
-        if not user:
-            return HttpResponseBadRequest("There is no account registered "
-                "with that email.")
-
-        # token_hex generates two hex digits per number, so halve our length
-        reset_code = secrets.token_hex(int(self.RESET_LINK_LENGTH / 2))
-
-        message = ("A request has been made to reset your password. To do so, please follow this link: <br /><br />" +
-                   f"https://planetterp.com/profile/resetpassword/{reset_code} <br><br>" +
-                   "If you did not request a password reset, you may disregard this email.")
         send_email(user_email, "PlanetTerp Password Reset", message)
+        form = ResetPasswordForm(data=request.POST)
+        ctx = {}
+        ctx.update(csrf(request))
+        form_html = render_crispy_form(form, form.helper, context=ctx)
+        context = {
+            "success": False,
+            "form": form_html
+        }
 
-        expires_at = datetime.now() + timedelta(days=1)
-        reset_code = ResetCode(user_id=user.id, reset_code=reset_code,
-            expires_at=expires_at)
-        # ensure the user only has one reset code active at a time
-        ResetCode.objects.filter(user_id=user.id).update(invalid=True)
-        reset_code.save()
-        return HttpResponse()
+        if form.is_valid():
+            user = form.cleaned_data['user']
+            user_email = form.cleaned_data['email']
+
+            # token_hex generates two hex digits per number, so halve our length
+            reset_code = secrets.token_hex(int(self.RESET_LINK_LENGTH / 2))
+
+            message = ("A request has been made to reset your password. To do so, please follow this link: <br /><br />" +
+                    f"https://planetterp.com/profile/resetpassword/{reset_code} <br><br>" +
+                    "If you did not request a password reset, you may disregard this email.")
+
+            expires_at = datetime.now() + timedelta(days=1)
+            reset_code = ResetCode(user_id=user.id, reset_code=reset_code,
+                expires_at=expires_at)
+            # ensure the user only has one reset code active at a time
+            ResetCode.objects.filter(user_id=user.id).update(invalid=True)
+            reset_code.save()
+            context["success"] = True
+
+        return JsonResponse(context)
 
 
 class Register(View):
