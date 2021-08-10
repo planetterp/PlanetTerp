@@ -267,7 +267,8 @@ class ResetPasswordForm(Form):
     email = EmailField(
         required=True,
         label=None,
-        help_text="Enter your email for instructions on how to reset your password"
+        help_text="Enter your email for instructions on how to reset your password",
+        error_messages={"required": "Please enter an email address"}
     )
 
     def __init__(self, *args, **kwargs):
@@ -307,10 +308,18 @@ class ResetPasswordForm(Form):
         super().clean()
         if 'email' in self.cleaned_data:
             clean_email = self.cleaned_data['email']
-            user = User.objects.filter(email=clean_email).first()
-            if not user:
+            users = User.objects.filter(email=clean_email)
+            if not users.first():
                 message = "There is no account assoicated with that email"
                 self.add_error('email', ValidationError(message, "DNE"))
+            elif users.count() > 1:
+                message = (
+                    "There are multiple accounts associated with this email."
+                    "Please copy this message and email it along with your username to "
+                    "<a href='mailto:admin@planetterp.com'>admin@planetterp.com</a>"
+                )
+                self.add_error('email', ValidationError(message, "DUP_EMAIL"))
 
-            self.cleaned_data['user'] = user
+
+            self.cleaned_data['user'] = users.first()
         return self.cleaned_data
