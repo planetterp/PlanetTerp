@@ -271,7 +271,7 @@ class RegisterForm(ModelForm):
         return field_errors
 
 # Form on login page prompting the user to input an email
-class PasswordResetForm(Form):
+class ForgotPasswordForm(Form):
     email = EmailField(
         required=True,
         label=None,
@@ -305,7 +305,7 @@ class PasswordResetForm(Form):
                     "Send Reset Email",
                     id="password-reset-form-submit",
                     css_class="btn-primary mt-3",
-                    onClick='submitPasswordResetForm()'
+                    onClick='submitForgotPasswordForm()'
                 ),
                 css_id="password-reset-modal",
                 title_id="password-reset-title",

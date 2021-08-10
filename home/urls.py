@@ -2,7 +2,7 @@ from django.urls import path, register_converter
 
 from home.views.add_professor import AddProfessor
 from home.views.admin import Admin
-from home.views.authentication import Login, Logout, PasswordReset, Register
+from home.views.authentication import Login, Logout, ForgotPassword, Register
 from home.views.basic import (About, Contact, PrivacyPolicy, TermsOfUse, Courses,
     Professors, Fall2020, Documents, SetColorScheme, Robots, Sitemap, Grades,
     CourseReviews, Index, SortReviewsTable)
@@ -41,7 +41,7 @@ urlpatterns = [
     # authentication
     path('login', Login.as_view(), name='login'),
     path('logout', Logout.as_view(), name='logout'),
-    path('passwordreset', PasswordReset.as_view(), name='password-reset'),
+    path('forgot_password', ForgotPassword.as_view(), name='password-reset'),
     path('register', Register.as_view(), name='register'),
 
     # basic

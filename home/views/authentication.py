@@ -13,7 +13,7 @@ from django.urls import reverse
 from django.views import View
 
 from home.models import User, ResetCode
-from home.forms.basic import LoginForm, RegisterForm, PasswordResetForm
+from home.forms.basic import LoginForm, RegisterForm, ForgotPasswordForm
 
 class Login(View):
     template = "login_register.html"
@@ -25,7 +25,7 @@ class Login(View):
         context = {
             "login_form": LoginForm(),
             "register_form": RegisterForm(),
-            "password_reset_form": PasswordResetForm()
+            "password_reset_form": ForgotPasswordForm()
         }
 
         return render(request, self.template, context=context)
@@ -55,12 +55,11 @@ class Logout(LoginRequiredMixin, View):
         logout(request)
         return redirect("/")
 
-
-class PasswordReset(View):
+class ForgotPassword(View):
     RESET_LINK_LENGTH = 80
 
     def post(self, request):
-        form = PasswordResetForm(data=request.POST)
+        form = ForgotPasswordForm(data=request.POST)
         ctx = {}
         ctx.update(csrf(request))
         form_html = render_crispy_form(form, form.helper, context=ctx)
