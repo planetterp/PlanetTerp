@@ -7,7 +7,7 @@ from django.forms import ModelForm, Form
 
 from crispy_forms.layout import Layout, Div, Field, HTML, Button
 from crispy_forms.helper import FormHelper
-from crispy_forms.bootstrap import AppendedText
+from crispy_forms.bootstrap import PrependedText
 
 from home.forms.layout_objects.bootstrap_modal import BootstrapModal
 from planetterp.settings import DATE_FORMAT
@@ -57,8 +57,7 @@ class ProfileForm(ModelForm):
         self.field_errors = self.create_field_errors()
         self.helper = FormHelper()
         self.helper.form_id = 'profile-form'
-        self.helper.label_class = 'float-left'
-        self.helper.field_class = 'col-6 pl-0'
+        self.helper.field_class = 'px-0'
         self.helper.form_show_errors = False
         self.helper.layout = self.generate_layout()
 
@@ -84,8 +83,9 @@ class ProfileForm(ModelForm):
             send_review_email_errors = self.field_errors['send_review_email']
             send_review_email = Field(
                 'send_review_email',
-                wrapper_class="profile-form-field pl-0"
+                wrapper_class="profile-form-field"
             )
+
         else:
             email_placeholder = "Enter an email address"
             send_review_email = None
@@ -94,12 +94,11 @@ class ProfileForm(ModelForm):
         info_icon_html = mark_safe('<i id="profile-page-info" class="fas fa-info-circle"></i>')
 
         layout = Layout(
-            Field('username', wrapper_class="profile-form-field"),
-            Field('date_joined', wrapper_class="profile-form-field"),
-            AppendedText(
+            'username',
+            'date_joined',
+            PrependedText(
                 'email',
                 info_icon_html,
-                wrapper_class="profile-form-field",
                 placeholder=email_placeholder
             ),
             self.field_errors['email'],

@@ -48,18 +48,27 @@
 		<br />
 		<h1 class="text-center">Settings</h1>
 		<br />
-
-		<div id="profile-form-container" class="w-50 ml-auto mr-auto">
-			{% crispy form %}
+		<div class="container">
+			<div class="row">
+				<div class="col"></div>
+				<div id="profile-form-container" class="col-5">
+					{% crispy form %}
+				</div>
+				<div class="col"></div>
+			</div>
 		</div>
-	</div>
 </div>
 
 <script>
 	$(function() {
-		$("#div_id_email span.input-group-text").click(function(){
+		$("#profile-page-info").parent().click(function() {
 			$("#email_hint_text").toggle();
 		});
+
+		$("#profile-page-info").parent().hover(function() {
+			$(this).toggleClass('profile-form-info');
+		});
+
 		var hash = window.location.hash;
 		// when we change `window.location.hash`, if there is an element with id equal to that hash,
 		// the browser will scroll to it automatically. We don't want this so we need to have our

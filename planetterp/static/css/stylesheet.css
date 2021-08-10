@@ -72,15 +72,11 @@ table {
 	word-wrap: break-word;
 }
 
-.profile-form-field {
-	text-align: -webkit-center;
-}
-
 #profile-form #hint_id_email {
 	text-align: justify;
 }
 
-#div_id_email span.input-group-text:hover{
+.profile-form-info {
 	background-color: #c4c4c4;
 }
 
