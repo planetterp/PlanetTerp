@@ -355,10 +355,6 @@ class ResetPasswordForm(ModelForm):
                     <div id="password_response" class="invalid-feedback" style="font-size: 15px">
                         {{ form.password.errors|first|striptags }}
                     </div>
-                {% else %}
-                    <div id="password_response" class="valid-feedback" style="font-size: 15px; display: none;">
-                        <strong>Password successfully reset.</strong> You can now login with your new password
-                    </div>
                 {% endif %}
             '''),
             Button(
