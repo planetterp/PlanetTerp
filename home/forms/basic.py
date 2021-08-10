@@ -140,6 +140,7 @@ class LoginForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.field_errors = self.create_field_errors()
+        self.fields['password'].widget = PasswordInput()
 
         self.helper = FormHelper()
         self.helper.form_id = "login-form"
@@ -214,6 +215,7 @@ class RegisterForm(ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.fields['password'].widget = PasswordInput()
         self.fields['username'].help_text = None
         email = self.fields['email']
         email.label = "Email"
@@ -342,7 +344,7 @@ class ResetPasswordForm(ModelForm):
 
     def __init__(self, reset_code: str, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        #self.fields['password'].widget = PasswordInput
+        self.fields['password'].widget = PasswordInput()
         self.fields['reset_code'].initial = reset_code
 
         self.helper = FormHelper()
