@@ -74,7 +74,6 @@ class ForgotPassword(View):
             # token_hex generates two hex digits per number, so halve our length
             reset_code = secrets.token_hex(int(self.RESET_LINK_LENGTH / 2))
             email_url = request.build_absolute_uri(reverse('reset-password', args=[reset_code]))
-            print(email_url)
             message = (
                 f"Dear {user.username},\nA request has been made to reset your password. To do "
                 f"so, please follow this link: \n{email_url}\n\n If you did not "
