@@ -6,13 +6,14 @@ from django.template.context_processors import csrf
 from crispy_forms.utils import render_crispy_form
 from django.utils.safestring import mark_safe
 from django.shortcuts import redirect, render
-from django.views import View
 from django.contrib.auth import login, logout
 from django.http.response import JsonResponse
 from django.utils.timezone import now
+from django.urls import reverse
+from django.views import View
 
 from home.models import User, ResetCode
-from home.forms.basic import LoginForm, RegisterForm, ResetPasswordForm
+from home.forms.basic import LoginForm, RegisterForm, PasswordResetForm
 
 class Login(View):
     template = "login_register.html"
@@ -24,7 +25,7 @@ class Login(View):
         context = {
             "login_form": LoginForm(),
             "register_form": RegisterForm(),
-            "reset_password_form": ResetPasswordForm()
+            "password_reset_form": PasswordResetForm()
         }
 
         return render(request, self.template, context=context)
@@ -59,7 +60,7 @@ class PasswordReset(View):
     RESET_LINK_LENGTH = 80
 
     def post(self, request):
-        form = ResetPasswordForm(data=request.POST)
+        form = PasswordResetForm(data=request.POST)
         ctx = {}
         ctx.update(csrf(request))
         form_html = render_crispy_form(form, form.helper, context=ctx)
@@ -73,15 +74,16 @@ class PasswordReset(View):
 
             # token_hex generates two hex digits per number, so halve our length
             reset_code = secrets.token_hex(int(self.RESET_LINK_LENGTH / 2))
-
+            email_url = request.build_absolute_uri(reverse('reset-password', args=[reset_code]))
+            print(email_url)
             message = (
                 f"Dear {user.username},\nA request has been made to reset your password. To do "
-                f"so, please follow this link: \nhttps://planetterp.com/profile/resetpassword/{reset_code}\n\n If you did not "
+                f"so, please follow this link: \n{email_url}\n\n If you did not "
                 "request a password reset, you may safely disregard this email."
             )
             html_message = mark_safe(
                 f"Dear {user.username},<br />A request has been made to reset your password. To do "
-                f'so, please follow <a href="https://planetterp.com/profile/resetpassword/{reset_code}">this</a> link. '
+                f'so, please follow <a href="{email_url}">this</a> link. '
                 "<br /><br /> If you did not request a password reset, you may "
                 "safely disregard this email."
 

@@ -1,8 +1,8 @@
 from django.core.exceptions import ValidationError
-from django.forms import CharField, DateTimeField, EmailField
+from django.forms import CharField, DateTimeField, EmailField, PasswordInput
 from django.utils.safestring import mark_safe
 from django.contrib.auth import authenticate
-from django.forms.widgets import DateInput
+from django.forms.widgets import DateInput, HiddenInput
 from django.forms import ModelForm, Form
 
 from crispy_forms.layout import Layout, Div, Field, HTML, Button
@@ -11,7 +11,7 @@ from crispy_forms.bootstrap import AppendedText
 
 from home.forms.layout_objects.bootstrap_modal import BootstrapModal
 from planetterp.settings import DATE_FORMAT
-from home.models import User
+from home.models import User, ResetCode
 
 class ProfileForm(ModelForm):
     username = CharField(
@@ -160,7 +160,7 @@ class LoginForm(ModelForm):
             ),
             Div(
                 Div(
-                    HTML('<a id="forgot-password-btn" data-toggle="modal" data-target="#reset-password-modal" style="color: blue;">Forgot password?</a>')
+                    HTML('<a id="forgot-password-btn" data-toggle="modal" data-target="#password-reset-modal" style="color: blue;">Forgot password?</a>')
                 ),
                 css_class="pb-2"
             ),
@@ -263,7 +263,8 @@ class RegisterForm(ModelForm):
 
         return field_errors
 
-class ResetPasswordForm(Form):
+# Form on login page prompting the user to input an email
+class PasswordResetForm(Form):
     email = EmailField(
         required=True,
         label=None,
@@ -295,12 +296,12 @@ class ResetPasswordForm(Form):
                 Button(
                     "submit",
                     "Send Reset Email",
-                    id="reset-password-form-submit",
+                    id="password-reset-form-submit",
                     css_class="btn-primary mt-3",
-                    onClick='submitResetPasswordForm()'
+                    onClick='submitPasswordResetForm()'
                 ),
-                css_id="reset-password-modal",
-                title_id="reset-password-title",
+                css_id="password-reset-modal",
+                title_id="password-reset-title",
                 title="Reset Password"
             )
         )
@@ -322,4 +323,59 @@ class ResetPasswordForm(Form):
 
 
             self.cleaned_data['user'] = users.first()
+        return self.cleaned_data
+
+# The form where the user actually inputs the new password
+class ResetPasswordForm(ModelForm):
+    reset_code = CharField(widget=HiddenInput)
+
+    class Meta:
+        model = User
+        fields = ["password"]
+
+    def __init__(self, reset_code: str, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        #self.fields['password'].widget = PasswordInput
+        self.fields['reset_code'].initial = reset_code
+
+        self.helper = FormHelper()
+        self.helper.form_id = "reset-password-form"
+        self.helper.form_class = "w-75"
+        self.helper.form_show_labels = False
+        self.helper.form_show_errors = False
+        self.helper.layout = Layout(
+            Field(
+                'password',
+                placeholder="Enter your new password...",
+                wrapper_class="mb-0"
+            ),
+            'reset_code',
+            HTML('''
+                {% if form.password.errors %}
+                    <div id="password_response" class="invalid-feedback" style="font-size: 15px">
+                        {{ form.password.errors|first|striptags }}
+                    </div>
+                {% else %}
+                    <div id="password_response" class="valid-feedback" style="font-size: 15px; display: none;">
+                        <strong>Password successfully reset.</strong> You can now login with your new password
+                    </div>
+                {% endif %}
+            '''),
+            Button(
+                "submit",
+                "Reset Password",
+                id="reset-password-form-submit",
+                css_class="btn-primary mt-3",
+                onClick='submitResetPasswordForm()'
+            )
+        )
+
+    def clean(self):
+        super().clean()
+        if 'password' in self.cleaned_data:
+            reset_code = ResetCode.objects.filter(reset_code=self.cleaned_data['reset_code']).first()
+            if not reset_code or reset_code.invalid:
+                self.add_error('password', ValidationError("Invalid reset code"))
+
+            self.cleaned_data['reset_code'] = reset_code
         return self.cleaned_data
