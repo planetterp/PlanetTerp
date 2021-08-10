@@ -1,14 +1,13 @@
 from enum import Enum
 
 from django.contrib.auth.models import AbstractUser
-from django.db.models.deletion import CASCADE
 from django.db.models.functions import Concat
-from django.db.models import Sum
 from django.urls import reverse
 from django.core import validators
 from django.db.models import (Model, CharField, DateTimeField, TextField,
     IntegerField, BooleanField, ForeignKey, PositiveIntegerField, RESTRICT,
-    ManyToManyField, SlugField, TextChoices, FloatField, Manager, QuerySet)
+    CASCADE, ManyToManyField, SlugField, TextChoices, FloatField, Manager,
+    QuerySet, EmailField, Sum)
 
 class GradeQuerySet(QuerySet):
     def average_gpa(self):
