@@ -349,7 +349,7 @@ class ResetPasswordForm(ModelForm):
 
         self.helper = FormHelper()
         self.helper.form_id = "reset-password-form"
-        self.helper.form_class = "w-75"
+        self.helper.form_class = "w-50"
         self.helper.form_show_labels = False
         self.helper.form_show_errors = False
         self.helper.layout = Layout(
