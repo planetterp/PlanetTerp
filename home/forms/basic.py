@@ -215,7 +215,14 @@ class RegisterForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['username'].help_text = None
-        self.fields['email'].label = "Email"
+        email = self.fields['email']
+        email.label = "Email"
+        email.error_messages['unique'] = mark_safe(
+            'A user with this email already exists. If you forgot your <br /> password, '
+            'please <a data-toggle="modal" data-target="#password-reset-modal"> '
+            '<strong>reset your password</strong></a>.'
+        )
+
         self.field_errors = self.create_field_errors()
 
         self.helper = FormHelper()
@@ -256,7 +263,7 @@ class RegisterForm(ModelForm):
             error_html = (
                 f'<div id="{{{{ form.{field}.name }}}}_errors"'
                 ' class="invalid-feedback register-error" style="font-size: 15px">'
-                f' {{{{ form.{field}.errors|first|striptags }}}}</div>'
+                f' {{{{ form.{field}.errors|first }}}}</div>'
             )
             endif = ' {% endif %}'
             field_errors[field] = HTML(if_condition + error_html + endif)

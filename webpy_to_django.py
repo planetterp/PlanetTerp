@@ -1,5 +1,18 @@
+# before running, do the following:
+# * delete any users with stupidly long emails
+# * delete any professor with a negative id
+# * run the following scripts:
+#   - wipe_django.py
+#   - remove_dup_emails.py
+# * change any reviews or professors with a NULL
+#   status to either verified, pending, or rejected
+
+# not necessary but will need to be addressed in the future:
+# * set any professors with duplicate slugs to a null slug (or some other
+#   resolution). My db has a bunch of professors with the slug "test", not put
+#   there by me.
+
 import os
-from django.db import models
 import web
 from django.core.wsgi import get_wsgi_application
 from planetterp.config import USER, PASSWORD
@@ -111,11 +124,15 @@ def migrate_users():
         val = row["send_review_email"]
         return True if val is None else bool(val)
 
+    def _email(row):
+        email = str(row['email'])
+        return None if email.isspace() or email == '' else email
+
     mapping = {
         "send_review_email": _send_review_email,
         "username": "username",
         "password": "password",
-        "email": "email",
+        "email": _email,
         "is_staff": "is_admin"
     }
     return _create_table("users", User, mapping)
@@ -191,12 +208,3 @@ users = migrate_users()
 reviews = migrate_reviews(users, courses, professors)
 grades = migrate_grades(courses, professors)
 geneds = migrate_geneds(courses)
-
-# before running, do the following:
-# * delete any users with stupidly long emails
-# * delete any professor with a negative id
-
-# not necessary but will need to be addressed in the future:
-# * set any professors with duplicate slugs to a null slug (or some other
-#   resolution). My db has a bunch of professors with the slug "test", not put
-#   there by me.
