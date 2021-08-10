@@ -337,4 +337,4 @@ class Admin(View):
                 "your profile settings page</a>."
                 )
 
-            send_email(reviewer_email, f"PlanetTerp Review {'Approved' if verified else 'Rejected'}", message)
+            send_email(reviewer_email, f"Planetterp Review {'Approved' if verified else 'Rejected'}", message)
