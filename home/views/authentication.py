@@ -1,14 +1,13 @@
 import secrets
 from datetime import timedelta
 
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.template.context_processors import csrf
 from crispy_forms.utils import render_crispy_form
 from django.utils.safestring import mark_safe
 from django.shortcuts import redirect, render
 from django.views import View
 from django.contrib.auth import login, logout
-from django.contrib.auth.decorators import login_required
-from django.utils.decorators import method_decorator
 from django.http.response import JsonResponse
 from django.utils.timezone import now
 
@@ -48,9 +47,9 @@ class Login(View):
         return JsonResponse(context)
 
 
-class Logout(View):
+class Logout(LoginRequiredMixin, View):
+    redirect_field_name = "index"
 
-    @method_decorator(login_required)
     def get(self, request):
         logout(request)
         return redirect("/")
