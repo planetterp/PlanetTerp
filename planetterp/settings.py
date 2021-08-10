@@ -15,8 +15,10 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 from pathlib import Path, PurePath
 from planetterp import config
 
-AUTH_USER_MODEL = "home.User"
 
+LOGIN_URL = 'login'
+
+AUTH_USER_MODEL = "home.User"
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
     'home.backend.BcryptBackend'

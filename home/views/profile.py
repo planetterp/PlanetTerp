@@ -1,8 +1,7 @@
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.http.response import HttpResponse, HttpResponseBadRequest, JsonResponse
 from django.shortcuts import render
 from django.views import View
-from django.contrib.auth.decorators import login_required
-from django.utils.decorators import method_decorator
-from django.http.response import HttpResponse, HttpResponseBadRequest, JsonResponse
 from django.contrib.auth import login
 from django.template.context_processors import csrf
 
@@ -12,10 +11,12 @@ from home.tables.reviews_table import ProfileReviewsTable
 from home.forms.basic import ProfileForm
 from planetterp.settings import DATE_FORMAT
 
-class Profile(View):
+# LoginRequiredMixin needs to be first
+#   https://stackoverflow.com/a/47250953
+class Profile(LoginRequiredMixin, View):
     template = "profile.html"
+    redirect_field_name = 'profile'
 
-    @method_decorator(login_required)
     def get(self, request):
         reviews = request.user.review_set.order_by("created_at")
 
@@ -25,7 +26,6 @@ class Profile(View):
         }
         return render(request, self.template, context)
 
-    @method_decorator(login_required)
     def post(self, request):
         user = request.user
         initial = {
