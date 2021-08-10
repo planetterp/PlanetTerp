@@ -2,18 +2,18 @@ from typing import Optional
 
 from django.shortcuts import redirect, render
 from django.views.generic.list import View
-from django.db.models import QuerySet, Q
+from django.db.models import Q
 from django.http import JsonResponse
 from django.template.context_processors import csrf
 
 from crispy_forms.utils import render_crispy_form
 
-from discord_webhook import DiscordWebhook # https://pypi.org/project/discord-webhook/
+# https://pypi.org/project/discord-webhook/
+from discord_webhook import DiscordWebhook
 from discord_webhook.webhook import DiscordEmbed
 
 from home.models import Review, Professor, ProfessorCourse, Grade, User
-from home.mail import send_email
-from home.utils import AdminAction, slug_in_use_err
+from home.utils import AdminAction
 from home.tables.reviews_table import UnverifiedReviewsTable
 from home.tables.basic import ProfessorsTable
 from home.forms.admin_forms import ProfessorMergeForm, ProfessorMergeFormModal, ProfessorSlugForm, ProfessorUpdateForm
@@ -324,17 +324,20 @@ class Admin(View):
 
         return JsonResponse(response)
 
-    def validate_email(self, verified: bool, professor: Professor, user: User):
-        reviewer_email = user.email
-
-        if reviewer_email and user.send_review_email:
+    def validate_email(self, verified_status: Review.Status, professor: Professor, user: User):
+        if user.email and user.send_review_email:
+            status_text = 'Under Review' if verified_status is Review.Status.PENDING else verified_status.value.capitalize()
             message = (
-                f"Your review for <a href=\"https://planetterp.com/professor/{professor.slug}\">{professor.name}"
-                f"</a> has been {'approved' if verified else 'rejected'}.<br />"
+                f'Your review for <a href="https://planetterp.com/professor/{professor.slug}">{professor.name}'
+                f"</a> is now {status_text.lower()}.<br />"
                 "<br /> If you would no longer like to receive review"
-                "verification emails, you can disable them on"
+                "verification emails, you can disable them on "
                 '<a href="https://planetterp.com/profile#settings">'
                 "your profile settings page</a>."
                 )
 
-            send_email(reviewer_email, f"Planetterp Review {'Approved' if verified else 'Rejected'}", message)
+            user.email_user(
+                f"Planetterp Review {status_text}",
+                message,
+                html_message=message
+            )

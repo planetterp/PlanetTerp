@@ -5,9 +5,9 @@ USER = 'root'
 PASSWORD = ''
 SECRET_KEY = 'django-insecure-zt7yxn++)bh)j#wzb)ofgd0^scu9rwr85%=3l%6g1zt(cx!t)_'
 
-email_config = {
-
-}
-email = None
 discord_webhook_help_url = None
 discord_webhook_updates_url = None
+
+** FOR DEVELOPMENT ONLY **
+EMAIL_HOST_USER = "planetterp.test@gmail.com"
+EMAIL_HOST_PASSWORD = "cqgkqrmnagasofuk" # app password

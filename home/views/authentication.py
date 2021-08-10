@@ -1,16 +1,17 @@
 import secrets
-from datetime import datetime, timedelta
+from datetime import timedelta
 
 from django.template.context_processors import csrf
 from crispy_forms.utils import render_crispy_form
+from django.utils.safestring import mark_safe
 from django.shortcuts import redirect, render
 from django.views import View
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.http.response import JsonResponse
+from django.utils.timezone import now
 
-from home.mail import send_email
 from home.models import User, ResetCode
 from home.forms.basic import LoginForm, RegisterForm, ResetPasswordForm
 
@@ -59,7 +60,6 @@ class PasswordReset(View):
     RESET_LINK_LENGTH = 80
 
     def post(self, request):
-        send_email(user_email, "PlanetTerp Password Reset", message)
         form = ResetPasswordForm(data=request.POST)
         ctx = {}
         ctx.update(csrf(request))
@@ -71,16 +71,30 @@ class PasswordReset(View):
 
         if form.is_valid():
             user = form.cleaned_data['user']
-            user_email = form.cleaned_data['email']
 
             # token_hex generates two hex digits per number, so halve our length
             reset_code = secrets.token_hex(int(self.RESET_LINK_LENGTH / 2))
 
-            message = ("A request has been made to reset your password. To do so, please follow this link: <br /><br />" +
-                    f"https://planetterp.com/profile/resetpassword/{reset_code} <br><br>" +
-                    "If you did not request a password reset, you may disregard this email.")
+            message = (
+                f"Dear {user.username},\nA request has been made to reset your password. To do "
+                f"so, please follow this link: \nhttps://planetterp.com/profile/resetpassword/{reset_code}\n\n If you did not "
+                "request a password reset, you may safely disregard this email."
+            )
+            html_message = mark_safe(
+                f"Dear {user.username},<br />A request has been made to reset your password. To do "
+                f'so, please follow <a href="https://planetterp.com/profile/resetpassword/{reset_code}">this</a> link. '
+                "<br /><br /> If you did not request a password reset, you may "
+                "safely disregard this email."
 
-            expires_at = datetime.now() + timedelta(days=1)
+            )
+
+            user.email_user(
+                subject="Planetterp Password Reset",
+                message=message,
+                html_message=html_message
+            )
+
+            expires_at = now() + timedelta(days=1)
             reset_code = ResetCode(user_id=user.id, reset_code=reset_code,
                 expires_at=expires_at)
             # ensure the user only has one reset code active at a time

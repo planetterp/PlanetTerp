@@ -168,3 +168,12 @@ CRISPY_TEMPLATE_PACK = 'bootstrap4'
 # Default CSS framework for django_tables2
 # https://django-tables2.readthedocs.io/en/latest/pages/custom-rendering.html#available-templates
 DJANGO_TABLES2_TEMPLATE = 'django_tables2/bootstrap4.html'
+
+# https://www.geeksforgeeks.org/setup-sending-email-in-django-project/
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_USE_TLS = True
+EMAIL_PORT = 587
+EMAIL_HOST_USER = config.EMAIL_HOST_USER
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+EMAIL_HOST_PASSWORD = config.EMAIL_HOST_PASSWORD

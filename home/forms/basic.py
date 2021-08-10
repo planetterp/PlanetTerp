@@ -288,7 +288,7 @@ class ResetPasswordForm(Form):
                         </div>
                     {% else %}
                         <div id="email_response" class="valid-feedback" style="font-size: 15px; display: none;">
-                            Email sent successfully
+                            <strong>Email sent successfully.</strong> Look for an email from admin@planetterp.com and be sure to check your spam/junk folder if you don't see the email in your inbox.
                         </div>
                     {% endif %}
                 '''),
