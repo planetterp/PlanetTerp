@@ -161,7 +161,7 @@ class LoginForm(ModelForm):
             ),
             Div(
                 Div(
-                    HTML('<a id="forgot-password-btn" data-toggle="modal" data-target="#password-reset-modal" style="color: blue;">Forgot password?</a>')
+                    HTML('<a href="" data-toggle="modal" data-target="#password-reset-modal" style="color: blue;">Forgot password?</a>')
                 ),
                 css_class="pb-2"
             ),
@@ -221,7 +221,7 @@ class RegisterForm(ModelForm):
         email.label = "Email"
         email.error_messages['unique'] = mark_safe(
             'A user with this email already exists. If you forgot your <br /> password, '
-            'please <a data-toggle="modal" data-target="#password-reset-modal"> '
+            'please <a href="" data-toggle="modal" data-target="#password-reset-modal" style="color: red;"> '
             '<strong>reset your password</strong></a>.'
         )
 
