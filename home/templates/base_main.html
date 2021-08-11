@@ -235,10 +235,10 @@
                 $(".anonymous-checkbox > div.form-group").addClass("mb-0");
 
                 initializeRateYo(1.8, "add");
+            });
 
-                if (window.location.href.includes("/professor/")) {
-                    initializeRateYo(3.1, "review");
-                }
+            $("#rateYo_add").on('shown.bs.modal', function() {
+                setRateYoSize("#review-left-wrapper-add", "#rateYo_add");
             });
 
             function changeColorScheme(scheme) {

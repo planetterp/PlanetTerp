@@ -133,6 +133,8 @@
 	var is_admin = {{ user.is_staff|yesno:"true,false" }};
 
 	$(function() {
+		initializeRateYo(3.1, "review");
+
 		$("#review-counter").html(`${num_reviews} review${num_reviews == 1 ? '' : 's'}`);
 
 		if (num_reviews > 0) {
@@ -167,6 +169,7 @@
 		}
 		el.style.animationFillMode = "forwards";
 		is_closed = !is_closed;
+		setRateYoSize("#review-left-wrapper-review", "#rateYo_review");
 	});
 
 	function generateProfessorStats() {

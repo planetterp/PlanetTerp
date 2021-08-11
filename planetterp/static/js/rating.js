@@ -29,7 +29,7 @@ $(window).resize(function() {
 	setRateYoSize("#review-left-wrapper-add", "#rateYo_add");
 
 	if (window.location.href.includes("/professor/")) {
-		setRateYoSize("#review-left-wrapper-review", "rateYo_review");
+		setRateYoSize("#review-left-wrapper-review", "#rateYo_review");
 	}
 });
 
