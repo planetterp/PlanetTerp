@@ -192,15 +192,15 @@ class User(AbstractUser):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        username_field = self._meta.get_field('username')
-        password_field = self._meta.get_field('password')
+        username = self._meta.get_field('username')
+        password = self._meta.get_field('password')
 
-        username_field.validators += [
+        username.validators += [
             validators.MaxLengthValidator(20, "Username must be less than 20 characters"),
             validators.MinLengthValidator(2, "Username must be at least 2 characters")
         ]
 
-        password_field.validators += [
+        password.validators += [
             validators.MinLengthValidator(8, "Password must be at least 8 characters")
         ]
 
