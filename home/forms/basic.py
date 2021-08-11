@@ -18,7 +18,8 @@ class ProfileForm(ModelForm):
     username = CharField(
         required=False,
         disabled=True,
-        label_suffix=None
+        label_suffix=None,
+        help_text=User._meta.get_field("username").help_text
     )
 
     date_joined = DateTimeField(
@@ -181,7 +182,6 @@ class LoginForm(ModelForm):
 
         return field_errors
 
-
     def clean(self):
         super().clean()
 
@@ -220,9 +220,10 @@ class RegisterForm(ModelForm):
         password.error_messages['required'] = User._meta.get_field("password").error_messages['required']
 
         username = self.fields['username']
-        username.help_text = None
+        user_model = User._meta.get_field("username")
+        username.help_text = user_model.help_text
         username.error_messages['unique'] = format_html(unique_error_message, "username")
-        username.error_messages['required'] = User._meta.get_field("username").error_messages['required']
+        username.error_messages['required'] = user_model.error_messages['required']
 
         email = self.fields['email']
         email.label = "Email"

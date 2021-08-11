@@ -195,6 +195,7 @@ class User(AbstractUser):
         username = self._meta.get_field('username')
         password = self._meta.get_field('password')
 
+        username.help_text = "Once a username is set, it cannot be changed."
         username.error_messages['required'] = "You must enter a username"
         username.validators += [
             validators.MaxLengthValidator(20, "Username must be less than 20 characters"),
