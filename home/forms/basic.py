@@ -1,14 +1,14 @@
-from django.core.exceptions import ValidationError
 from django.forms import CharField, DateTimeField, EmailField, PasswordInput
-from django.utils.safestring import mark_safe
-from django.utils.html import format_html
-from django.contrib.auth import authenticate
 from django.forms.widgets import DateInput, HiddenInput
+from django.core.exceptions import ValidationError
+from django.utils.safestring import mark_safe
+from django.contrib.auth import authenticate
+from django.utils.html import format_html
 from django.forms import ModelForm, Form
 
 from crispy_forms.layout import Layout, Div, Field, HTML, Button
-from crispy_forms.helper import FormHelper
 from crispy_forms.bootstrap import PrependedText
+from crispy_forms.helper import FormHelper
 
 from home.forms.layout_objects.bootstrap_modal import BootstrapModal
 from planetterp.settings import DATE_FORMAT
