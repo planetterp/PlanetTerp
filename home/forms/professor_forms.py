@@ -13,6 +13,7 @@ from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Fieldset, Layout, Div, Field, HTML, Button
 from crispy_forms.bootstrap import FormActions, Alert, InlineRadios
 
+from home.forms.layout_objects.bootstrap_modal import BootstrapModal
 from home.models import Review, Professor, Course
 from planetterp import config
 
@@ -328,6 +329,17 @@ class ProfessorFormAdd(ProfessorForm):
         left_side = (name, name_errors, type_,
             type_errors, course, crispy_course_errors)
         return left_side
+
+    def generate_layout(self):
+        layout = Layout(
+            BootstrapModal(
+                super().generate_layout(),
+                css_id="add-professor-modal",
+                title_id="add-professor-label",
+                title="Add a new Professor/TA"
+            )
+        )
+        return layout
 
     def clean(self):
         super().clean()

@@ -194,20 +194,8 @@
             {% endif %}
         </div>
 
-        <div class="modal fade" id="add-professor-modal" tabindex="-1" role="dialog" aria-labelledby="add-modal-label">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h4 class="modal-title" id="add-modal-label">Add a new Professor/TA</h4>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true" style="float: left">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        {% professor_form_add %}
-                    </div>
-                </div>
-            </div>
+        <div id="add-professor-form-container">
+            {% professor_form_add %}
         </div>
 
         <div id="content">
@@ -244,11 +232,9 @@
                     }
                 });
 
-                /* Temporary work-around to remove space under
-                anonymous field in add professor form */
                 $(".anonymous-checkbox > div.form-group").addClass("mb-0");
 
-                initializeRateYo(2.5, "add");  // Located in rating.js
+                initializeRateYo(1.8, "add");
 
                 if (window.location.href.includes("/professor/")) {
                     initializeRateYo(3.1, "review");
