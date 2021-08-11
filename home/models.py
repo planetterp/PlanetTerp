@@ -217,7 +217,7 @@ class AuditLog(Model):
 
 
 class Discussion(Model):
-    author = ForeignKey(User, RESTRICT)
+    author = ForeignKey(User, CASCADE)
     title = CharField(max_length=200)
     num_views = PositiveIntegerField(default=0)
     content = TextField()
@@ -279,8 +279,8 @@ class Review(Model):
 
     professor = ForeignKey(Professor, CASCADE)
     course = ForeignKey(Course, RESTRICT, null=True, blank=True)
-    user = ForeignKey(User, RESTRICT, null=True, blank=True)
-    updater = ForeignKey(User, RESTRICT, null=True, blank=True, related_name="updater")
+    user = ForeignKey(User, CASCADE, null=True, blank=True)
+    updater = ForeignKey(User, CASCADE, null=True, blank=True, related_name="updater")
     content = TextField()
     rating = IntegerField()
     grade = CharField(max_length=2, null=True, blank=True)
@@ -329,7 +329,7 @@ class Grade(Model):
         )
 
 class GroupmeUser(Model):
-    user = ForeignKey(User, RESTRICT)
+    user = ForeignKey(User, CASCADE)
     groups = ManyToManyField("GroupmeGroup")
     access_token = CharField(max_length=100)
     groupme_username = CharField(max_length=100)
@@ -368,7 +368,7 @@ class ProfessorCourse(Model):
 
 
 class DiscussionReply(Model):
-    user = ForeignKey(User, RESTRICT)
+    user = ForeignKey(User, CASCADE)
     discussion = ForeignKey(Discussion, RESTRICT)
     content = TextField()
     created_at = DateTimeField(auto_now_add=True)
@@ -378,7 +378,7 @@ class DiscussionReply(Model):
 
 
 class ResetCode(Model):
-    user = ForeignKey(User, RESTRICT)
+    user = ForeignKey(User, CASCADE)
     reset_code = CharField(max_length=100)
     expires_at = DateTimeField()
     invalid = BooleanField(default=False)
@@ -399,7 +399,7 @@ class SectionMeeting(Model):
 
 
 class UserSchedule(Model):
-    user = ForeignKey(User, RESTRICT)
+    user = ForeignKey(User, CASCADE)
     section = ForeignKey(Section, RESTRICT)
     active = BooleanField(default=True)
     semester = CharField(max_length=6)
