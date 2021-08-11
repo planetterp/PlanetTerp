@@ -1,6 +1,7 @@
 from django.core.exceptions import ValidationError
 from django.forms import CharField, DateTimeField, EmailField, PasswordInput
 from django.utils.safestring import mark_safe
+from django.utils.html import format_html
 from django.contrib.auth import authenticate
 from django.forms.widgets import DateInput, HiddenInput
 from django.forms import ModelForm, Form
@@ -80,14 +81,12 @@ class ProfileForm(ModelForm):
             send_review_email = None
             send_review_email_errors = None
 
-        info_icon_html = mark_safe('<i id="profile-page-info" class="fas fa-info-circle"></i>')
-
         layout = Layout(
             'username',
             'date_joined',
             PrependedText(
                 'email',
-                info_icon_html,
+                mark_safe('<i id="email-field-info" class="fas fa-info-circle"></i>'),
                 placeholder=email_placeholder
             ),
             self.field_errors['email'],
@@ -204,14 +203,19 @@ class RegisterForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['password'].widget = PasswordInput()
-        self.fields['username'].help_text = None
+
+        unique_error_message = (
+            'A user with that {} already exists. If you forgot your <br /> password, '
+            'please <a href="" data-toggle="modal" data-target="#password-reset-modal" style="color: red;"> '
+            '<strong>reset your password</strong></a> or login on the left.'
+        )
+        username = self.fields['username']
+        username.help_text = None
+        username.error_messages['unique'] = format_html(unique_error_message, "username")
+
         email = self.fields['email']
         email.label = "Email"
-        email.error_messages['unique'] = mark_safe(
-            'A user with this email already exists. If you forgot your <br /> password, '
-            'please <a href="" data-toggle="modal" data-target="#password-reset-modal" style="color: red;"> '
-            '<strong>reset your password</strong></a>.'
-        )
+        email.error_messages['unique'] = format_html(unique_error_message, "email")
 
         self.field_errors = self.create_field_errors()
 
