@@ -17,6 +17,7 @@ function initializeRateYo(multiplier, form_type, show_error_styles) {
 	$(instance_id).on("rateyo.set", function(e, data) {
 		var rating = data.rating;
 		$(rating_field_id).val(rating);
+		$(instance_id).rateYo("option", "normalFill", "#808080");
 	});
 
 	if ($(rating_field_id).val() != '') {
