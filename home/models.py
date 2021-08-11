@@ -167,7 +167,6 @@ class Section(Model):
     def __str__(self):
         return f"{self.course} ({self.section_number}) taught by {self.professors}"
 
-# TODO replace login/permission decorators with appropriate mixins
 class User(AbstractUser):
     send_review_email = BooleanField(default=True)
     email = EmailField(
