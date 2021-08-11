@@ -1,6 +1,7 @@
 from enum import Enum
 
 from django.contrib.auth.models import AbstractUser
+from django.utils.safestring import mark_safe
 from django.db.models.functions import Concat
 from django.urls import reverse
 from django.core import validators
@@ -174,7 +175,19 @@ class User(AbstractUser):
         default=None,
         unique=True,
         validators=[validators.validate_email],
-        error_messages={"unique": "A user with this email already exists."}
+        error_messages={"unique": "A user with this email already exists."},
+        help_text=mark_safe(
+            'Once an email is set, it cannot be changed. '
+            '<span id="email_hint_text" style="display: none;">'
+            '<br /><br /> Planetterp will only send you emails when a review of '
+            'yours is approved, rejected, or unverified. You can opt out of this '
+            'in your account settings at any time. <br /><br /> Your email and '
+            'any other personal data on our site is kept confidential and isn\'t '
+            'shared with anyone else. If you have any questions about how '
+            'Planetterp handles your data, please email '
+            '<a href="mailto:admin@planetterp.com">admin@planetterp.com</a>'
+            '</span>'
+        )
     )
 
     def __init__(self, *args, **kwargs):

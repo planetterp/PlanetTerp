@@ -35,17 +35,6 @@ class ProfileForm(ModelForm):
         super().__init__(*args, **kwargs)
         self.user = kwargs.get("instance")
 
-        self.fields['email'].help_text =  mark_safe(
-            '<span id="email_hint_text" style="display: none;">'
-            'Planetterp will only send you emails when a review of yours is'
-            ' approved, rejected, or unverified. Your email and any other'
-            ' personal data on our site is kept confidential and isn\'t shared'
-            ' with anyone else. If you have any questions about how Planetterp'
-            ' handles your data, please email'
-            ' <a href="mailto:admin@planetterp.com">admin@planetterp.com</a>'
-            '</span>'
-        )
-
         if self.user.email:
             self.fields['email'].disabled = True
             self.fields['send_review_email'].label = (
