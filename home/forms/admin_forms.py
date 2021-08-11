@@ -630,7 +630,7 @@ class ProfessorMergeFormModal(ProfessorMergeForm):
                 super().generate_layout(),
                 css_id="merge-professor-modal",
                 title_id="merge-professor-label",
-                title=f'Search for a professor/TA to merge with'
+                title='Search for a professor/TA to merge with'
             )
         )
         return layout
