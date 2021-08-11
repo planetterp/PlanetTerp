@@ -66,7 +66,6 @@ class ProfileForm(ModelForm):
 
         return field_errors
 
-
     def generate_layout(self):
         if self.user.email:
             email_placeholder = None
@@ -125,8 +124,15 @@ class LoginForm(ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+        password = self.fields['password']
+        password.widget = PasswordInput()
+        password.error_messages['required'] = User._meta.get_field("password").error_messages['required']
+
+        username = self.fields['username']
+        username.error_messages['required'] = User._meta.get_field("username").error_messages['required']
+
         self.field_errors = self.create_field_errors()
-        self.fields['password'].widget = PasswordInput()
 
         self.helper = FormHelper()
         self.helper.form_id = "login-form"
@@ -201,16 +207,21 @@ class RegisterForm(ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['password'].widget = PasswordInput()
 
         unique_error_message = (
             'A user with that {} already exists. If you forgot your <br /> password, '
             'please <a href="" data-toggle="modal" data-target="#password-reset-modal" style="color: red;"> '
             '<strong>reset your password</strong></a> or login on the left.'
         )
+
+        password = self.fields['password']
+        password.widget = PasswordInput()
+        password.error_messages['required'] = User._meta.get_field("password").error_messages['required']
+
         username = self.fields['username']
         username.help_text = None
         username.error_messages['unique'] = format_html(unique_error_message, "username")
+        username.error_messages['required'] = User._meta.get_field("username").error_messages['required']
 
         email = self.fields['email']
         email.label = "Email"

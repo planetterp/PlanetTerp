@@ -195,11 +195,13 @@ class User(AbstractUser):
         username = self._meta.get_field('username')
         password = self._meta.get_field('password')
 
+        username.error_messages['required'] = "You must enter a username"
         username.validators += [
             validators.MaxLengthValidator(20, "Username must be less than 20 characters"),
             validators.MinLengthValidator(2, "Username must be at least 2 characters")
         ]
 
+        password.error_messages['required'] = "You must enter a password"
         password.validators += [
             validators.MinLengthValidator(8, "Password must be at least 8 characters")
         ]
