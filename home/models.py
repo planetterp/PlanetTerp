@@ -172,6 +172,7 @@ class User(AbstractUser):
     send_review_email = BooleanField(default=True)
     email = EmailField(
         null=True,
+        blank=True,
         default=None,
         unique=True,
         validators=[validators.validate_email],
