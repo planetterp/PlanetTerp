@@ -65,7 +65,7 @@ class ProfessorForm(Form):
 
         self.helper = FormHelper()
         self.helper.form_id = self.form_html_id
-        self.helper.layout = self.create_form_layout()
+        self.helper.layout = self.generate_layout()
         # we create custom form errors, don't let crispy handle errors
         self.helper.form_show_errors = False
 
@@ -77,7 +77,7 @@ class ProfessorForm(Form):
     def get_content_styles(self):
         pass
 
-    def create_form_layout(self):
+    def generate_layout(self):
         # Ordering the fields/elements and assigning css styles
         # https://django-crispy-forms.readthedocs.io/en/latest/layouts.html#universal-layout-objects
         submit_button = Button(
