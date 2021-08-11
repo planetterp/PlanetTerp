@@ -51,6 +51,7 @@ class Profile(LoginRequiredMixin, View):
             if form.is_valid():
                 form.save()
                 context["success"] = True
+                context['message'] = "Settings updated successfully"
                 form = ProfileForm(instance=request.user)
         else:
             context["message"] = "Nothing to update"

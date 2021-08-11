@@ -102,12 +102,11 @@ class ProfileForm(ModelForm):
                             onClick="updateProfile()"
                         ),
                         Div(
-                            HTML("Profile updated successfully"),
                             css_id="profile-form-success",
                             css_class="col text-success text-center d-none",
                             style="font-size: 20px"
                         ),
-                        css_class="col-6 pl-0 d-flex"
+                        css_class="col-10 pl-0 d-flex"
                     ),
                     css_class="row"
                 ),
@@ -224,7 +223,6 @@ class RegisterForm(ModelForm):
         self.helper.form_show_errors = False
         self.helper.field_class = 'w-75'
         self.helper.label_class = 'mt-2'
-
         self.helper.layout = Layout(
             Div(
                 Field('username', placeholder="Username", wrapper_class='mb-0'),
@@ -232,7 +230,12 @@ class RegisterForm(ModelForm):
                 css_class="username-container mb-1"
             ),
             Div(
-                Field('email', placeholder="Email (optional)", wrapper_class='mb-0'),
+                PrependedText(
+                    'email',
+                    mark_safe('<i id="email-field-info" class="fas fa-info-circle"></i>'),
+                    placeholder="Email (optional)",
+                    wrapper_class='mb-0'
+                ),
                 self.field_errors['email'],
                 css_class="email-container mb-1"
             ),
@@ -244,7 +247,7 @@ class RegisterForm(ModelForm):
             Button(
                 'submit',
                 'Register',
-                css_class="btn-primary",
+                css_class="btn-primary mt-2",
                 onClick='submitRegisterForm()'
             )
         )

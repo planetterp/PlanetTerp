@@ -27,7 +27,23 @@
 		</div>
 	</div>
 </div>
+
 <script>
+	$(function(){
+		bindEvents();
+	});
+
+	function bindEvents() {
+		$("#email-field-info").parent().on('click', function() {
+			$("#email_hint_text").toggle();
+		});
+
+		$("#email-field-info").parent().hover(function() {
+			$(this).toggleClass('email-field-info-bg');
+		});
+	}
+
+
 	function submitLoginForm() {
 		$.ajax({
 			type: "POST",
@@ -55,6 +71,7 @@
 				} else {
 					$("#register-form-container").html(data['register_form']);
 					$("div.register-error").show();
+					bindEvents();
 				}
 			}
 		});

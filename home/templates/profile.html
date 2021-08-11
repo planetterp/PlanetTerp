@@ -61,14 +61,7 @@
 
 <script>
 	$(function() {
-		$("#profile-page-info").parent().click(function() {
-			$("#email_hint_text").toggle();
-		});
-
-		$("#profile-page-info").parent().hover(function() {
-			$(this).toggleClass('profile-form-info');
-		});
-
+		bindEvents();
 		var hash = window.location.hash;
 		// when we change `window.location.hash`, if there is an element with id equal to that hash,
 		// the browser will scroll to it automatically. We don't want this so we need to have our
@@ -85,6 +78,16 @@
 		window.location.hash = e.target.hash.replace("-noscroll", "");
 	});
 
+	function bindEvents() {
+		$("#email-field-info").parent().on('click', function() {
+			$("#email_hint_text").toggle();
+		});
+
+		$("#email-field-info").parent().hover(function() {
+			$(this).toggleClass('email-field-info-bg');
+		});
+	}
+
 	function updateProfile() {
 		$.ajax({
 			type: "POST",
@@ -92,14 +95,12 @@
 			data: $("#profile-form").serialize(),
 			success: function(data) {
 				if (data["success"]) {
-					if (data["message"]) {
-						$("#profile-form-success").html(data["message"]);
-					} else {
-						location.reload();
-					}
+					$("#profile-form-success").html(data["message"]);
+					$("#profile-form-success").removeClass('d-none');
 				} else {
 					$("#profile-form").html(data['form']);
 					$("#profile-form div.invalid-feedback").show();
+					bindEvents();
 				}
 			}
 		});
