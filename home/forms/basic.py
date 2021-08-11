@@ -58,7 +58,7 @@ class ProfileForm(ModelForm):
             if_condition = f'{{% if form.{field}.errors %}} '
             error_html = (
                 f'<div id="{{{{ form.{field}.name }}}}_errors"'
-                ' class="invalid-feedback text-center" style="font-size: 15px">'
+                ' class="invalid-feedback" style="font-size: 15px">'
                 f' {{{{ form.{field}.errors|striptags }}}}</div>'
             )
             endif = ' {% endif %}'
@@ -86,7 +86,8 @@ class ProfileForm(ModelForm):
             PrependedText(
                 'email',
                 mark_safe('<i id="email-field-info" class="fas fa-info-circle"></i>'),
-                placeholder=email_placeholder
+                placeholder=email_placeholder,
+                wrapper_class="mb-0"
             ),
             self.field_errors['email'],
             send_review_email,
@@ -97,7 +98,7 @@ class ProfileForm(ModelForm):
                         Button(
                             'save',
                             'Save',
-                            css_class="btn-primary",
+                            css_class="btn-primary mt-3",
                             onClick="updateProfile()"
                         ),
                         Div(
