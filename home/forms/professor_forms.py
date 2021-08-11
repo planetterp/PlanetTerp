@@ -181,21 +181,23 @@ class ProfessorForm(Form):
     def send_webhook(self):
         channel_url = config.discord_webhook_updates_url
 
-        if channel_url is not None:
-            webhook = DiscordWebhook(url=channel_url)
+        if channel_url is None:
+            return
 
-            if self.form_type is Review.ReviewType.REVIEW:
-                num = Review.objects.pending.count()
-            elif self.form_type is Review.ReviewType.ADD:
-                num = Professor.objects.pending.count()
-            else:
-                raise ValueError("Invalid form type!")
+        webhook = DiscordWebhook(url=channel_url)
 
-            title = f"{num} new {'review' if num == 1 else 'reviews'}"
-            embed = DiscordEmbed(title=title,
-                url="https://planetterp.com/admin")
-            webhook.add_embed(embed)
-            webhook.execute()
+        if self.form_type is Review.ReviewType.REVIEW:
+            num = Review.objects.pending.count()
+        elif self.form_type is Review.ReviewType.ADD:
+            num = Professor.objects.pending.count()
+        else:
+            raise ValueError("Invalid form type!")
+
+        title = f"{num} new {'review' if num == 1 else 'reviews'}"
+        embed = DiscordEmbed(title=title,
+            url="https://planetterp.com/admin")
+        webhook.add_embed(embed)
+        webhook.execute()
 
 # The review form that contains fields specific to the review form
 class ProfessorFormReview(ProfessorForm):
