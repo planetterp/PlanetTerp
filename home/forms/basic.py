@@ -312,6 +312,7 @@ class ForgotPasswordForm(Form):
                 title="Reset Password"
             )
         )
+
     def clean(self):
         super().clean()
         if 'email' in self.cleaned_data:
@@ -321,7 +322,7 @@ class ForgotPasswordForm(Form):
                 message = "There is no account assoicated with that email"
                 self.add_error('email', ValidationError(message, "DNE"))
             elif users.count() > 1:
-                message = (
+                message = mark_safe(
                     "There are multiple accounts associated with this email."
                     "Please copy this message and email it along with your username to "
                     "<a href='mailto:admin@planetterp.com'>admin@planetterp.com</a>"
