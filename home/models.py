@@ -168,7 +168,6 @@ class Section(Model):
         return f"{self.course} ({self.section_number}) taught by {self.professors}"
 
 class User(AbstractUser):
-    email_changed = BooleanField(default=False)
     send_review_email = BooleanField(default=True)
     email = EmailField(
         null=True,
