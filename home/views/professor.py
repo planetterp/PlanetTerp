@@ -35,7 +35,9 @@ class Professor(View):
 
         reviews_table = VerifiedReviewsTable(reviews, request)
 
-        average_rating = reviews.aggregate(average_rating=Sum("rating") / Count("rating"))["average_rating"]
+        sum, num = reviews.aggregate(sum=Sum("rating"), num=Count("rating")).values()
+        average_rating = 0 if not (sum or num) else float(sum)/num
+
         courses_taught = Course.objects.filter(professors__pk=professor.pk)
 
         courses_reviewed = []
