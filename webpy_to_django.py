@@ -1,10 +1,11 @@
-# before running, do the following:
-# * delete any users with stupidly long emails
+# This script can be run on its own but `db_setup.py full` will perform a full
+# db migration. If you decide to run this script alone, do the following before:
+# * delete any users with stupidly long emails (or set their email to NULL)
 # * delete any professor with a negative id
-# * run the following scripts:
-#   - wipe_django.py
-# * change any reviews or professors with a NULL
-#   status to either verified, pending, or rejected
+# * ensure all blank emails are set to NULL
+# * run wipe_django.py
+# * change any reviews or professors with a NULL status to either verified,
+#   pending, or rejected
 
 # not necessary but will need to be addressed in the future:
 # * set any professors with duplicate slugs to a null slug (or some other

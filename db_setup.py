@@ -1,6 +1,11 @@
 # This is an all-in-one script to get your db up and running. It assumes you
 #   already have data in your webpy tables to be migrated to the django tables.
 # * Export your db to have a backup before running.
+#
+# Use the command-line arg "full" to perform a complete migration from
+#   web.py to django.
+# Use without any command-line args to update your django db (do this if you've
+#   already migrated your db from web.py and only need to update the user model)
 
 import os
 import sys

@@ -1,3 +1,5 @@
+# You can exectue `db_setup.py full` to completely migrate your db to django
+
 import os
 import web
 from planetterp.config import USER, PASSWORD
