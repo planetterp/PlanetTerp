@@ -96,24 +96,18 @@ class ProfileForm(ModelForm):
             send_review_email,
             send_review_email_errors,
             Div(
-                Div(
-                    Div(
-                        Button(
-                            'save',
-                            'Save',
-                            css_class="btn-primary mt-3",
-                            onClick="updateProfile()"
-                        ),
-                        Div(
-                            css_id="profile-form-success",
-                            css_class="col text-success text-center d-none",
-                            style="font-size: 20px"
-                        ),
-                        css_class="col-10 pl-0 d-flex"
-                    ),
-                    css_class="row"
+                Button(
+                    'save',
+                    'Save',
+                    css_class="btn-primary",
+                    onClick="updateProfile()"
                 ),
-                css_class="container"
+                Div(
+                    css_id="profile-form-success",
+                    css_class="col text-success text-center d-none",
+                    style="font-size: 20px"
+                ),
+                css_class="mt-3"
             )
         )
 

@@ -96,7 +96,7 @@
 			success: function(data) {
 				if (data["success"]) {
 					$("#profile-form-success").html(data["message"]);
-					$("#profile-form-success").removeClass('d-none');
+					$("#profile-form-success").removeClass('d-none').addClass('d-inline');
 				} else {
 					$("#profile-form").html(data['form']);
 					$("#profile-form div.invalid-feedback").show();
