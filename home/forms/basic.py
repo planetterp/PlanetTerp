@@ -223,7 +223,25 @@ class RegisterForm(ModelForm):
         self.helper.form_show_errors = False
         self.helper.field_class = 'w-75'
         self.helper.label_class = 'mt-2'
-        self.helper.layout = Layout(
+        self.helper.layout = self.generate_layout()
+
+    def create_field_errors(self):
+        field_errors = {}
+
+        for field in self.fields:
+            if_condition = f'{{% if form.{field}.errors %}} '
+            error_html = (
+                f'<div id="{{{{ form.{field}.name }}}}_errors"'
+                ' class="invalid-feedback register-error" style="font-size: 15px">'
+                f' {{{{ form.{field}.errors|first }}}}</div>'
+            )
+            endif = ' {% endif %}'
+            field_errors[field] = HTML(if_condition + error_html + endif)
+
+        return field_errors
+
+    def generate_layout(self):
+        return Layout(
             Div(
                 Field('username', placeholder="Username", wrapper_class='mb-0'),
                 self.field_errors['username'],
@@ -251,21 +269,6 @@ class RegisterForm(ModelForm):
                 onClick='submitRegisterForm()'
             )
         )
-
-    def create_field_errors(self):
-        field_errors = {}
-
-        for field in self.fields:
-            if_condition = f'{{% if form.{field}.errors %}} '
-            error_html = (
-                f'<div id="{{{{ form.{field}.name }}}}_errors"'
-                ' class="invalid-feedback register-error" style="font-size: 15px">'
-                f' {{{{ form.{field}.errors|first }}}}</div>'
-            )
-            endif = ' {% endif %}'
-            field_errors[field] = HTML(if_condition + error_html + endif)
-
-        return field_errors
 
 # Form on login page prompting the user to input an email
 class ForgotPasswordForm(Form):
