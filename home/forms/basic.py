@@ -3,7 +3,6 @@ from django.forms.widgets import DateInput, HiddenInput
 from django.core.exceptions import ValidationError
 from django.utils.safestring import mark_safe
 from django.contrib.auth import authenticate
-from django.utils.html import format_html
 from django.forms import ModelForm, Form
 
 from crispy_forms.layout import Layout, Div, Field, HTML, Button
@@ -11,7 +10,6 @@ from crispy_forms.bootstrap import PrependedText
 from crispy_forms.helper import FormHelper
 
 from home.forms.layout_objects.bootstrap_modal import BootstrapModal
-from home.validators import validate_unique_email
 from planetterp.settings import DATE_FORMAT
 from home.models import User, ResetCode
 
@@ -37,15 +35,16 @@ class ProfileForm(ModelForm):
         super().__init__(*args, **kwargs)
         self.user = kwargs.get("instance")
         self.fields['username'].help_text = User._meta.get_field("username").help_text
+        email = self.fields['email']
 
         if self.user.email:
-            self.fields['email'].disabled = True
+            email.disabled = True
             self.fields['send_review_email'].label = (
                 "Email me updates pertaining to the status of my reviews"
             )
         else:
             self.fields.pop("send_review_email")
-            self.fields['email'].validators = User._meta.get_field("email").validators + [validate_unique_email]
+            email.error_messages['unique'] = User.error_message_unique(self.user, "email", include_anchor=False)
 
         self.field_errors = self.create_field_errors()
         self.helper = FormHelper()
@@ -205,12 +204,6 @@ class RegisterForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        unique_error_message = (
-            'A user with that {} already exists. If you forgot your <br /> password, '
-            'please <a href="" data-toggle="modal" data-target="#password-reset-modal" style="color: red;"> '
-            '<strong>reset your password</strong></a> or login on the left.'
-        )
-
         password = self.fields['password']
         password.widget = PasswordInput()
         password.error_messages['required'] = User._meta.get_field("password").error_messages['required']
@@ -218,14 +211,10 @@ class RegisterForm(ModelForm):
         username = self.fields['username']
         user_model = User._meta.get_field("username")
         username.help_text = user_model.help_text
-        username.error_messages['unique'] = format_html(unique_error_message, "username")
         username.error_messages['required'] = user_model.error_messages['required']
 
         email = self.fields['email']
-        email.validators = User._meta.get_field("email").validators + [validate_unique_email]
         email.label = "Email"
-        if self.has_error('email', code="email_exists"):
-            self.errors['email'] = [format_html(unique_error_message, "email")]
 
         self.field_errors = self.create_field_errors()
 
