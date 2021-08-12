@@ -1,16 +1,16 @@
-from django.shortcuts import render
 from django.views import View
-from django.http import HttpResponse
+from django.shortcuts import render
 from django.db.models import Sum, Count
-from django.http import JsonResponse
+from django.http import HttpResponse, JsonResponse
 from django.template.context_processors import csrf
+
 from crispy_forms.utils import render_crispy_form
 
+from home.utils import send_updates_webhook
 from home.forms.professor_forms import ProfessorFormReview
-from home.forms.admin_forms import ProfessorUpdateForm, ProfessorUnverifyForm, ProfessorMergeFormModal
 from home.models import Professor as ProfessorModel, Review, Course, Grade
 from home.tables.reviews_table import VerifiedReviewsTable
-from home.utils import send_updates_webhook
+from home.forms.admin_forms import ProfessorUpdateForm, ProfessorUnverifyForm, ProfessorMergeFormModal
 
 
 class Professor(View):

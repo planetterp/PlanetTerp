@@ -3,7 +3,6 @@ from django.shortcuts import redirect, render
 from django.views import View
 from django.views.generic import TemplateView, RedirectView, ListView
 from django.http import HttpResponse
-from django.core.serializers import serialize
 
 from home.models import Organization, Professor, Course, Review, Grade
 from home.tables.reviews_table import VerifiedReviewsTable
