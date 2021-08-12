@@ -95,13 +95,12 @@
 		$("#main-search").autocomplete({
 			minLength: 3,
 			source: function(request, response) {
-				$.get("{% url 'autocomplete' %}", {"query": request.term, "types[]": ["professor", "course"]}, function(data) {
+				$.get("{% url 'autocomplete' %}", {"query": request.term, "types[]": ["professor", "course"], "return_attrs[]": ["url"]}, function(data) {
 					response(data);
 				});
 			},
 			select: function(event, ui) {
-				var location = ui.item.value;
-				window.location.href = location;
+				window.location = ui.item.result.url;
 				return false;
 			}
 		});
