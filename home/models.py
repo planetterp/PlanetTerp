@@ -170,6 +170,7 @@ class Section(Model):
 class User(AbstractUser):
     send_review_email = BooleanField(default=True)
     email = EmailField(
+        unique=True,
         null=True,
         blank=True,
         validators=[validators.validate_email],
@@ -203,6 +204,14 @@ class User(AbstractUser):
         password.validators += [
             validators.MinLengthValidator(8, "Password must be at least 8 characters")
         ]
+
+    # Workaround to force CharField to store empty values as NULL instead of ''
+    # https://stackoverflow.com/a/38621160
+    def save(self, *args, **kwargs):
+        if not self.email or self.email.strip() == '':
+            self.email = None
+
+        super().save(*args, **kwargs)
 
 
 class AuditLog(Model):
