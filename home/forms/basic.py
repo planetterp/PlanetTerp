@@ -19,8 +19,7 @@ class ProfileForm(ModelForm):
     username = CharField(
         required=False,
         disabled=True,
-        label_suffix=None,
-        help_text=User._meta.get_field("username").help_text
+        label_suffix=None
     )
 
     date_joined = DateTimeField(
@@ -37,6 +36,7 @@ class ProfileForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.user = kwargs.get("instance")
+        self.fields['username'].help_text = User._meta.get_field("username").help_text
 
         if self.user.email:
             self.fields['email'].disabled = True
