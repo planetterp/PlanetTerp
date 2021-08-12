@@ -11,6 +11,7 @@ from crispy_forms.bootstrap import PrependedText
 from crispy_forms.helper import FormHelper
 
 from home.forms.layout_objects.bootstrap_modal import BootstrapModal
+from home.validators import validate_unique_email
 from planetterp.settings import DATE_FORMAT
 from home.models import User, ResetCode
 
@@ -44,6 +45,7 @@ class ProfileForm(ModelForm):
             )
         else:
             self.fields.pop("send_review_email")
+            self.fields['email'].validators = User._meta.get_field("email").validators + [validate_unique_email]
 
         self.field_errors = self.create_field_errors()
         self.helper = FormHelper()
@@ -226,8 +228,10 @@ class RegisterForm(ModelForm):
         username.error_messages['required'] = user_model.error_messages['required']
 
         email = self.fields['email']
+        email.validators = User._meta.get_field("email").validators + [validate_unique_email]
         email.label = "Email"
-        email.error_messages['unique'] = format_html(unique_error_message, "email")
+        if self.has_error('email', code="email_exists"):
+            self.errors['email'] = [format_html(unique_error_message, "email")]
 
         self.field_errors = self.create_field_errors()
 

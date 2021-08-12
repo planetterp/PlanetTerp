@@ -168,14 +168,12 @@ class Section(Model):
         return f"{self.course} ({self.section_number}) taught by {self.professors}"
 
 class User(AbstractUser):
+    email_changed = BooleanField(default=False)
     send_review_email = BooleanField(default=True)
     email = EmailField(
         null=True,
         blank=True,
-        default=None,
-        unique=True,
         validators=[validators.validate_email],
-        error_messages={"unique": "A user with this email already exists."},
         help_text=mark_safe(
             'Once an email is set, it cannot be changed. '
             '<span id="email_hint_text" style="display: none;">'
