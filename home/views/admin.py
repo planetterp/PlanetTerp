@@ -337,7 +337,7 @@ class Admin(View):
                 )
 
             user.email_user(
-                f"Planetterp Review {status_text}",
+                f"PlanetTerp Review {status_text}",
                 message,
                 html_message=message
             )
