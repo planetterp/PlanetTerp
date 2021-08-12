@@ -72,12 +72,14 @@
 					{% else %}
 						&#8220;{{ review.content }}&#8221;
 					{% endif %}
-					<footer class="blockquote-footer"><span>
-						{% if not review.anonymous or user and user.is_staff %}
-							{{ review.user.username }}
-						{% else %}
-							Anonymous
-						{% endif %}</span>
+					<footer class="blockquote-footer">
+						<em>
+							{% if not review.anonymous or user and user.is_staff %}
+								{{ review.user.username }}
+							{% else %}
+								Anonymous
+							{% endif %}
+						</em>
 					</footer>
 				</blockquote>
 			{% endfor %}
