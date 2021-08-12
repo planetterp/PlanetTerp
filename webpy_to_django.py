@@ -3,7 +3,6 @@
 # * delete any professor with a negative id
 # * run the following scripts:
 #   - wipe_django.py
-#   - remove_dup_emails.py
 # * change any reviews or professors with a NULL
 #   status to either verified, pending, or rejected
 
@@ -124,16 +123,13 @@ def migrate_users():
         val = row["send_review_email"]
         return True if val is None else bool(val)
 
-    def _email(row):
-        email = str(row['email'])
-        return None if email.isspace() or email == '' else email
-
     mapping = {
         "send_review_email": _send_review_email,
         "username": "username",
         "password": "password",
-        "email": _email,
-        "is_staff": "is_admin"
+        "email": "email",
+        "is_staff": "is_admin",
+        "email_changed": "email_changed"
     }
     return _create_table("users", User, mapping)
 
