@@ -1,28 +1,40 @@
-<div class="text-center">
-    <strong id="average-gpa-text"></strong>
+<div class="container">
+    <div class="row text-center">
+        <div class="col">
+            <strong id="average-gpa-text"></strong>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <div class="custom-control custom-checkbox">
+                <input class="custom-control-input" type="checkbox" id="exclude-spring-2020-checkbox">
+                <label class="custom-control-label" for="exclude-spring-2020-checkbox" id="exclude-spring-2020">exclude spring 2020</label>
+            </div>
+        </div>
+        {% if lookup_by_courses %}
+            <div class="col">
+                <select id="grades-by-course" class="custom-select custom-select-sm w-auto">
+                    <option value="All courses" selected>All courses</option>
+                    {% for course in lookup_by_courses %}
+                        <option value="{{ course }}">{{ course }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        {% endif %}
+    </div>
+
+    <div class="row">
+        <div class="col">
+            <canvas id="grades" width="500px" height="400px"></canvas>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col">
+            <small>* "W"s are considered to be 0.0 quality points. "Other" grades are not factored into GPA calculation. Grade data not guarenteed to be correct.</small>
+        </div>
+    </div>
 </div>
-
-<span style="float: left;" id="only-spring-2020-notice"></span>
-<label style="float: left;" id="exclude-spring-2020">
-    exclude spring 2020
-    <input type="checkbox" id="exclude-spring-2020-checkbox" checked>
-</label>
-
-{% if lookup_by_courses %}
-    <span style="float: right;">
-        <label for="grades-by-course">Lookup by course:</label>
-        <select id="grades-by-course">
-            <option value="All courses">All courses</option>
-            {% for course in lookup_by_courses %}
-                <option value="{{ course }}">{{ course }}</option>
-            {% endfor %}
-        </select>
-    </span>
-{% endif %}
-
-<canvas id="grades" width="500px" height="400px"></canvas>
-
-<small>* "W"s are considered to be 0.0 quality points. "Other" grades are not factored into GPA calculation.</small><br />
 
 <script type="text/javascript">
     const graph = $("#grades")[0].getContext("2d");
@@ -128,7 +140,7 @@
             var average_gpa = grade_data.average_gpa ?? 0;
             var num_students = grade_data.num_students ?? 0;
 
-            $("#average-gpa-text").text(`Average GPA: ${average_gpa.toFixed(2)} between ${num_students.toLocaleString()} students*`);
+            $("#average-gpa-text").html(`Average GPA of ${average_gpa.toFixed(2)} between ${num_students.toLocaleString()} students*`);
             chart.data.datasets[0].data = grade_data.data_minus
             chart.data.datasets[1].data = grade_data.data_flat
             chart.data.datasets[2].data = grade_data.data_plus

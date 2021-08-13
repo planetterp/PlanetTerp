@@ -255,10 +255,6 @@ body {
 	color: #00d82f;
 }
 
-#homepage-support {
-	right: 60px;
-}
-
 #information-container .row {
 	width: 100%;
 	margin: 0 auto;
@@ -456,11 +452,6 @@ div#toggle-btn button {
 
 @media (max-width: 800px) {
 	/* Begin homepage */
-
-	#homepage-support {
-		order: 2;
-		right: 0px;
-	}
 
 	#homepage-stats {
 		order: 1;

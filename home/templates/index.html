@@ -1,5 +1,6 @@
 {% extends "base_main.html" %}
 {% load utils %}
+{% load static %}
 
 {% block title %}Home | PlanetTerp{% endblock %}
 
@@ -15,78 +16,90 @@
 {% endblock %}
 
 {% block content %}
-<h1 class="text-center" style="font-weight: bold;">Welcome to PlanetTerp</h1>
-
-<p class="text-center" style="font-size: 15px; margin-top: -10px;"><em>a community for students at the university of maryland</em></p>
-
-<form action="/search" class="form-inline justify-content-center">
-	<label for="main-search" class="text-center" style="font-size: 1.75rem; font-weight: 500; margin-left: 10%; margin-right: 10%;">Search for a course, professor, or teaching assistant</label>
-	<input type="search" id="main-search" name="query" class="form-control form-control-lg w-50" placeholder="Search...">
-	<button type="submit" class="btn btn-primary ml-3">Search</button>
-</form>
-
-<br /><br />
-
-<div class="container">
-	<div class="row">
-		<div id="homepage-support" class="col-md-4 text-center">
-			<div style="font-size: 20px;">PlanetTerp is proud to support</div>
-			<a href="{{ random_organization.url }}" target="_blank"><img src="../static/images/organizations/{{ random_organization.image }}" style="width: {{ random_organization.width }}px; height: {{ random_organization.height }}px;" alt='{{ random_organization.alt }}'></a>
-			<br />
-			<a href="{% url 'about' %}#organizations"><small>Want to see your organization here?</small></a>
-		</div>
-		<div id="homepage-stats" class="col-md-4 text-center">
-			<h3><strong>PlanetTerp includes...</strong></h3>
-			<h3><span id="numCourses">{{ num_courses }}</span> courses</h3>
-			<h3><span id="numProfessors">{{ num_professors }}</span> professors</h3>
-			<h3><span id="numReviews">{{ num_reviews }}</span> reviews</h3>
-			<h3><span id="numCourseGrades">{{ num_course_grades }}</span> course grades</h3>
+<div class="w-75 mx-auto">
+	<div class="row mt-3">
+		<div class="col">
+			<h1 class="text-center" style="font-weight: bold;">Welcome to PlanetTerp</h1>
+			<p class="text-center" style="font-size: 15px; margin-top: -10px;">
+				<em>a community for students at the University of Maryland</em>
+			</p>
 		</div>
 	</div>
-</div>
 
+	<div class="row mb-3">
+		<div class="col">
+			<form action="/search" class="text-center">
+				<label for="main-search" style="font-size: 1.75rem; font-weight: 500;">Search for a course, professor, or teaching assistant</label>
+				<div class="input-group">
+					<input type="search" id="main-search" name="query" class="form-control form-control-lg" placeholder="Search...">
+					<div class="input-group-append">
+						<button type="submit" class="btn btn-primary">Search</button>
+					</div>
+				</div>
+			</form>
+		</div>
+	</div>
 
-<div class="container">
 	<div class="row">
-		<div class="col-md-6" id="recent-reviews">
+		<div class="col text-center" id="homepage-stats">
+			<h2><strong>PlanetTerp includes...</strong></h2>
+			<h2><span id="numCourses">{{ num_courses }}</span> courses</h2>
+			<h2><span id="numProfessors">{{ num_professors }}</span> professors</h2>
+			<h2><span id="numReviews">{{ num_reviews }}</span> reviews</h2>
+			<h2><span id="numCourseGrades">{{ num_course_grades }}</span> course grades</h2>
+		</div>
+	</div>
+
+	<div class="row mb-3">
+		<div class="col" id="recent-reviews">
 			<h4>Recent reviews</h4>
 			{% for review in recent_reviews %}
-				<strong><a href="/professor/{{ review.professor.slug }}">{{ review.professor.name }}</a></strong>
-				{% if review.course %}
-					<small>({{ review.course.department }}{{ review.course.course_number }})</small>
+			<strong><a href="/professor/{{ review.professor.slug }}">{{ review.professor.name }}</a></strong>
+			{% if review.course %}
+			<small>({{ review.course.department }}{{ review.course.course_number }})</small>
+			{% endif %}
+			<br />
+
+			{% for i in 0|range:review.rating %}
+			<i class="fas fa-star" style="margin-top: 4px;"></i>
+			<i class="far fa-star"></i>
+			{% endfor %}
+
+			{% for i in review.rating|range:5 %}
+			<i class="far fa-star"></i>
+			{% endfor %}
+
+			<blockquote>
+				{% if review.content|length > 120 %}
+				&#8220; {{ review.content|slice:":120" }}...&#8221;
+				{% else %}
+				&#8220;{{ review.content }}&#8221;
 				{% endif %}
-				<br />
-
-				{% for i in 0|range:review.rating %}
-					<i class="fas fa-star" style="margin-top: 4px;"></i>
-					<i class="far fa-star"></i>
-				{% endfor %}
-
-				{% for i in review.rating|range:5 %}
-					<i class="far fa-star"></i>
-				{% endfor %}
-
-				<blockquote>
-					{% if review.content|length > 120 %}
-						&#8220; {{ review.content|slice:":120" }}...&#8221;
-					{% else %}
-						&#8220;{{ review.content }}&#8221;
-					{% endif %}
-					<footer class="blockquote-footer">
-						<em>
-							{% if not review.anonymous or user and user.is_staff %}
-								{{ review.user.username }}
-							{% else %}
-								Anonymous
-							{% endif %}
-						</em>
-					</footer>
-				</blockquote>
+				<footer class="blockquote-footer">
+					<em>
+						{% if not review.anonymous or user and user.is_staff %}
+						{{ review.user.username }}
+						{% else %}
+						Anonymous
+						{% endif %}
+					</em>
+				</footer>
+			</blockquote>
 			{% endfor %}
 		</div>
-		<div class="col-md-6" id="grades-graph">
+
+		<div class="col-5" id="grades-graph">
 			{% include "grade_graph.html" only %}
 		</div>
+
+		<div class="col text-center">
+			<div>
+				<span style="font-size: 18px;">PlanetTerp is proud to support</span>
+			</div>
+			<a href="{{ random_organization.url }}" target="_blank"><img src="{% static 'random_organization.image' %}" style="width: {{ random_organization.width }}px; height: {{ random_organization.height }}px;" alt='{{ random_organization.alt }}'></a>
+			<a href="{% url 'about' %}#organizations"><small>Want to see your organization here?</small></a>
+		</div>
+
 	</div>
 </div>
 
