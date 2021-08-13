@@ -11,10 +11,11 @@ class GradeData(View):
         data = request.GET
         professor = data.get("professor", None)
         course = data.get("course", None)
+        semester = data.get("semester", None)
         spring_2020 = data.get("spring_2020", True) == "true"
 
         (average_gpa, num_students, grades) = self._grade_data(professor,
-            course, spring_2020)
+            course, semester, spring_2020)
 
         def _statistic(name):
             if not num_students:
@@ -42,7 +43,7 @@ class GradeData(View):
 
     @staticmethod
     @ttl_cache(24 * 60 * 60)
-    def _grade_data(professor, course, spring_2020):
+    def _grade_data(professor, course, semester, spring_2020):
         grades = Grade.objects.all()
 
         if professor:

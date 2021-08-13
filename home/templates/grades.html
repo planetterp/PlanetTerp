@@ -60,7 +60,7 @@
 			<div id="semester-search-input" class="form-group row justify-content-center" style="display: none;">
 				<label for="semester-search" class="col-form-label" style="width: 11%;">Semester</label>
 				<div class="col-sm-3" style="display: flex; align-items: center;">
-					<select id="semester-search" name="semester">
+					<select id="semester-search" name="semester" class="custom-select w-auto">
 						<option value="Select...">Select...</option>
 						<option value="Spring 2012">Spring 2012</option>
 						<option value="Fall 2012">Fall 2012</option>
@@ -137,10 +137,12 @@
 			minLength: 3,
 			source: function(request, response) {
 				$.ajax({
-					url: 'grades',
+					url: "{% url 'autocomplete' %}",
 					dataType: 'json',
 					data: {
-						'course': request.term
+						"query": request.term,
+						"types[]": ["course"],
+						"return_attrs[]": ["name"]
 					},
 					success: function(data) {
 						response(data);
@@ -148,7 +150,7 @@
 				})
 			},
 			select: function(event, ui) {
-				var course = ui.item.value;
+				var course = ui.item.result.name;
 				courseGrades(course);
 			}
 		});
@@ -182,17 +184,16 @@
 			}
 		});
 
-		function courseGrades (course) {
+		function courseGrades(course) {
 			lastSearch = "course";
 			$("#semester-search").val("Select...");
 
 			$.ajax({
-				url: 'grades',
+				url: "{% url 'grade-data' %}",
 				dataType: 'json',
 				data: {
-					'grades': true,
 					'course': course,
-					'includeSpring2020': $('#include-spring2020').is(':checked')
+					'spring_2020': $('#include-spring2020').is(':checked')
 				},
 				success: function(data) {
 					$("#grades-information").html("");
@@ -237,12 +238,11 @@
 			lastSearch = "professor";
 
 			$.ajax({
-				url: 'grades',
+				url: "{% url 'grade-data' %}",
 				dataType: 'json',
 				data: {
-					'grades': true,
 					'professor': professor,
-					'includeSpring2020': $('#include-spring2020').is(':checked')
+					'spring_2020': $('#include-spring2020').is(':checked')
 				},
 				success: function(data) {
 					$("#grades-information").html("");
@@ -298,10 +298,9 @@
 
 		$("#semester-search").change(function() {
 			$.ajax({
-				url: 'grades',
+				url: "{% url 'grade-data' %}",
 				dataType: 'json',
 				data: {
-					'grades': true,
 					'course': $("#course-search").val(),
 					'semester': $("#semester-search").val()
 				},

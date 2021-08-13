@@ -1,13 +1,14 @@
 from enum import Enum
 
 from django.contrib.auth.models import AbstractUser
+from django.db.models.deletion import SET_NULL
 from django.utils.safestring import mark_safe
 from django.db.models.functions import Concat
 from django.utils.html import format_html
 from django.urls import reverse
 from django.core import validators
 from django.db.models import (Model, CharField, DateTimeField, TextField,
-    IntegerField, BooleanField, ForeignKey, PositiveIntegerField, RESTRICT,
+    IntegerField, BooleanField, ForeignKey, PositiveIntegerField, SET_NULL,
     CASCADE, ManyToManyField, SlugField, TextChoices, FloatField, Manager,
     QuerySet, EmailField, Sum)
 
@@ -115,6 +116,7 @@ class Course(Model):
     def __str__(self):
         return self.name
 
+
 class Professor(Model):
     class Type(TextChoices):
         PROFESSOR = "professor"
@@ -154,19 +156,28 @@ class Professor(Model):
         return f"{self.name} ({self.slug})"
 
 
+class ProfessorSection(Model):
+    class Meta:
+        db_table = "home_professor_section"
+
+    professor = ForeignKey(Professor, CASCADE)
+    section = ForeignKey("Section", CASCADE)
+
+
 class Section(Model):
-    course = ForeignKey(Course, RESTRICT)
-    professors = ManyToManyField(Professor)
+    course = ForeignKey(Course, CASCADE)
+    professors = ManyToManyField(Professor, through=ProfessorSection)
     semester = CharField(max_length=6)
     section_number = CharField(max_length=8)
     seats = PositiveIntegerField()
     available_seats = PositiveIntegerField()
     waitlist = PositiveIntegerField()
-    active = BooleanField()
+    active = BooleanField(default=True)
     created_at = DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"{self.course} ({self.section_number}) taught by {self.professors}"
+
 
 class User(AbstractUser):
     send_review_email = BooleanField(default=True)
@@ -233,6 +244,9 @@ class User(AbstractUser):
 
 
 class AuditLog(Model):
+    class Meta:
+        db_table = "home_audit_log"
+
     username = TextField()
     summary = TextField()
     created_at = DateTimeField(auto_now_add=True)
@@ -251,6 +265,9 @@ class Discussion(Model):
 
 
 class Fall2020Search(Model):
+    class Meta:
+        db_table = "home_fall_2020_search"
+
     query = TextField()
     created_at = DateTimeField(auto_now_add=True)
 
@@ -261,7 +278,7 @@ class Gened(Model):
         "DSSP", "DVCC", "DVUP", "SCIS"
     ]
 
-    course = ForeignKey(Course, RESTRICT)
+    course = ForeignKey(Course, CASCADE)
     name = CharField(max_length=4)
     created_at = DateTimeField(auto_now_add=True)
 
@@ -303,7 +320,7 @@ class Review(Model):
     objects = ReviewManager()
 
     professor = ForeignKey(Professor, CASCADE)
-    course = ForeignKey(Course, RESTRICT, null=True, blank=True)
+    course = ForeignKey(Course, CASCADE, null=True, blank=True)
     user = ForeignKey(User, CASCADE, null=True, blank=True)
     updater = ForeignKey(User, CASCADE, null=True, blank=True, related_name="updater")
     content = TextField()
@@ -320,7 +337,7 @@ class Grade(Model):
     POSSIBLE_GRADES = [choice[0] for choice in Review.Grades.choices]
     VOWEL_GRADES = ["A", "A-", "A+", "F"]
 
-    course = ForeignKey(Course, RESTRICT)
+    course = ForeignKey(Course, CASCADE)
     professor = ForeignKey(Professor, CASCADE, null=True)
     semester = CharField(max_length=6)
     section = CharField(max_length=10)
@@ -354,6 +371,9 @@ class Grade(Model):
         )
 
 class GroupmeUser(Model):
+    class Meta:
+        db_table = "home_groupme_user"
+
     user = ForeignKey(User, CASCADE)
     groups = ManyToManyField("GroupmeGroup")
     access_token = CharField(max_length=100)
@@ -365,6 +385,9 @@ class GroupmeUser(Model):
 
 
 class GroupmeGroup(Model):
+    class Meta:
+        db_table = "home_groupme_group"
+
     name = CharField(max_length=191)
     group_id = IntegerField()
     created_at = DateTimeField(auto_now_add=True)
@@ -383,8 +406,11 @@ class Organization(Model):
 
 
 class ProfessorCourse(Model):
+    class Meta:
+        db_table = "home_professor_course"
+
     professor = ForeignKey(Professor, CASCADE)
-    course = ForeignKey(Course, RESTRICT)
+    course = ForeignKey(Course, CASCADE)
     recent_semester = CharField(max_length=6, null=True, blank=True)
     created_at = DateTimeField(auto_now_add=True)
 
@@ -393,8 +419,11 @@ class ProfessorCourse(Model):
 
 
 class DiscussionReply(Model):
+    class Meta:
+        db_table = "home_discussion_reply"
+
     user = ForeignKey(User, CASCADE)
-    discussion = ForeignKey(Discussion, RESTRICT)
+    discussion = ForeignKey(Discussion, CASCADE)
     content = TextField()
     created_at = DateTimeField(auto_now_add=True)
 
@@ -403,6 +432,9 @@ class DiscussionReply(Model):
 
 
 class ResetCode(Model):
+    class Meta:
+        db_table = "home_reset_code"
+
     user = ForeignKey(User, CASCADE)
     reset_code = CharField(max_length=100)
     expires_at = DateTimeField()
@@ -410,7 +442,10 @@ class ResetCode(Model):
 
 
 class SectionMeeting(Model):
-    section = ForeignKey(Section, RESTRICT)
+    class Meta:
+        db_table = "home_section_meeting"
+
+    section = ForeignKey(Section, CASCADE)
     days = TextField()
     start_time = TextField()
     end_time = TextField()
@@ -424,8 +459,11 @@ class SectionMeeting(Model):
 
 
 class UserSchedule(Model):
+    class Meta:
+        db_table = "home_user_schedule"
+
     user = ForeignKey(User, CASCADE)
-    section = ForeignKey(Section, RESTRICT)
+    section = ForeignKey(Section, SET_NULL, null=True)
     active = BooleanField(default=True)
     semester = CharField(max_length=6)
     loadtime = FloatField(blank=True, null=True)

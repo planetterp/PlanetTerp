@@ -195,12 +195,62 @@ def migrate_geneds(courses):
 
     return _create_table("geneds", Gened, mapping)
 
+def migrate_sections(courses):
+    def _active(row):
+        val = row['active']
+        return bool(val)
 
-courses = migrate_courses()
-professors = migrate_professors()
-link_courses_and_professors(courses, professors)
+    mapping = {
+        "semester": "semester",
+        "section_number": "section_number",
+        "seats": "seats",
+        "available_seats": "available_seats",
+        "waitlist": "waitlist",
+        "active": _active,
+        "created_at": "created",
+        "course": lambda row: _foreign_key(courses, row, "course_id")
+    }
+    return _create_table("sections", Section, mapping)
 
-users = migrate_users()
-reviews = migrate_reviews(users, courses, professors)
-grades = migrate_grades(courses, professors)
-geneds = migrate_geneds(courses)
+def link_sections_and_professors(professors: QuerySet, sections: QuerySet):
+    for row in db.select("sections"):
+        pk = int(row["id"]) - 19966
+        section = sections.filter(id=pk).first() #sections[row["id"]]
+        professor_ids = str(row["professor_ids"]).split(",")
+        for id in professor_ids:
+            professor = professors.filter(pk=id.strip()).first()#professors[id]
+            section.professors.add(professor)
+
+def migrate_section_meetings(sections):
+    def _building(row):
+        val = row['building']
+        return None if not val or val == '' else val
+
+    mapping = {
+        "section": lambda row: _foreign_key(sections, row, "section_id"),
+        "days": "days",
+        "start_time": "start_time",
+        "end_time": "end_time",
+        "building": _building,
+        "room": "room",
+        "type": "type",
+        "created_at": "created"
+    }
+
+    return _create_table("section_meetings", SectionMeeting, mapping)
+
+
+#courses = migrate_courses()
+#professors = migrate_professors()
+#link_courses_and_professors(courses, professors)
+
+#users = migrate_users()
+#reviews = migrate_reviews(users, courses, professors)
+#grades = migrate_grades(courses, professors)
+#geneds = migrate_geneds(courses)
+#courses = Course.objects.all()
+professors = Professor.objects.all()
+#sections = migrate_sections(courses)
+sections = Section.objects.all()
+link_sections_and_professors(professors, sections)
+migrate_section_meetings(sections)
