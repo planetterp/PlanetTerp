@@ -201,6 +201,7 @@ def migrate_sections(courses):
         return bool(val)
 
     mapping = {
+        "id": "id",
         "semester": "semester",
         "section_number": "section_number",
         "seats": "seats",
@@ -212,13 +213,12 @@ def migrate_sections(courses):
     }
     return _create_table("sections", Section, mapping)
 
-def link_sections_and_professors(professors: QuerySet, sections: QuerySet):
+def link_sections_and_professors(professors, sections):
     for row in db.select("sections"):
-        pk = int(row["id"]) - 19966
-        section = sections.filter(id=pk).first() #sections[row["id"]]
+        section = sections.filter(id=row["id"]).first() #sections[row["id"]]
         professor_ids = str(row["professor_ids"]).split(",")
         for id in professor_ids:
-            professor = professors.filter(pk=id.strip()).first()#professors[id]
+            professor = professors.filter(id=id).first()#professors[id]
             section.professors.add(professor)
 
 def migrate_section_meetings(sections):
@@ -248,9 +248,10 @@ def migrate_section_meetings(sections):
 #reviews = migrate_reviews(users, courses, professors)
 #grades = migrate_grades(courses, professors)
 #geneds = migrate_geneds(courses)
-#courses = Course.objects.all()
+
+courses = Course.objects.all()
 professors = Professor.objects.all()
 #sections = migrate_sections(courses)
 sections = Section.objects.all()
 link_sections_and_professors(professors, sections)
-migrate_section_meetings(sections)
+#migrate_section_meetings(sections)

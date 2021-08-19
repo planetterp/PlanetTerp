@@ -160,7 +160,7 @@ class ProfessorSection(Model):
     class Meta:
         db_table = "home_professor_section"
 
-    professor = ForeignKey(Professor, CASCADE)
+    professor = ForeignKey(Professor, CASCADE, null=True)
     section = ForeignKey("Section", CASCADE)
 
 
@@ -176,7 +176,7 @@ class Section(Model):
     created_at = DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.course} ({self.section_number}) taught by {self.professors}"
+        return f"{self.course} ({self.section_number}) taught by {self.professors.name}"
 
 
 class User(AbstractUser):
