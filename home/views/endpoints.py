@@ -23,6 +23,8 @@ class Autocomplete(View):
                 value_dict["pk"] = result.pk
             if "name" in return_attrs:
                 value_dict['name'] = result.name
+            if "slug" in return_attrs:
+                value_dict['slug'] = result.slug
 
             data = {
                 "label": f"{result.name} ({result.pk})" if request.user.is_staff else f"{result.name}",

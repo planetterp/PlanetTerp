@@ -47,7 +47,6 @@
 	<h1 class="text-center">Historical Grade Lookup</h1>
 
 	<div class="row">
-		<!-- <div class="col-sm-1"></div> -->
 		<div class="col-sm-6 text-center">
 			<h2>Lookup by course</h2>
 
@@ -60,8 +59,11 @@
 			<div id="semester-search-input" class="form-group row justify-content-center" style="display: none;">
 				<label for="semester-search" class="col-form-label">Semester</label>
 				<div class="col-sm-3" style="display: flex; align-items: center;">
+					{% comment %} TODO: Replace hard-coded select options with
+					programatically obtained options that reflect semesters we
+					actually have data for {% endcomment %}
 					<select id="semester-search" name="semester" class="custom-select">
-						<option value="Select...">Select...</option>
+						<option value="">Select...</option>
 						<option value="Spring 2012">Spring 2012</option>
 						<option value="Fall 2012">Fall 2012</option>
 						<option value="Spring 2013">Spring 2013</option>
@@ -186,7 +188,7 @@
 
 		function courseGrades(course) {
 			lastSearch = "course";
-			$("#semester-search").val("Select...");
+			$("#semester-search").val("");
 
 			$.ajax({
 				url: "{% url 'grade-data' %}",
@@ -234,49 +236,60 @@
 			})
 		}
 
-		function professorGrades (professor) {
+		function professorGrades(professor) {
+			/*
+			var professor_courses;
+			var data = {
+				professor_slug: professor
+			}
+			$.get("{% url 'grades' %}", data, function(courses) {
+				professor_courses = courses.courses;
+				console.log(professor_courses);
+			});
+			*/
 			lastSearch = "professor";
-
 			$.ajax({
 				url: "{% url 'grade-data' %}",
 				dataType: 'json',
 				data: {
 					'professor': professor,
+					'professor_courses': true,
 					'spring_2020': $('#include-spring2020').is(':checked')
 				},
 				success: function(data) {
+					console.log(data)
 					$("#grades-information").html("");
 					$("#grades-information-error").html("");
 					$("html").find('.graph-wrapper').remove(); // Remove all previously created graphs
 					$("html").find('.grades-info').remove(); // Remove all previously created course information
 
-					var name = data[data.length - 1];
-					var averageGpa = data[data.length - 2];
-					var numStudents = data[data.length - 3];
-					var slug = data[data.length - 4];
+					var name = $("#professor-search").val();
+					var averageGpa = data.average_gpa;
+					var numStudents = data.num_students;
+					var slug = data.professor;
 
-					data = data[0];
+					{% url 'professor' slug as prof_url %}
+					{% if prof_url %}
+						$("#grades-information").html("<h4><strong><a href=\"{{ prof_url }}\" target=\"_blank\">" + name + "</a></strong> Average GPA: " + averageGpa + " between " + numStudents + " students</h4>");
+					{% endif %}
+					var len_data = data.length - 1
+					$("#grades-information").append("<em>" + name + " grade distribution for " + len_data + " course(s):</em>");
 
-					$("#grades-information").html("<h4><strong><a href=\"/professor/" + slug + "\" target=\"_blank\">" + name + "</a></strong> Average GPA: " + averageGpa + " between " + numStudents + " students</h4>");
-
-					var plural = "";
-					if (data.length != 1) {
-						plural = "s";
+					for (let item in data.items()) {
+						console.log(item)
 					}
-
-					$("#grades-information").append("<em>" + name + " grade distribution for " + data.length + " course" + plural + ":</em>");
-
-					for (var i = 0; i < data.length; i++) {
-						generate_graph(data[i][17], data[i]);
+					/*
+					for (var i = 0; i < len_data; i++) {
+						generate_graph(professor_courses[i].name, data[i]);
 					}
-
+					*/
 					$("#include-spring2020-input").show();
 				},
 				error: function(response) {
 					$("html").find('.graph-wrapper').remove(); // Remove all previously created graphs
 					$("html").find('.grades-info').remove(); // Remove all previously created course information
 
-					if (response.responseText === "Only Spring 2020 grade data is available for those parameters.") {
+					if (response.responseText == "Only Spring 2020 grade data is available for those parameters.") {
 						$("#include-spring2020-input").show();
 
 						var errorText = "<div class=\"alert alert-info error-alert text-center\">";
@@ -309,7 +322,7 @@
 					$("#grades-information-error").html("");
 					$("html").find('.graph-wrapper').remove(); // Remove all previously created graphs
 					$("html").find('.grades-info').remove(); // Remove all previously created course information
-					if ($("#semester-search").val() === "Select...") {
+					if ($("#semester-search").val() == "") {
 						($("#course-search").val(), data);
 						$("#include-spring2020-input").show();
 					}
@@ -339,10 +352,9 @@
 		$("#section-search").keypress(function (e) {
 			if (e.which == 13) { // User pressed enter
 				$.ajax({
-				url: 'grades',
+				url: "{% url 'grade-data' %}",
 				dataType: 'json',
 				data: {
-					'grades': true,
 					'course': $("#course-search").val(),
 					'semester': $("#semester-search").val(),
 					'section': $("#section-search").val()
@@ -354,7 +366,7 @@
 					$("#grades-information").html("");
 					$("#grades-information-error").html("");
 
-					if ($("#section-search").val() === "") {
+					if ($("#section-search").val() == "") {
 						generate_graph($("#course-search").val(), data, $("#semester-search").val());
 					}
 					else {
@@ -381,10 +393,12 @@
 			minLength: 3,
 			source: function(request, response) {
 				$.ajax({
-					url: 'grades',
+					url: "{% url 'autocomplete' %}",
 					dataType: 'json',
 					data: {
-						'professor': request.term
+						"query": request.term,
+						"types[]": ["professor"],
+						"return_attrs[]": ["slug"]
 					},
 					success: function(data) {
 						response(data);
@@ -392,29 +406,27 @@
 				})
 			},
 			select: function(event, ui) {
-				var professor = ui.item.value;
+				var professor = ui.item.result.slug;
 				professorGrades(professor);
 			}
 		});
 
-
-		function generate_graph (course, grade_data) {
+		function generate_graph(course, grade_data) {
 			course = course.toUpperCase();
 			$("#grades-graphs").append('<p id="grades-text' + canvasCount + '" class="text-center grades-info"></p>')
 			$("#grades-graphs").append('<div class="graph-wrapper"><canvas id="grades' + canvasCount + '" width="500px" height="500px" style="margin: 0 auto;"></canvas></div>')
 
 			var graph = document.getElementById('grades' + canvasCount).getContext("2d");
+			var grades_text = `Showing data for <a href="/course/${course}" target="_blank">${course}</a>`
 
-			if (arguments.length == 2) {
-				$("#grades-text" + canvasCount).html("<a href=\"/course/" + course + "\" target=\"_blank\">" + course + "</a> Average GPA: " + grade_data[15] + " between " + grade_data[16] + " students");
-			}
-			else if (arguments.length == 3) {
-				$("#grades-text" + canvasCount).html("<a href=\"/course/" + course + "\" target=\"_blank\">" + course + "</a> " + arguments[2] + " Average GPA: " + grade_data[15] + " between " + grade_data[16] + " students");
-			}
-			else if (arguments.length == 4) {
-				$("#grades-text" + canvasCount).html("<a href=\"/course/" + course + "\" target=\"_blank\">" + course + "</a> " + arguments[2] + " (Section " + arguments[3] + ") Average GPA: " + grade_data[15] + " between " + grade_data[16] + " students");
+			if (arguments.length == 3) {
+				grades_text += ` ${arguments[2]}`
+			} else if (arguments.length == 4) {
+				grades_text += ` ${arguments[2]} (Section ${arguments[3]})`
 			}
 
+			grades_text += `<br>Average GPA: ${grade_data.average_gpa} between ${grade_data.num_students} students`
+			$("#grades-text" + canvasCount).html(grades_text);
 			canvasCount++;
 
 			gradesGraph = new Chart(graph, {
@@ -424,7 +436,7 @@
 					datasets: [
 						{
 							label: "-",
-							data: [grade_data[2], grade_data[5], grade_data[8], grade_data[11]],
+							data: grade_data.data_minus,
 							backgroundColor: [
 								'rgba(58, 215, 65, .4)',
 								'rgba(58, 215, 65, .4)',
@@ -441,7 +453,7 @@
 						},
 						{
 							label: "",
-							data: [grade_data[1], grade_data[4], grade_data[7], grade_data[10], grade_data[12], grade_data[13], grade_data[14]],
+							data: grade_data.data_flat,
 							backgroundColor: [
 								'rgba(25, 140, 35, .5)',
 								'rgba(25, 140, 35, .5)',
@@ -464,7 +476,7 @@
 						},
 						{
 							label: "+",
-							data: [grade_data[0], grade_data[3], grade_data[6], grade_data[9]],
+							data: grade_data.data_plus,
 							backgroundColor: [
 								'rgba(6, 74, 12, .7)',
 								'rgba(6, 74, 12, .7)',
@@ -484,7 +496,7 @@
 				options: {
 					title: {
 						display: true,
-						text: arguments.length == 2 ? course + ' Grade Distribution' : (arguments.length == 3 ? course + ' ' + arguments[2] + ' Grade Distribution' : course + ' ' + arguments[2] + ' Section ' + arguments[3] + ' Grade Distribution')
+						text: 'Grade Distribution'
 					},
 					scales: {
 						xAxes: [{stacked: true}],

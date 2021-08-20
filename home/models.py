@@ -1,20 +1,19 @@
 from enum import Enum
 
 from django.contrib.auth.models import AbstractUser
-from django.db.models.deletion import SET_NULL
 from django.utils.safestring import mark_safe
 from django.db.models.functions import Concat
 from django.utils.html import format_html
 from django.urls import reverse
 from django.core import validators
 from django.db.models import (Model, CharField, DateTimeField, TextField,
-    IntegerField, BooleanField, ForeignKey, PositiveIntegerField, SET_NULL,
+    IntegerField, BooleanField, ForeignKey, PositiveIntegerField, EmailField,
     CASCADE, ManyToManyField, SlugField, TextChoices, FloatField, Manager,
-    QuerySet, EmailField, Sum)
+    QuerySet, Sum)
 
 class GradeQuerySet(QuerySet):
     def average_gpa(self):
-        return self.aggregate(
+        avg_gpa = self.aggregate(
             average_gpa=(
                 (Sum("a_plus") * 4  + Sum("a") * 4 + Sum("a_minus") * 3.7 +
                 Sum("b_plus") * 3.3 + Sum("b") * 3 + Sum("b_minus") * 2.7 +
@@ -24,6 +23,8 @@ class GradeQuerySet(QuerySet):
                 Sum("num_students")
             )
         )["average_gpa"]
+
+        return round(avg_gpa, 2)
 
     def num_students(self):
         return self.aggregate(
@@ -463,7 +464,7 @@ class UserSchedule(Model):
         db_table = "home_user_schedule"
 
     user = ForeignKey(User, CASCADE)
-    section = ForeignKey(Section, SET_NULL, null=True)
+    section = ForeignKey(Section, CASCADE, null=True)
     active = BooleanField(default=True)
     semester = CharField(max_length=6)
     loadtime = FloatField(blank=True, null=True)

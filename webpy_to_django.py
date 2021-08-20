@@ -215,10 +215,16 @@ def migrate_sections(courses):
 
 def link_sections_and_professors(professors, sections):
     for row in db.select("sections"):
-        section = sections.filter(id=row["id"]).first() #sections[row["id"]]
+        section = sections[row["id"]]
         professor_ids = str(row["professor_ids"]).split(",")
         for id in professor_ids:
-            professor = professors.filter(id=id).first()#professors[id]
+            # sections.professor_ids use 0 to represent no professor so try to
+            # get a professor by the id or use None instead
+            try:
+                professor = professors[int(id)]
+            except KeyError:
+                professor = None
+
             section.professors.add(professor)
 
 def migrate_section_meetings(sections):
@@ -240,18 +246,18 @@ def migrate_section_meetings(sections):
     return _create_table("section_meetings", SectionMeeting, mapping)
 
 
-#courses = migrate_courses()
-#professors = migrate_professors()
-#link_courses_and_professors(courses, professors)
+courses = migrate_courses()
+professors = migrate_professors()
+link_courses_and_professors(courses, professors)
 
-#users = migrate_users()
-#reviews = migrate_reviews(users, courses, professors)
-#grades = migrate_grades(courses, professors)
-#geneds = migrate_geneds(courses)
+users = migrate_users()
+reviews = migrate_reviews(users, courses, professors)
+grades = migrate_grades(courses, professors)
+geneds = migrate_geneds(courses)
 
-courses = Course.objects.all()
-professors = Professor.objects.all()
-#sections = migrate_sections(courses)
-sections = Section.objects.all()
+#courses = Course.objects.all()
+#professors = Professor.objects.all()
+sections = migrate_sections(courses)
+#sections = Section.objects.all()
 link_sections_and_professors(professors, sections)
 #migrate_section_meetings(sections)

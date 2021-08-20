@@ -21,6 +21,15 @@ def semester_name(semester_number):
 
     return f"{season} {year}"
 
+def semester_number(semester_name: str):
+    seasons = {"Spring": "01", "Summer": "05", "Fall": "08", "Winter": "12"}
+    season, year = semester_name.strip().split(' ')
+
+    if season == "Winter":
+        year = int(year) + 1
+
+    return f"{year}{seasons[season]}"
+
 # This list must be kept in ascending order, as other parts of the codebase rely
 # on the ordering.
 RECENT_SEMESTERS = ["202008", "202012", "202101", "202105", "202108"]
