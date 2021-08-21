@@ -32,7 +32,6 @@ class Search(View):
                 return redirect(result)
 
         context = {
-            "logged_in": request.session.get("id", None),
             "results": results
         }
 
