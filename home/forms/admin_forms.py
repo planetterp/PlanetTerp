@@ -20,13 +20,15 @@ class ReviewVerifyForm(Form):
 
     def __init__(self, review_id, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.fields['review_id'].initial = review_id
 
         self.helper = FormHelper()
         self.helper.form_id = f"{Review.Status.VERIFIED.value}_{review_id}"
         self.helper.form_class = "unverified_review_form"
         self.helper.form_show_errors = False
-        self.fields['review_id'].initial = review_id
+        self.helper.layout = self.generate_layout()
 
+    def generate_layout(self):
         submit_button = Button(
             "verify",
             "Verify",
@@ -34,8 +36,12 @@ class ReviewVerifyForm(Form):
             style="border-bottom-right-radius: 0; border-top-right-radius: 0;",
             onClick=f"verifyReview('#{self.helper.form_id}')"
         )
-
-        self.helper.layout = Layout('review_id', 'verified', 'action_type', FormActions(submit_button))
+        return Layout(
+            'review_id',
+            'verified',
+            'action_type',
+            FormActions(submit_button)
+        )
 
 # For rejecting unverified reviews
 class ReviewRejectForm(Form):
@@ -45,13 +51,15 @@ class ReviewRejectForm(Form):
 
     def __init__(self, review_id, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.fields['review_id'].initial = review_id
 
         self.helper = FormHelper()
         self.helper.form_id = f"{Review.Status.REJECTED.value}_{review_id}"
         self.helper.form_class = "unverified_review_form"
         self.helper.form_show_errors = False
-        self.fields['review_id'].initial = review_id
+        self.helper.layout = self.generate_layout()
 
+    def generate_layout(self):
         submit_button = Button(
             "reject",
             "Reject",
@@ -59,8 +67,13 @@ class ReviewRejectForm(Form):
             style="border-bottom-left-radius: 0; border-top-left-radius: 0;",
             onClick=f"verifyReview('#{self.helper.form_id}')"
         )
+        return Layout(
+            'review_id',
+            'verified',
+            'action_type',
+            FormActions(submit_button)
+        )
 
-        self.helper.layout = Layout('review_id', 'verified', 'action_type', FormActions(submit_button))
 
 # For sending a help webhook of an unverified review
 class ReviewHelpForm(Form):
@@ -69,21 +82,27 @@ class ReviewHelpForm(Form):
 
     def __init__(self, review_id, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.fields['review_id'].initial = review_id
 
         self.helper = FormHelper()
         self.helper.form_id = f"{AdminAction.REVIEW_HELP.value}_{review_id}"
         self.helper.form_class = "unverified_review_form"
         self.helper.form_show_errors = False
-        self.fields['review_id'].initial = review_id
+        self.helper.layout = self.generate_layout()
 
+    def generate_layout(self):
         submit_button = Button(
             "help",
             "Help",
             css_class="btn-warning",
             onClick=f"sendResponse($('#{self.helper.form_id}').serialize(), 'review_help')"
         )
+        return Layout(
+            'review_id',
+            'action_type',
+            FormActions(submit_button)
+        )
 
-        self.helper.layout = Layout('review_id', 'action_type', FormActions(submit_button))
 
 # For unverifying a verified review. Currently used on /professor
 class ReviewUnverifyForm(Form):
@@ -93,21 +112,27 @@ class ReviewUnverifyForm(Form):
 
     def __init__(self, review_id, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.fields['review_id'].initial = review_id
 
         self.helper = FormHelper()
         self.helper.form_id = f"unverify_review_{review_id}"
         self.helper.form_class = "unverify_review"
         self.helper.form_show_errors = False
-        self.fields['review_id'].initial = review_id
+        self.helper.layout = self.generate_layout()
 
+    def generate_layout(self):
         submit_button = Button(
             "unverify",
             "Unverify",
             css_class="btn-danger btn-lg",
             onClick=f"unverifyReview('#{self.helper.form_id}')"
         )
-
-        self.helper.layout = Layout('review_id', 'verified', 'action_type', FormActions(submit_button))
+        return Layout(
+            'review_id',
+            'verified',
+            'action_type',
+            FormActions(submit_button)
+        )
 
 # For verifying unverified professors
 class ProfessorVerifyForm(Form):
@@ -117,13 +142,15 @@ class ProfessorVerifyForm(Form):
 
     def __init__(self, professor_id, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.fields['professor_id'].initial = professor_id
 
         self.helper = FormHelper()
         self.helper.form_id = f"{Professor.Status.VERIFIED.value}_{professor_id}"
         self.helper.form_class = "unverified_professor_form"
         self.helper.form_show_errors = False
-        self.fields['professor_id'].initial = professor_id
+        self.helper.layout = self.generate_layout()
 
+    def generate_layout(self):
         submit_button = Button(
             "verify",
             "Verify",
@@ -131,8 +158,13 @@ class ProfessorVerifyForm(Form):
             style="border-bottom-right-radius: 0; border-top-right-radius: 0;",
             onClick=f"verifyProfessor('#{self.helper.form_id}')"
         )
+        return Layout(
+            'professor_id',
+            'verified',
+            'action_type',
+            FormActions(submit_button)
+        )
 
-        self.helper.layout = Layout('professor_id', 'verified', 'action_type', FormActions(submit_button))
 
 # For rejecting unverified professors
 class ProfessorRejectForm(Form):
@@ -142,13 +174,15 @@ class ProfessorRejectForm(Form):
 
     def __init__(self, professor_id, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.fields['professor_id'].initial = professor_id
 
         self.helper = FormHelper()
         self.helper.form_id = f"{Professor.Status.REJECTED.value}_{professor_id}"
         self.helper.form_class = "unverified_professor_form"
         self.helper.form_show_errors = False
-        self.fields['professor_id'].initial = professor_id
+        self.helper.layout = self.generate_layout()
 
+    def generate_layout(self):
         submit_button = Button(
             "reject",
             "Reject",
@@ -156,8 +190,13 @@ class ProfessorRejectForm(Form):
             style="border-bottom-left-radius: 0; border-top-left-radius: 0;",
             onClick=f"verifyProfessor('#{self.helper.form_id}')"
         )
+        return Layout(
+            'professor_id',
+            'verified',
+            'action_type',
+            FormActions(submit_button)
+        )
 
-        self.helper.layout = Layout('professor_id', 'verified', 'action_type', FormActions(submit_button))
 
 # For deleting unverified professors. This action cannot be undone.
 # Use carefully: Once a professor is deleted, all their data is lost
@@ -169,27 +208,29 @@ class ProfessorDeleteForm(Form):
 
     def __init__(self, professor: Professor, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.fields['professor_id'].initial = professor.pk
+        self.fields['professor_type'].initial = professor.type
 
         self.helper = FormHelper()
         self.helper.form_id = f"delete_{professor.pk}"
         self.helper.form_class = "unverified_professor_form"
         self.helper.form_show_errors = False
-        self.fields['professor_id'].initial = professor.pk
-        self.fields['professor_type'].initial = professor.type
+        self.helper.layout = self.generate_layout()
 
+    def generate_layout(self):
         submit_button = Button(
             "delete",
             "Delete",
             css_class="btn-dark",
             onClick=f"deleteProfessor('#{self.helper.form_id}')"
         )
-
-        self.helper.layout = Layout(
+        return Layout(
             'professor_id',
             'professor_type',
             'action_type',
             FormActions(submit_button)
         )
+
 
 # For manually entering a professor's slug when
 # the system couldn't automatically generate one
@@ -201,13 +242,17 @@ class ProfessorSlugForm(Form):
 
     def __init__(self, professor: Professor, modal_title="", *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.professor = professor
+        self.modal_title = modal_title
+        self.fields['professor_id'].initial = self.professor.pk
 
         self.helper = FormHelper()
-        self.helper.form_id = f"slug-form-{professor.pk}"
+        self.helper.form_id = f"slug-form-{self.professor.pk}"
         self.helper.form_class = "slug-form"
         self.helper.form_show_errors = False
-        self.fields['professor_id'].initial = professor.pk
+        self.helper.layout = self.generate_layout()
 
+    def generate_layout(self):
         slug_errors = HTML(
             '''
             {% if form.slug.errors %}
@@ -217,32 +262,31 @@ class ProfessorSlugForm(Form):
             {% endif %}
             '''
         )
-
-        self.helper.layout = Layout(
+        return Layout(
             BootstrapModal(
                 Field(
                     'slug',
-                    id=f"slug-form-slug-{professor.pk}",
+                    id=f"slug-form-slug-{self.professor.pk}",
                     placeholder="Enter a slug"
                 ),
                 slug_errors,
                 Field(
                     'professor_id',
-                    id=f"slug-form-id-{professor.pk}"
+                    id=f"slug-form-id-{self.professor.pk}"
                 ),
                 'action_type',
                 FormActions(
                     Button(
                         "done",
                         "Done",
-                        id=f"submit-slug-form-{professor.pk}",
+                        id=f"submit-slug-form-{self.professor.pk}",
                         css_class="btn-primary float-right mt-3",
-                        onClick=f"verifySlug('#slug-form-{professor.pk}')"
+                        onClick=f"verifySlug('#slug-form-{self.professor.pk}')"
                     )
                 ),
-                css_id=f"slug-modal-{professor.pk}",
-                title_id=f"slug-modal-label-{professor.pk}",
-                title=modal_title
+                css_id=f"slug-modal-{self.professor.pk}",
+                title_id=f"slug-modal-label-{self.professor.pk}",
+                title=self.modal_title
             )
         )
 
@@ -455,8 +499,10 @@ class ProfessorUnverifyForm(Form):
         self.helper = FormHelper()
         self.helper.form_id = "unverify-professor-form"
         self.helper.form_show_errors = False
+        self.helper.layout = self.generate_layout()
 
-        self.helper.layout = Layout(
+    def generate_layout(self):
+        return Layout(
             'professor_id',
             'action_type',
             'verified'
