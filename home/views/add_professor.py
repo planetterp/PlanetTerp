@@ -17,28 +17,24 @@ class AddProfessor(View):
         if form.is_valid():
             cleaned_data = form.cleaned_data
 
-            professor_data = {
-                "name": cleaned_data['name'],
-                "slug": None,
-                "type": cleaned_data['type_']
-            }
-
-            new_professor = Professor(**professor_data)
+            new_professor = Professor(
+                name=cleaned_data['name'],
+                slug=None,
+                type=cleaned_data['type_']
+            )
             new_professor.save()
 
             course = Course.objects.filter(name=cleaned_data['course']).first()
 
-            review_data = {
-                "professor": new_professor,
-                "course": course,
-                "user": user if user.is_authenticated else None,
-                "content": cleaned_data['content'],
-                "rating": cleaned_data['rating'],
-                "grade": cleaned_data['grade'],
-                "anonymous": cleaned_data['anonymous']
-            }
-
-            new_review = Review(**review_data)
+            new_review = Review(
+                professor=new_professor,
+                course=course,
+                user=user if user.is_authenticated else None,
+                content=cleaned_data['content'],
+                rating=cleaned_data['rating'],
+                grade=cleaned_data['grade'],
+                anonymous=cleaned_data['anonymous']
+            )
             new_review.save()
 
             send_updates_webhook()
