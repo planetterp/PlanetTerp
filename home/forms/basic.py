@@ -118,12 +118,14 @@ class LoginForm(ModelForm):
     class Meta:
         model = User
         fields = ["password"]
+        widgets = {
+            "password": PasswordInput()
+        }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         password = self.fields['password']
-        password.widget = PasswordInput()
         password.error_messages['required'] = User._meta.get_field("password").error_messages['required']
 
         username = self.fields['username']
@@ -202,21 +204,23 @@ class RegisterForm(ModelForm):
     class Meta:
         model = User
         fields = ["username", "email", "password"]
+        widgets = {
+            "password": PasswordInput()
+        }
+        labels = {
+            'email': "Email"
+        }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         password = self.fields['password']
-        password.widget = PasswordInput()
         password.error_messages['required'] = User._meta.get_field("password").error_messages['required']
 
         username = self.fields['username']
         username_model_field = User._meta.get_field("username")
         username.help_text = username_model_field.help_text
         username.error_messages['required'] = username_model_field.error_messages['required']
-
-        email = self.fields['email']
-        email.label = "Email"
 
         self.field_errors = self.create_field_errors()
 
@@ -345,10 +349,12 @@ class ResetPasswordForm(ModelForm):
     class Meta:
         model = User
         fields = ["password"]
+        widgets = {
+            "password": PasswordInput()
+        }
 
     def __init__(self, reset_code: str, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['password'].widget = PasswordInput()
         self.fields['reset_code'].initial = reset_code
 
         self.helper = FormHelper()
