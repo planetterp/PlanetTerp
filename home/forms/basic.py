@@ -209,9 +209,9 @@ class RegisterForm(ModelForm):
         password.error_messages['required'] = User._meta.get_field("password").error_messages['required']
 
         username = self.fields['username']
-        user_model = User._meta.get_field("username")
-        username.help_text = user_model.help_text
-        username.error_messages['required'] = user_model.error_messages['required']
+        username_model_field = User._meta.get_field("username")
+        username.help_text = username_model_field.help_text
+        username.error_messages['required'] = username_model_field.error_messages['required']
 
         email = self.fields['email']
         email.label = "Email"
