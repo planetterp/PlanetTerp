@@ -28,13 +28,15 @@ class ProfileForm(ModelForm):
     )
 
     class Meta:
-        model = User
+        model = User()
         fields = ["username", "email", "date_joined", "send_review_email"]
+        help_text = {
+            "username": User._meta.get_field("username").help_text
+        }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.user = kwargs.get("instance")
-        self.fields['username'].help_text = User._meta.get_field("username").help_text
         email = self.fields['email']
 
         if self.user.email:
@@ -121,16 +123,17 @@ class LoginForm(ModelForm):
         widgets = {
             "password": PasswordInput()
         }
+        error_messages = {
+            "username": {
+                "required": User._meta.get_field("username").error_messages["required"]
+            },
+            "password": {
+                "required": User._meta.get_field("password").error_messages["required"]
+            }
+        }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-
-        password = self.fields['password']
-        password.error_messages['required'] = User._meta.get_field("password").error_messages['required']
-
-        username = self.fields['username']
-        username.error_messages['required'] = User._meta.get_field("username").error_messages['required']
-
         self.field_errors = self.create_field_errors()
 
         self.helper = FormHelper()
@@ -210,18 +213,20 @@ class RegisterForm(ModelForm):
         labels = {
             'email': "Email"
         }
+        help_text = {
+            "username": User._meta.get_field("username").help_text
+        }
+        error_messages = {
+            "username": {
+                'required': User._meta.get_field("username").error_messages['required']
+            },
+            "password": {
+                'required': User._meta.get_field("password").error_messages['required']
+            }
+        }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-
-        password = self.fields['password']
-        password.error_messages['required'] = User._meta.get_field("password").error_messages['required']
-
-        username = self.fields['username']
-        username_model_field = User._meta.get_field("username")
-        username.help_text = username_model_field.help_text
-        username.error_messages['required'] = username_model_field.error_messages['required']
-
         self.field_errors = self.create_field_errors()
 
         self.helper = FormHelper()
