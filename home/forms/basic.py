@@ -136,8 +136,10 @@ class LoginForm(ModelForm):
         self.helper.form_show_errors = False
         self.helper.field_class = 'w-75'
         self.helper.label_class = 'mt-2'
+        self.helper.layout = self.generate_layout()
 
-        self.helper.layout = Layout(
+    def generate_layout(self):
+        return Layout(
             Div(
                 Field('username', placeholder="Username", wrapper_class='mb-0'),
                 self.field_errors['username'],
@@ -286,7 +288,10 @@ class ForgotPasswordForm(Form):
         self.helper.form_id = "reset_password_form"
         self.helper.form_show_labels = False
         self.helper.form_show_errors = False
-        self.helper.layout = Layout(
+        self.helper.layout = self.generate_layout()
+
+    def generate_layout(self):
+        return Layout(
             BootstrapModal(
                 Field('email', placeholder="Email", wrapper_class="mb-0"),
                 HTML('''
@@ -351,7 +356,10 @@ class ResetPasswordForm(ModelForm):
         self.helper.form_class = "w-50"
         self.helper.form_show_labels = False
         self.helper.form_show_errors = False
-        self.helper.layout = Layout(
+        self.helper.layout = self.generate_layout()
+
+    def generate_layout(self):
+        return Layout(
             Field(
                 'password',
                 placeholder="Enter your new password...",
