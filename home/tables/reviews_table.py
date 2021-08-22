@@ -79,7 +79,7 @@ class VerifiedReviewsTable(BaseReviewsTable):
 
     def __init__(self, reviews, request, *args, **kwargs):
         noun = "instructor" if "professor" in request.path else "course"
-        self.empty_text = mark_safe(
+        empty_text = mark_safe(
             (
             f'<h4 class="text-center">This {noun} has not been reviewed yet. '
             'Why not be the first to do so?</h4>'
@@ -90,23 +90,23 @@ class VerifiedReviewsTable(BaseReviewsTable):
         if request.user.is_staff:
             self.columns.append(ReviewsTableColumn.ACTION)
 
-        kwargs = {"empty_text": self.empty_text}
+        kwargs = {"empty_text": empty_text}
         super().__init__(self.columns, reviews, request, *args, **kwargs)
 
 class UnverifiedReviewsTable(BaseReviewsTable):
     action = UnverifiedReviewsActionColumn()
 
     def __init__(self, reviews, request, *args, **kwargs):
-        self.empty_text = mark_safe('<h4 class="text-center">There are no reviews to verify!</h4>')
+        empty_text = mark_safe('<h4 class="text-center">There are no reviews to verify!</h4>')
         self.columns = [ReviewsTableColumn.INFORMATION, ReviewsTableColumn.REVIEW, ReviewsTableColumn.ACTION]
 
-        kwargs = {"empty_text": self.empty_text}
+        kwargs = {"empty_text": empty_text}
         super().__init__(self.columns, reviews, request, *args, **kwargs)
 
 class ProfileReviewsTable(BaseReviewsTable):
     def __init__(self, reviews, request, *args, **kwargs):
-        self.empty_text = mark_safe('<h4 class="text-center">You haven\'t written any reviews! Why not start now?</h4>')
+        empty_text = mark_safe('<h4 class="text-center">You haven\'t written any reviews! Why not start now?</h4>')
         self.columns = [ReviewsTableColumn.INFORMATION, ReviewsTableColumn.REVIEW, ReviewsTableColumn.STATUS]
 
-        kwargs = {"empty_text": self.empty_text}
+        kwargs = {"empty_text": empty_text}
         super().__init__(self.columns, reviews, request, *args, **kwargs)
