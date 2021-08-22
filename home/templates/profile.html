@@ -97,6 +97,11 @@
 				if (data["success"]) {
 					$("#profile-form-success").html(data["message"]);
 					$("#profile-form-success").removeClass('d-none').addClass('d-inline');
+
+					let email_field = $("#profile-form #id_email");
+					if (!(email_field.val() == '' || email_field.prop("disabled"))) {
+						email_field.prop("disabled", "true");
+					}
 				} else {
 					$("#profile-form").html(data['form']);
 					$("#profile-form div.invalid-feedback").show();
