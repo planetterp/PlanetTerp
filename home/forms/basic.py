@@ -28,6 +28,9 @@ class ProfileForm(ModelForm):
     )
 
     class Meta:
+        # This is a temporary workaround for
+        # https://discord.com/channels/784561204289994753/879121341159186453/879124088226992209
+        # and needs to be resolved properly in the future
         model = User()
         fields = ["username", "email", "date_joined", "send_review_email"]
         help_text = {
