@@ -223,7 +223,8 @@ class User(AbstractUser):
             validators.MinLengthValidator(8, "Password must be at least 8 characters")
         ]
 
-    def error_message_unique(self, value, include_anchor=True):
+    @staticmethod
+    def error_message_unique(value, include_anchor=True):
         error_message = 'A user with that {} already exists.'
 
         if include_anchor:
