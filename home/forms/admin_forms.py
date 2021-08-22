@@ -499,8 +499,8 @@ class ProfessorMergeForm(Form):
 
     def __init__(self, request, merge_subject: Professor=None, use_large_inputs=False, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.input_css_classes = " form-control-lg" if use_large_inputs else ""
-        self.button_css_classes = " btn-lg w-100" if use_large_inputs else ""
+        self.input_css_classes = "form-control-lg" if use_large_inputs else ""
+        self.button_css_classes = "btn-lg w-100" if use_large_inputs else ""
 
         self.helper = FormHelper()
         self.helper.form_id = "merge-professor-form"
@@ -562,7 +562,7 @@ class ProfessorMergeForm(Form):
                     'merge_subject',
                     placeholder="Merge Subject",
                     type="search",
-                    css_class="rounded-0" + self.input_css_classes,
+                    css_class="rounded-0 " + self.input_css_classes,
                     wrapper_class="mb-0"
                 ),
                 'subject_id',
@@ -574,7 +574,7 @@ class ProfessorMergeForm(Form):
                     'merge_target',
                     placeholder="Merge Target",
                     type="search",
-                    css_class="rounded-right" + self.input_css_classes,
+                    css_class="rounded-right " + self.input_css_classes,
                     wrapper_class="mb-0"
                 ),
                 'target_id',
@@ -583,7 +583,7 @@ class ProfessorMergeForm(Form):
             Button(
                 'merge',
                 'Merge',
-                css_class="btn-primary float-right mt-3" + self.button_css_classes,
+                css_class="btn-primary float-right mt-3 " + self.button_css_classes,
                 onClick='sendResponse($("#merge-professor-form").serialize(), "professor_merge")'
             )
         )
