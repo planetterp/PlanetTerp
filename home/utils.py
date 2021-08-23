@@ -74,7 +74,6 @@ def ttl_cache(max_age, maxsize=128, typed=False):
     exactly `max_age` seconds. Rather it only guarantees that the result will be
     cached for at *most* `max_age` seconds. This is to simplify implementation.
     """
-
     def decorator(function):
         @lru_cache(maxsize=maxsize, typed=typed)
         def with_time_salt(*args, __time_salt, **kwargs):
