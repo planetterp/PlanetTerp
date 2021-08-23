@@ -57,6 +57,24 @@ def slug_in_use_err(slug: str, name: str):
 
 # adapted from https://stackoverflow.com/a/63674816
 def ttl_cache(max_age, maxsize=128, typed=False):
+    """
+    An @lru_cache, but instead of caching indefinitely (or until purged from
+    the cache, which in practice rarely happens), only caches for `max_age`
+    seconds.
+
+    That is, at the first function call with certain arguments, the result is
+    cached. Then, when the funcion is called again with those arguments, if it
+    has been more than `max_age` seconds since the first call, the result is
+    recalculated and that value is cached. Otherwise, the cached value is
+    returned.
+
+    Warnings
+    --------
+    This function does not guarantee that the result will be cached for exactly
+    `max_age` seconds. Rather it only guarantees that the result will be cached
+    for at *most* `max_age` seconds. This is to simplify implementation.
+    """
+
     def decorator(function):
         @lru_cache(maxsize=maxsize, typed=typed)
         def with_time_salt(*args, __time_salt, **kwargs):
