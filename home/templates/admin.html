@@ -66,20 +66,27 @@
 	}
 
 	function verifyReview(form) {
-		sendResponse($(form).serialize(), "review_verify", {"count" : --num_reviews});
+		var review_counter = (num_reviews > 0 ? --num_reviews : 0)
+		sendResponse($(form).serialize(), "review_verify", {"count" : review_counter});
 	}
 
 	function verifyProfessor(form) {
-		args = {"count" : --prof_count, "num_reviews" : num_reviews}
+		var professor_counter = (prof_count > 0 ? --prof_count : 0)
+
+		args = {"count" : professor_counter, "num_reviews" : num_reviews}
 		sendResponse($(form).serialize(), "professor_verify", args);
 	}
 
 	function verifySlug(form) {
-		sendResponse($(form).serialize(), "professor_slug", {"count" : --prof_count});
+		var professor_counter = (prof_count > 0 ? --prof_count : 0)
+
+		sendResponse($(form).serialize(), "professor_slug", {"count" : professor_counter});
 	}
 
 	function deleteProfessor(form) {
-		var args = {"count" : --prof_count, "num_reviews" : num_reviews, "form": form};
+		var professor_counter = (prof_count > 0 ? --prof_count : 0)
+
+		var args = {"count" : professor_counter, "num_reviews" : num_reviews, "form": form};
 		sendResponse($(form).serialize(), "professor_verify", args);
 	}
 
