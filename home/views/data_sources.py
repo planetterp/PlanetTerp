@@ -3,7 +3,7 @@ from django.views import View
 from django.db.models import Sum
 
 from home.utils import ttl_cache, semester_number
-from home.models import Professor, Grade, Course, Gened, ProfessorCourse
+from home.models import Professor, Grade, Course, Gened
 
 
 class GradeData(View):
@@ -14,88 +14,74 @@ class GradeData(View):
         course = data.get("course", None)
         semester = data.get("semester", None)
         section = data.get("section", None)
-        spring_2020 = data.get("spring_2020", True) == "true"
-
-        def _statistic(name, num_students, grades):
-            if not num_students:
-                return 0
-            return round((grades[name] / num_students) * 100, 2)
+        spring_2020 = data.get("spring_2020", False) == "true"
 
         if professor_courses:
+            grade_data = self._course_grade_data(professor, spring_2020)
             data = {
-                "professor": professor
+                "professor_slug": grade_data.pop("professor_slug"),
+                "average_gpa": grade_data.pop("average_gpa"),
+                "num_students": grade_data.pop("num_students"),
+                "data": {}
             }
 
-            course_data = self._professor_course_grade_data(professor)
-            for course_name, course_data in self._professor_course_grade_data(professor):
-                (average_gpa, num_students, course_grades, *args) = course_data
+            for course_name, course_data in grade_data.items():
+                (course_average_gpa, course_num_students, course_grades) = course_data
 
-                args = (num_students, course_grades)
-                data[course_name] = {
-                    "average_gpa": average_gpa,
-                    "num_students": num_students,
-                    "data_plus": [
-                        _statistic("a_plus_total", *args),
-                        _statistic("b_plus_total", *args),
-                        _statistic("c_plus_total", *args),
-                        _statistic("d_plus_total", *args)
-                    ],
-                    "data_flat": [
-                        _statistic("a_total", *args),
-                        _statistic("b_total", *args),
-                        _statistic("c_total", *args),
-                        _statistic("d_total", *args),
-                        _statistic("f_total", *args),
-                        _statistic("w_total", *args),
-                        _statistic("other_total", *args)
-                    ],
-                    "data_minus": [
-                        _statistic("a_minus_total", *args),
-                        _statistic("b_minus_total", *args),
-                        _statistic("c_minus_total", *args),
-                        _statistic("d_minus_total", *args)
-                    ]
-                }
+                if course_num_students and course_average_gpa:
+                    data['data'][course_name] = self._get_data(
+                        course_average_gpa, course_num_students, course_grades)
         else:
             (average_gpa, num_students, grades) = self._grade_data(professor,
                 professor_courses, course, semester, section, spring_2020)
 
-            args = (num_students, grades)
-            data = {
-                "average_gpa": average_gpa,
-                "num_students": num_students,
-                "data_plus": [
-                    _statistic("a_plus_total", *args),
-                    _statistic("b_plus_total", *args),
-                    _statistic("c_plus_total", *args),
-                    _statistic("d_plus_total", *args)
-                ],
-                "data_flat": [
-                    _statistic("a_total", *args),
-                    _statistic("b_total", *args),
-                    _statistic("c_total", *args),
-                    _statistic("d_total", *args),
-                    _statistic("f_total", *args),
-                    _statistic("w_total", *args),
-                    _statistic("other_total", *args)
-                ],
-                "data_minus": [
-                    _statistic("a_minus_total", *args),
-                    _statistic("b_minus_total", *args),
-                    _statistic("c_minus_total", *args),
-                    _statistic("d_minus_total", *args)
-                ]
-            }
+            data = self._get_data(average_gpa, num_students, grades)
 
         return JsonResponse(data)
 
     @staticmethod
-    @ttl_cache(24 * 60 * 60)
-    def _professor_course_grade_data(professor):
-        professor = Professor.objects.verified.filter(slug=professor).first()
-        grades = Grade.objects.filter(professor=professor)
+    def _get_data(average_gpa, num_students, grades):
+        def _statistic(name):
+            if not num_students:
+                return 0
+            return round((grades[name] / num_students) * 100, 2)
+
+        return {
+            "average_gpa": average_gpa,
+            "num_students": num_students,
+            "data_plus": [
+                _statistic("a_plus_total"),
+                _statistic("b_plus_total"),
+                _statistic("c_plus_total"),
+                _statistic("d_plus_total")
+            ],
+            "data_flat": [
+                _statistic("a_total"),
+                _statistic("b_total"),
+                _statistic("c_total"),
+                _statistic("d_total"),
+                _statistic("f_total"),
+                _statistic("w_total"),
+                _statistic("other_total")
+            ],
+            "data_minus": [
+                _statistic("a_minus_total"),
+                _statistic("b_minus_total"),
+                _statistic("c_minus_total"),
+                _statistic("d_minus_total")
+            ]
+        }
+
+    @staticmethod
+    def _course_grade_data(professor, spring_2020):
+        professor = Professor.objects.verified.filter(name=professor).first()
         courses = Course.objects.filter(professors=professor)
+        grades = Grade.objects.filter(professor=professor)
+        if not spring_2020:
+            grades = grades.exclude(semester=202001)
+
         grade_data = {
+            "professor_slug": professor.slug,
             "average_gpa": grades.average_gpa(),
             "num_students": grades.num_students()
         }

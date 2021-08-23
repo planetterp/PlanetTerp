@@ -13,7 +13,7 @@ from django.db.models import (Model, CharField, DateTimeField, TextField,
 
 class GradeQuerySet(QuerySet):
     def average_gpa(self):
-        avg_gpa = self.aggregate(
+        return self.aggregate(
             average_gpa=(
                 (Sum("a_plus") * 4  + Sum("a") * 4 + Sum("a_minus") * 3.7 +
                 Sum("b_plus") * 3.3 + Sum("b") * 3 + Sum("b_minus") * 2.7 +
@@ -23,8 +23,6 @@ class GradeQuerySet(QuerySet):
                 Sum("num_students")
             )
         )["average_gpa"]
-
-        return round(avg_gpa, 2)
 
     def num_students(self):
         return self.aggregate(
