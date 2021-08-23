@@ -70,9 +70,9 @@ def ttl_cache(max_age, maxsize=128, typed=False):
 
     Warnings
     --------
-    This function does not guarantee that the result will be cached for exactly
-    `max_age` seconds. Rather it only guarantees that the result will be cached
-    for at *most* `max_age` seconds. This is to simplify implementation.
+    This function does not actually guarantee that the result will be cached for
+    exactly `max_age` seconds. Rather it only guarantees that the result will be
+    cached for at *most* `max_age` seconds. This is to simplify implementation.
     """
 
     def decorator(function):
