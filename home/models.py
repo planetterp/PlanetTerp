@@ -82,6 +82,9 @@ class ProfessorManager(Manager):
         return self.filter(status=Professor.Status.REJECTED)
 
 
+# The db_table Meta option changes the name of the table in the db viewer. It's
+# purely for aesthetics.
+
 class Course(Model):
     department = CharField(max_length=4)
     course_number = CharField(max_length=6)
