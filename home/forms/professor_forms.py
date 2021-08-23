@@ -57,8 +57,8 @@ class ProfessorForm(Form):
         label="Post Anonymously"
     )
 
-    def __init__(self, user: QuerySet, form_type: Review.ReviewType, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, user: QuerySet, form_type: Review.ReviewType, **kwargs):
+        super().__init__(**kwargs)
         self.user = user
         self.form_type = form_type
         self.field_errors = self.create_field_errors()
@@ -219,8 +219,8 @@ class ProfessorFormReview(ProfessorForm):
         label=False
     )
 
-    def __init__(self, user, professor, *args, **kwargs):
-        super().__init__(user, Review.ReviewType.REVIEW, *args, **kwargs)
+    def __init__(self, user, professor, **kwargs):
+        super().__init__(user, Review.ReviewType.REVIEW, **kwargs)
 
         choices = [(course.name, course.name) for course in Course.objects.filter(professors__pk=professor.id)]
         choices.insert(0, ('course', "Course"))
@@ -297,8 +297,8 @@ class ProfessorFormAdd(ProfessorForm):
         label=False
     )
 
-    def __init__(self, user, *args, **kwargs):
-        super().__init__(user, Review.ReviewType.ADD, *args, **kwargs)
+    def __init__(self, user, **kwargs):
+        super().__init__(user, Review.ReviewType.ADD, **kwargs)
 
         choices = [(tup[0],tup[0]) for tup in Professor.Type.choices]
         self.fields['type_'].choices = choices

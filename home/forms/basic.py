@@ -37,8 +37,8 @@ class ProfileForm(ModelForm):
             "username": User._meta.get_field("username").help_text
         }
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
         self.user = kwargs.get("instance")
         email = self.fields['email']
 
@@ -135,8 +135,8 @@ class LoginForm(ModelForm):
             }
         }
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
         self.field_errors = self.create_field_errors()
 
         self.helper = FormHelper()
@@ -228,8 +228,8 @@ class RegisterForm(ModelForm):
             }
         }
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
         self.field_errors = self.create_field_errors()
 
         self.helper = FormHelper()
@@ -293,8 +293,8 @@ class ForgotPasswordForm(Form):
         error_messages={"required": "Please enter an email address"}
     )
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
 
         self.helper = FormHelper()
         self.helper.form_id = "reset_password_form"
@@ -361,8 +361,8 @@ class ResetPasswordForm(ModelForm):
             "password": PasswordInput()
         }
 
-    def __init__(self, reset_code: str, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, reset_code: str, **kwargs):
+        super().__init__(**kwargs)
         self.fields['reset_code'].initial = reset_code
 
         self.helper = FormHelper()

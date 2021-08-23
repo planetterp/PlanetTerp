@@ -18,8 +18,8 @@ class ReviewVerifyForm(Form):
     verified = CharField(required=True, widget=HiddenInput, initial=Review.Status.VERIFIED.value)
     action_type = CharField(required=True, widget=HiddenInput, initial=AdminAction.REVIEW_VERIFY.value)
 
-    def __init__(self, review_id, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, review_id, **kwargs):
+        super().__init__(**kwargs)
         self.fields['review_id'].initial = review_id
 
         self.helper = FormHelper()
@@ -49,8 +49,8 @@ class ReviewRejectForm(Form):
     verified = CharField(required=True, widget=HiddenInput, initial=Review.Status.REJECTED.value)
     action_type = CharField(required=True, widget=HiddenInput, initial=AdminAction.REVIEW_VERIFY.value)
 
-    def __init__(self, review_id, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, review_id, **kwargs):
+        super().__init__(**kwargs)
         self.fields['review_id'].initial = review_id
 
         self.helper = FormHelper()
@@ -80,8 +80,8 @@ class ReviewHelpForm(Form):
     review_id = IntegerField(required=True, widget=HiddenInput)
     action_type = CharField(required=True, widget=HiddenInput, initial=AdminAction.REVIEW_HELP.value)
 
-    def __init__(self, review_id, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, review_id, **kwargs):
+        super().__init__(**kwargs)
         self.fields['review_id'].initial = review_id
 
         self.helper = FormHelper()
@@ -110,8 +110,8 @@ class ReviewUnverifyForm(Form):
     verified = CharField(required=True, widget=HiddenInput, initial=Review.Status.PENDING.value)
     action_type = CharField(required=True, widget=HiddenInput, initial=AdminAction.REVIEW_VERIFY.value)
 
-    def __init__(self, review_id, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, review_id, **kwargs):
+        super().__init__(**kwargs)
         self.fields['review_id'].initial = review_id
 
         self.helper = FormHelper()
@@ -140,8 +140,8 @@ class ProfessorVerifyForm(Form):
     verified = CharField(required=True, widget=HiddenInput, initial=Professor.Status.VERIFIED.value)
     action_type = CharField(required=True, widget=HiddenInput, initial=AdminAction.PROFESSOR_VERIFY.value)
 
-    def __init__(self, professor_id, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, professor_id, **kwargs):
+        super().__init__(**kwargs)
         self.fields['professor_id'].initial = professor_id
 
         self.helper = FormHelper()
@@ -172,8 +172,8 @@ class ProfessorRejectForm(Form):
     verified = CharField(required=True, widget=HiddenInput, initial=Professor.Status.REJECTED.value)
     action_type = CharField(required=True, widget=HiddenInput, initial=AdminAction.PROFESSOR_VERIFY.value)
 
-    def __init__(self, professor_id, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, professor_id, **kwargs):
+        super().__init__(**kwargs)
         self.fields['professor_id'].initial = professor_id
 
         self.helper = FormHelper()
@@ -206,8 +206,8 @@ class ProfessorDeleteForm(Form):
     professor_type = CharField(required=True, widget=HiddenInput)
     action_type = CharField(required=True, widget=HiddenInput, initial=AdminAction.PROFESSOR_DELETE.value)
 
-    def __init__(self, professor: Professor, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, professor: Professor, **kwargs):
+        super().__init__(**kwargs)
         self.fields['professor_id'].initial = professor.pk
         self.fields['professor_type'].initial = professor.type
 
@@ -240,8 +240,8 @@ class ProfessorSlugForm(Form):
     professor_id = IntegerField(required=True, widget=HiddenInput)
     action_type = CharField(required=True, widget=HiddenInput, initial=AdminAction.PROFESSOR_SLUG.value)
 
-    def __init__(self, professor: Professor, modal_title="", *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, professor: Professor, modal_title="", **kwargs):
+        super().__init__(**kwargs)
         self.professor = professor
         self.modal_title = modal_title
         self.fields['professor_id'].initial = self.professor.pk
@@ -365,8 +365,8 @@ class ProfessorUpdateForm(ModelForm):
         model = Professor
         exclude = ['status']
 
-    def __init__(self, professor: Professor, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, professor: Professor, **kwargs):
+        super().__init__(**kwargs)
         self.professor = professor
         self.helper = FormHelper()
         self.helper.form_id = "edit-professor-form"
@@ -493,8 +493,8 @@ class ProfessorUnverifyForm(Form):
     action_type = CharField(required=True, widget=HiddenInput, initial=AdminAction.PROFESSOR_VERIFY.value)
     verified = CharField(required=True, widget=HiddenInput, initial=Professor.Status.PENDING.value)
 
-    def __init__(self, professor_id, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, professor_id, **kwargs):
+        super().__init__(**kwargs)
         self.fields['professor_id'].initial = professor_id
         self.helper = FormHelper()
         self.helper.form_id = "unverify-professor-form"
@@ -543,8 +543,8 @@ class ProfessorMergeForm(Form):
         widget=HiddenInput
     )
 
-    def __init__(self, request, merge_subject: Professor=None, use_large_inputs=False, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, request, merge_subject: Professor=None, use_large_inputs=False, **kwargs):
+        super().__init__(**kwargs)
         self.input_css_classes = "form-control-lg" if use_large_inputs else ""
         self.button_css_classes = "btn-lg w-100" if use_large_inputs else ""
 
