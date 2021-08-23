@@ -33,7 +33,7 @@ class GradeData(View):
                         course_average_gpa, course_num_students, course_grades)
         else:
             (average_gpa, num_students, grades) = self._grade_data(professor,
-                professor_courses, course, semester, section, spring_2020)
+                course, semester, section, spring_2020)
 
             data = self._get_data(average_gpa, num_students, grades)
 
