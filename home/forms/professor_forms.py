@@ -12,6 +12,7 @@ from discord_webhook.webhook import DiscordEmbed
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Fieldset, Layout, Div, Field, HTML, Button
 from crispy_forms.bootstrap import FormActions, Alert, InlineRadios
+from django.utils.safestring import mark_safe
 
 from home.forms.layout_objects.bootstrap_modal import BootstrapModal
 from home.models import Review, Professor, Course
@@ -121,8 +122,13 @@ class ProfessorForm(Form):
                 css_class="anonymous-checkbox"
             )
         else:
+            banner_text = (
+                '<strong>Note:</strong> <a href="/login" target="_blank">'
+                'Register</a> to save your reviews to an account and to put a '
+                'username next to your reviews'
+            )
             login_banner = Alert(
-                '<strong>Note:</strong> <a href="{% url \'login\' %}" target="_blank">Register</a> to save your reviews to an account and to put a username next to your reviews',
+                mark_safe(banner_text),
                 css_class="alert-primary text-center info-alert w-100 rounded-0"
             )
 
