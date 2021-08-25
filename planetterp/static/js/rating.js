@@ -25,16 +25,18 @@ function initializeRateYo(multiplier, form_type, show_error_styles) {
 	}
 }
 
-$(window).resize(function() {
-	setRateYoSize("#review-left-wrapper-add", "#rateYo_add");
-
-	if (window.location.href.includes("/professor/")) {
-		setRateYoSize("#review-left-wrapper-review", "#rateYo_review");
-	}
-});
-
 function setRateYoSize(wrapper_id, rateYo_instance_id) {
 	var starWidth =  $(wrapper_id).width() / 5;
 	starWidth = (starWidth >= 20 ? starWidth : 20) // minimum starWidth is 20px
 	$(rateYo_instance_id).rateYo("option", "starWidth", starWidth + "px");
 }
+
+$(function() {
+	$(window).resize(function() {
+		setRateYoSize("#review-left-wrapper-add", "#rateYo_add");
+
+		if (window.location.href.includes("/professor/")) {
+			setRateYoSize("#review-left-wrapper-review", "#rateYo_review");
+		}
+	});
+});
