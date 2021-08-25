@@ -1,11 +1,11 @@
 from enum import Enum, auto
 from functools import lru_cache, wraps
-from home.models import Professor, Review
 import time
 
 from discord_webhook import DiscordWebhook
 from discord_webhook.webhook import DiscordEmbed
 
+from home.models import Professor, Review
 from planetterp.config import discord_webhook_updates_url
 
 def semester_name(semester_number):
