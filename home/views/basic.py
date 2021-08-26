@@ -1,11 +1,16 @@
+from django.template.context_processors import csrf
 from django.http.response import JsonResponse
 from django.shortcuts import redirect, render
 from django.views import View
 from django.views.generic import TemplateView, RedirectView, ListView
 from django.http import HttpResponse
 
+from crispy_forms.utils import render_crispy_form
+
 from home.models import Organization, Professor, Course, Review, Grade
 from home.tables.reviews_table import VerifiedReviewsTable
+from home.forms.basic import HistoricCourseGradeLookupForm
+from home.utils import GradeData
 
 
 class About(View):
@@ -51,7 +56,6 @@ class Robots(TemplateView):
     template_name = "robots.html"
 
 class Sitemap(View):
-
     def get(self, request):
         courses = Course.objects.all()
         professors = Professor.objects.verified
@@ -64,8 +68,41 @@ class Sitemap(View):
             content_type="application/xml")
 
 # TODO reimplement this page
-class Grades(TemplateView):
+class Grades(View):
     template_name = "grades.html"
+
+    def get(self, request):
+        context = {
+            "form": HistoricCourseGradeLookupForm()
+        }
+        return render(request, self.template_name, context)
+
+    def post(self, request):
+        form = HistoricCourseGradeLookupForm(request.POST["course"], data=request.POST)
+        ctx = {}
+        ctx.update(csrf(request))
+        context = {
+            "success": False
+        }
+
+        if form.is_valid():
+            context["success"] = True
+            data = request.POST
+            professor = data.get("professor", None)
+            professor_courses = data.get("professor_courses", False)
+            course = data.get("course", None)
+            semester = data.get("semester", None)
+            section = data.get("section", None)
+            spring_2020 = data.get("spring_2020", False) == "true"
+
+            if professor_courses:
+                context['data'] = GradeData.compose_course_grade_data(professor, spring_2020)
+            else:
+                context['data'] = GradeData.compose_grade_data(professor, course, semester, section, spring_2020)
+        else:
+            print(form.errors)
+        context["form"] = render_crispy_form(form, form.helper, context=ctx)
+        return JsonResponse(context)
 
 class CourseReviews(View):
     def get(self, request, name):

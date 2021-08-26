@@ -1,4 +1,5 @@
 {% extends "base_main.html" %}
+{% load crispy_forms_tags %}
 
 {% block title %}Grade Lookup | PlanetTerp{% endblock %}
 
@@ -47,53 +48,14 @@
 	<h1 class="text-center">Historical Grade Lookup</h1>
 
 	<div class="row">
-		<div class="col-sm-6 text-center">
+		<div class="col-6 text-center">
 			<h2>Lookup by course</h2>
-
-			<div class="form-group row justify-content-center">
-				<label for="course-search" class="col-form-label">Course</label>
-				<div class="col-sm-3">
-					<input type="text" class="form-control autocomplete" id="course-search" placeholder="Course..." name="course">
-				</div>
-			</div>
-			<div id="semester-search-input" class="form-group row justify-content-center" style="display: none;">
-				<label for="semester-search" class="col-form-label">Semester</label>
-				<div class="col-sm-3" style="display: flex; align-items: center;">
-					{% comment %} TODO: Replace hard-coded select options with
-					programatically obtained options that reflect semesters we
-					actually have data for {% endcomment %}
-					<select id="semester-search" name="semester" class="custom-select">
-						<option value="">Select...</option>
-						<option value="Spring 2012">Spring 2012</option>
-						<option value="Fall 2012">Fall 2012</option>
-						<option value="Spring 2013">Spring 2013</option>
-						<option value="Fall 2013">Fall 2013</option>
-						<option value="Spring 2014">Spring 2014</option>
-						<option value="Fall 2014">Fall 2014</option>
-						<option value="Spring 2015">Spring 2015</option>
-						<option value="Fall 2015">Fall 2015</option>
-						<option value="Spring 2016">Spring 2016</option>
-						<option value="Fall 2016">Fall 2016</option>
-						<option value="Spring 2017">Spring 2017</option>
-						<option value="Fall 2017">Fall 2017</option>
-						<option value="Spring 2018">Spring 2018</option>
-						<option value="Fall 2018">Fall 2018</option>
-						<option value="Spring 2019">Spring 2019</option>
-						<option value="Fall 2019">Fall 2019</option>
-						<option value="Spring 2020">Spring 2020</option>
-						<option value="Fall 2020">Fall 2020</option>
-					</select>
-				</div>
-			</div>
-			<div id="section-search-input" class="form-group row justify-content-center" style="display: none;">
-				<label for="course-search" class="col-form-label">Section</label>
-				<div class="col-sm-3">
-					<input type="text" class="form-control autocomplete" id="section-search" placeholder="Section..." name="section">
-				</div>
+			<div id="course-lookup-form-container">
+				{% crispy form %}
 			</div>
 		</div>
 
-		<div class="col-sm-6 text-center">
+		<div class="col-6 text-center">
 			<h2>Lookup by professor</h2>
 
 			<div class="form-group row justify-content-center">
@@ -130,32 +92,12 @@
 
 <script type="text/javascript" src="../static/js/chart.min.js"></script>
 <script>
-	$(document).ready(function() {
-		var gradesGraph;
-		var canvasCount = 0;
-		var lastSearch;
+	var gradesGraph;
+	var canvasCount = 0;
+	var lastSearch;
 
-		$("#course-search").autocomplete({
-			minLength: 3,
-			source: function(request, response) {
-				$.ajax({
-					url: "{% url 'autocomplete' %}",
-					dataType: 'json',
-					data: {
-						"query": request.term,
-						"types[]": ["course"],
-						"return_attrs[]": ["name"]
-					},
-					success: function(data) {
-						response(data);
-					}
-				})
-			},
-			select: function(event, ui) {
-				var course = ui.item.result.name;
-				courseGrades(course);
-			}
-		});
+	$(function() {
+		initializeCourseLookupAutoComplete();
 
 		$("#course-search").keypress(function (e) { // Allow course search when user
 													// presses enter (rather than clicking
@@ -186,61 +128,12 @@
 			}
 		});
 
-		function courseGrades(course) {
-			lastSearch = "course";
-			$("#semester-search").val("");
-
-			$.ajax({
-				url: "{% url 'grade-data' %}",
-				dataType: 'json',
-				data: {
-					'course': course,
-					'spring_2020': $('#include-spring2020').is(':checked')
-				},
-				success: function(data) {
-					$("#grades-information").html("");
-					$("#grades-information-error").html("");
-					$("html").find('.graph-wrapper').remove(); // Remove all previously created graphs
-					$("html").find('.grades-info').remove(); // Remove all previously created course information
-
-					$("#include-spring2020-input").show();
-					$("#semester-search").prop('checked', false);
-					$("#semester-search-input").show();
-
-					generate_graph(course, data);
-				},
-				error: function(response) {
-					if (response.responseText === "Only Spring 2020 grade data is available for those parameters.") {
-						$("#include-spring2020-input").show();
-
-						var errorText = "<div class=\"alert alert-info error-alert text-center\">";
-						errorText += "<strong>Note:</strong> ";
-						errorText += "This course only has grade data for Spring 2020. Click on the <code>include spring 2020</code> checkbox above to check the grades for this course for Spring 2020.</h5>.";
-						errorText += "</div><br />";
-						}
-					else {
-						var errorText = "<div class=\"alert alert-danger error-alert text-center\">";
-						errorText += "<strong>Error:</strong> ";
-						errorText += "No grade data available for that course.";
-						errorText += "</div><br />";
-					}
-
-					$("html").find('.graph-wrapper').remove(); // Remove all previously created graphs
-					$("html").find('.grades-info').remove(); // Remove all previously created course information
-					$("#grades-information").html("");
-					$("#grades-information-error").html(errorText);
-
-					$("#section-search-input").hide();
-					$("#section-search").val("");
-				}
-			})
-		}
-
 		function professorGrades(professor) {
 			lastSearch = "professor";
 
 			$.ajax({
-				url: "{% url 'grade-data' %}",
+				url: "{% url 'grades' %}",
+				type: "POST",
 				dataType: 'json',
 				data: {
 					'professor': professor,
@@ -291,93 +184,14 @@
 			})
 		}
 
-		$("#semester-search").change(function() {
-			$.ajax({
-				url: "{% url 'grade-data' %}",
-				dataType: 'json',
-				data: {
-					'course': $("#course-search").val(),
-					'semester': $("#semester-search").val()
-				},
-				success: function(data) {
-					$("#grades-information").html("");
-					$("#grades-information-error").html("");
-					$("html").find('.graph-wrapper').remove(); // Remove all previously created graphs
-					$("html").find('.grades-info').remove(); // Remove all previously created course information
-					if ($("#semester-search").val() == "") {
-						($("#course-search").val(), data);
-						$("#include-spring2020-input").show();
-					}
-					else {
-						generate_graph($("#course-search").val(), data, $("#semester-search").val());
-					}
-					$("#section-search-input").show();
-				},
-				error: function(response) {
-					$("html").find('.graph-wrapper').remove(); // Remove all previously created graphs
-					$("html").find('.grades-info').remove(); // Remove all previously created course information
-
-					var errorText = "<div class=\"alert alert-danger error-alert text-center\">";
-					errorText += "<strong>Error:</strong> ";
-					errorText += "No grade data available for those parameters.";
-					errorText += "</div><br />";
-					$("#grades-information").html("");
-					$("#grades-information-error").html(errorText);
-					$("#section-search-input").hide();
-				}
-			})
-
-			$("#include-spring2020-input").hide();
-			$("#section-search").val("");
-		});
-
-		$("#section-search").keypress(function (e) {
-			if (e.which == 13) { // User pressed enter
-				$.ajax({
-				url: "{% url 'grade-data' %}",
-				dataType: 'json',
-				data: {
-					'course': $("#course-search").val(),
-					'semester': $("#semester-search").val(),
-					'section': $("#section-search").val()
-				},
-				success: function(data) {
-					$("html").find('.graph-wrapper').remove(); // Remove all previously created graphs
-					$("html").find('.grades-info').remove(); // Remove all previously created course information
-
-					$("#grades-information").html("");
-					$("#grades-information-error").html("");
-
-					if ($("#section-search").val() == "") {
-						generate_graph($("#course-search").val(), data, $("#semester-search").val());
-					}
-					else {
-						generate_graph($("#course-search").val(), data, $("#semester-search").val(), $("#section-search").val());
-					}
-				},
-				error: function(response) {
-					$("html").find('.graph-wrapper').remove(); // Remove all previously created graphs
-					$("html").find('.grades-info').remove(); // Remove all previously created course information
-
-					var errorText = "<div class=\"alert alert-danger error-alert text-center\">";
-					errorText += "<strong>Error:</strong> ";
-					errorText += "No grade data available for those parameters.";
-					errorText += "</div><br />";
-					$("#grades-information").html("");
-					$("#grades-information-error").html(errorText);
-				}
-			})
-			}
-		});
-
-		$("#professor-search").autocomplete({
-			minLength: 3,
-			source: function(request, response) {
-				$.ajax({
-					url: "{% url 'autocomplete' %}",
-					dataType: 'json',
-					data: {
-						"query": request.term,
+			$("#professor-search").autocomplete({
+				minLength: 3,
+				source: function(request, response) {
+					$.ajax({
+						url: "{% url 'autocomplete' %}",
+						dataType: 'json',
+						data: {
+							"query": request.term,
 						"types[]": ["professor"],
 						"return_attrs[]": ["name"]
 					},
@@ -391,119 +205,260 @@
 				professorGrades(professor);
 			}
 		});
+	});
 
-		function generate_graph(course, grade_data) {
-			course = course.toUpperCase();
-			$("#grades-graphs").append('<p id="grades-text' + canvasCount + '" class="text-center grades-info"></p>')
-			$("#grades-graphs").append('<div class="graph-wrapper"><canvas id="grades' + canvasCount + '" width="500px" height="500px" style="margin: 0 auto;"></canvas></div>')
+	function courseGrades(course) {
+		lastSearch = "course";
+		$("#semester-search").val("");
 
-			var graph = document.getElementById('grades' + canvasCount).getContext("2d");
-			var grades_text = `Showing data for <a href="/course/${course}" target="_blank">${course}</a>`
+		$.ajax({
+			url: "{% url 'grades' %}",
+			type: "POST",
+			dataType: 'json',
+			data: {
+				'course': course,
+				'spring_2020': $('#include-spring2020').is(':checked')
+			},
+			success: function(data) {
+				$("html").find('.graph-wrapper').remove(); // Remove all previously created graphs
+				$("html").find('.grades-info').remove(); // Remove all previously created course information
+				$("#grades-information").html("");
+				$("#course-lookup-form-container").html(data.form);
+				initializeCourseLookupAutoComplete();
 
-			if (arguments.length == 3) {
-				grades_text += ` ${arguments[2]}`
-			} else if (arguments.length == 4) {
-				grades_text += ` ${arguments[2]} (Section ${arguments[3]})`
+				if (data["success"]) {
+					$(".lookup-error").hide();
+
+					$("#include-spring2020-input").show();
+					$("#semester-search").prop('checked', false);
+					$("#semester-search-input").show();
+
+					generate_graph(course, data.data);
+				} else {
+					$("#section-search-input").hide();
+					$(".lookup-error").show();
+				}
+			},
+		})
+	}
+
+
+	function initializeCourseLookupAutoComplete() {
+		$("#course-search").autocomplete({
+			minLength: 3,
+			source: function(request, response) {
+				$.ajax({
+					url: "{% url 'autocomplete' %}",
+					dataType: 'json',
+					data: {
+						"query": request.term,
+						"types[]": ["course"],
+						"return_attrs[]": ["name"]
+					},
+					success: function(data) {
+						response(data);
+					}
+				})
+			},
+			select: function(event, ui) {
+				var course = ui.item.result.name;
+				courseGrades(course);
 			}
+		});
+	}
 
-			grades_text += `<br>Average GPA: ${grade_data.average_gpa.toFixed(2)} between ${grade_data.num_students} students`
-			$("#grades-text" + canvasCount).html(grades_text);
-			canvasCount++;
 
-			gradesGraph = new Chart(graph, {
-				type: 'bar',
-				data: {
-					labels: ["A", "B", "C", "D", "F", "W", "other"],
-					datasets: [
-						{
-							label: "-",
-							data: grade_data.data_minus,
-							backgroundColor: [
-								'rgba(58, 215, 65, .4)',
-								'rgba(58, 215, 65, .4)',
-								'rgba(58, 215, 65, .4)',
-								'rgba(58, 215, 65, .4)'
-							],
-							borderColor: [
-								'rgba(29, 77, 0, 1)',
-								'rgba(29, 77, 0, 1)',
-								'rgba(29, 77, 0, 1)',
-								'rgba(29, 77, 0, 1)'
-							],
-							borderWidth: 2
-						},
-						{
-							label: "",
-							data: grade_data.data_flat,
-							backgroundColor: [
-								'rgba(25, 140, 35, .5)',
-								'rgba(25, 140, 35, .5)',
-								'rgba(25, 140, 35, .5)',
-								'rgba(25, 140, 35, .5)',
-								'rgba(226, 0, 0, .7)',
-								'rgba(226, 0, 0, .7)',
-								'rgba(217, 217, 217, .4)',
-							],
-							borderColor: [
-								'rgba(29, 77, 0, 1)',
-								'rgba(29, 77, 0, 1)',
-								'rgba(29, 77, 0, 1)',
-								'rgba(29, 77, 0, 1)',
-								'rgba(196, 0, 0, 1)',
-								'rgba(196, 0, 0, 1)',
-								'rgba(201, 201, 201, 1)'
-							],
-							borderWidth: 2
-						},
-						{
-							label: "+",
-							data: grade_data.data_plus,
-							backgroundColor: [
-								'rgba(6, 74, 12, .7)',
-								'rgba(6, 74, 12, .7)',
-								'rgba(6, 74, 12, .7)',
-								'rgba(6, 74, 12, .7)'
-							],
-							borderColor: [
-								'rgba(29, 77, 0, 1)',
-								'rgba(29, 77, 0, 1)',
-								'rgba(29, 77, 0, 1)',
-								'rgba(29, 77, 0, 1)'
-							],
-							borderWidth: 2
-						}
+	function generate_graph(course, grade_data) {
+		console.log(grade_data);
+		course = course.toUpperCase();
+		$("#grades-graphs").append('<p id="grades-text' + canvasCount + '" class="text-center grades-info"></p>')
+		$("#grades-graphs").append('<div class="graph-wrapper"><canvas id="grades' + canvasCount + '" width="500px" height="500px" style="margin: 0 auto;"></canvas></div>')
+
+		var graph = document.getElementById('grades' + canvasCount).getContext("2d");
+		var grades_text = `Showing data for <a href="/course/${course}" target="_blank">${course}</a>`
+
+		if (arguments.length == 3) {
+			grades_text += ` ${arguments[2]}`
+		} else if (arguments.length == 4) {
+			grades_text += ` ${arguments[2]} (Section ${arguments[3]})`
+		}
+
+		grades_text += `<br>Average GPA: ${grade_data.average_gpa.toFixed(2)} between ${grade_data.num_students} students`
+		$("#grades-text" + canvasCount).html(grades_text);
+		canvasCount++;
+
+		gradesGraph = new Chart(graph, {
+			type: 'bar',
+			data: {
+				labels: ["A", "B", "C", "D", "F", "W", "other"],
+				datasets: [
+					{
+						label: "-",
+						data: grade_data.data_minus,
+						backgroundColor: [
+							'rgba(58, 215, 65, .4)',
+							'rgba(58, 215, 65, .4)',
+							'rgba(58, 215, 65, .4)',
+							'rgba(58, 215, 65, .4)'
+						],
+						borderColor: [
+							'rgba(29, 77, 0, 1)',
+							'rgba(29, 77, 0, 1)',
+							'rgba(29, 77, 0, 1)',
+							'rgba(29, 77, 0, 1)'
+						],
+						borderWidth: 2
+					},
+					{
+						label: "",
+						data: grade_data.data_flat,
+						backgroundColor: [
+							'rgba(25, 140, 35, .5)',
+							'rgba(25, 140, 35, .5)',
+							'rgba(25, 140, 35, .5)',
+							'rgba(25, 140, 35, .5)',
+							'rgba(226, 0, 0, .7)',
+							'rgba(226, 0, 0, .7)',
+							'rgba(217, 217, 217, .4)',
+						],
+						borderColor: [
+							'rgba(29, 77, 0, 1)',
+							'rgba(29, 77, 0, 1)',
+							'rgba(29, 77, 0, 1)',
+							'rgba(29, 77, 0, 1)',
+							'rgba(196, 0, 0, 1)',
+							'rgba(196, 0, 0, 1)',
+							'rgba(201, 201, 201, 1)'
+						],
+						borderWidth: 2
+					},
+					{
+						label: "+",
+						data: grade_data.data_plus,
+						backgroundColor: [
+							'rgba(6, 74, 12, .7)',
+							'rgba(6, 74, 12, .7)',
+							'rgba(6, 74, 12, .7)',
+							'rgba(6, 74, 12, .7)'
+						],
+						borderColor: [
+							'rgba(29, 77, 0, 1)',
+							'rgba(29, 77, 0, 1)',
+							'rgba(29, 77, 0, 1)',
+							'rgba(29, 77, 0, 1)'
+						],
+						borderWidth: 2
+					}
+				]
+			},
+			options: {
+				title: {
+					display: true,
+					text: 'Grade Distribution'
+				},
+				scales: {
+					xAxes: [{stacked: true}],
+					yAxes: [{
+						stacked: true,
+						scaleLabel: {
+							display: true,
+							labelString: "% of students"
+						}}
 					]
 				},
-				options: {
-					title: {
-						display: true,
-						text: 'Grade Distribution'
-					},
-					scales: {
-						xAxes: [{stacked: true}],
-						yAxes: [{
-							stacked: true,
-							scaleLabel: {
-								display: true,
-								labelString: "% of students"
-							}}
-						]
-					},
-					legend: {
-						reverse: true
-					},
-					responsive: true,
-					maintainAspectRatio: false,
-					tooltips: {
-						callbacks: {
-							title: function(tooltipItem, data) {
-								return tooltipItem[0]['xLabel'] + data['datasets'][tooltipItem[0]['datasetIndex']]['label'];
-							}
+				legend: {
+					reverse: true
+				},
+				responsive: true,
+				maintainAspectRatio: false,
+				tooltips: {
+					callbacks: {
+						title: function(tooltipItem, data) {
+							return tooltipItem[0]['xLabel'] + data['datasets'][tooltipItem[0]['datasetIndex']]['label'];
 						}
 					}
 				}
-			});
+			}
+		});
+	}
+
+	function semesterSearch() {
+		$.ajax({
+			url: "{% url 'grades' %}",
+			type: "POST",
+			dataType: 'json',
+			data: {
+				'course': $("#course-search").val(),
+				'semester': $("#semester-search").val()
+			},
+			success: function(data) {
+				$("#grades-information").html("");
+				$("html").find('.graph-wrapper').remove(); // Remove all previously created graphs
+				$("html").find('.grades-info').remove(); // Remove all previously created course information
+				$("#course-lookup-form-container").html(data.form);
+				initializeCourseLookupAutoComplete();
+				$("#semester-search-input").show();
+
+				if(data["success"]) {
+					$(".lookup-error").hide();
+
+					if ($("#semester-search").val() == "") {
+						//($("#course-search").val(), data);
+						$("#include-spring2020-input").show();
+					}
+					else {
+						var course = $("#course-search").val();
+						var semester = $("#semester-search :selected").text();
+						generate_graph(course, data.data, semester);
+					}
+					$("#section-search-input").show();
+				} else {
+					$(".lookup-error").show();
+				}
+			}
+		});
+
+		$("#include-spring2020-input").hide();
+		$("#section-search").val("");
+	}
+
+	function sectionSearch(e) {
+		if (e.which == 13) { // User pressed enter
+			$.ajax({
+				url: "{% url 'grades' %}",
+				type: "POST",
+				dataType: 'json',
+				data: {
+					'course': $("#course-search").val(),
+					'semester': $("#semester-search").val(),
+					'section': $("#section-search").val()
+				},
+				success: function(data) {
+					$("html").find('.graph-wrapper').remove(); // Remove all previously created graphs
+					$("html").find('.grades-info').remove(); // Remove all previously created course information
+					$("#grades-information").html("");
+					$("#course-lookup-form-container").html(data.form);
+					initializeCourseLookupAutoComplete();
+					$("#semester-search-input").show();
+					$("#section-search-input").show();
+
+					if (data["success"]) {
+						$(".lookup-error").hide();
+						var course = $("#course-search").val();
+						var semester = $("#semester-search :selected").text();
+						if ($("#section-search").val() == "") {
+							generate_graph(course, data.data, semester);
+						}
+						else {
+							var section = $("#section-search").val();
+							generate_graph(course, data.data, semester, section);
+						}
+					} else {
+						$(".lookup-error").show();
+					}
+				}
+			})
 		}
-	});
+	}
 </script>
 {% endblock %}

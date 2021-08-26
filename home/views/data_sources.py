@@ -1,9 +1,9 @@
 from django.http import JsonResponse
-from django.views import View
 from django.db.models import Sum
+from django.views import View
 
-from home.utils import ttl_cache, semester_number
 from home.models import Professor, Grade, Course, Gened
+from home.utils import ttl_cache, GradeData
 
 
 class GradeData(View):
@@ -109,7 +109,7 @@ class GradeData(View):
             course = Course.objects.filter(name=course).first()
             grades = grades.filter(course=course)
         if semester:
-            grades = grades.filter(semester=semester_number(semester))
+            grades = grades.filter(semester=semester)
         if section:
             grades = grades.filter(section=section)
         if not spring_2020:

@@ -1,3 +1,4 @@
+from typing import Optional
 from enum import Enum, auto
 from functools import lru_cache, wraps
 import time
@@ -5,7 +6,7 @@ import time
 from discord_webhook import DiscordWebhook
 from discord_webhook.webhook import DiscordEmbed
 
-from home.models import Professor, Review
+from home.models import Course, Professor, Review, Grade
 from planetterp.config import discord_webhook_updates_url
 
 def semester_name(semester_number):
@@ -106,3 +107,108 @@ def send_updates_webhook(*, include_professors=True, include_reviews=True):
 
     webhook.add_embed(embed)
     webhook.execute()
+
+class GradeData:
+    def __get_data(average_gpa, num_students, grades):
+        def _statistic(name):
+            if not num_students:
+                return 0
+            return round((grades[name] / num_students) * 100, 2)
+
+        return {
+            "average_gpa": average_gpa,
+            "num_students": num_students,
+            "data_plus": [
+                _statistic("a_plus_total"),
+                _statistic("b_plus_total"),
+                _statistic("c_plus_total"),
+                _statistic("d_plus_total")
+            ],
+            "data_flat": [
+                _statistic("a_total"),
+                _statistic("b_total"),
+                _statistic("c_total"),
+                _statistic("d_total"),
+                _statistic("f_total"),
+                _statistic("w_total"),
+                _statistic("other_total")
+            ],
+            "data_minus": [
+                _statistic("a_minus_total"),
+                _statistic("b_minus_total"),
+                _statistic("c_minus_total"),
+                _statistic("d_minus_total")
+            ]
+        }
+
+    def __course_grade_data(professor, spring_2020):
+        professor = Professor.objects.verified.filter(name=professor).first()
+        courses = Course.objects.filter(professors=professor)
+        grades = Grade.objects.filter(professor=professor)
+        if not spring_2020:
+            grades = grades.exclude(semester=202001)
+
+        grade_data = {
+            "professor_slug": professor.slug,
+            "average_gpa": grades.average_gpa(),
+            "num_students": grades.num_students()
+        }
+        for course in courses:
+            course_grades = grades
+            course_grades = course_grades.filter(course=course)
+
+            average_course_gpa = course_grades.average_gpa()
+            num_course_students = course_grades.num_students()
+            course_grades = course_grades.grade_totals_aggregate()
+
+            grade_data[course.name] = (average_course_gpa, num_course_students, course_grades)
+
+        return grade_data
+
+    @ttl_cache(24 * 60 * 60)
+    def __grade_data(professor, course, semester, section, spring_2020):
+        grades = Grade.objects.all()
+
+        if professor:
+            professor = Professor.objects.verified.filter(slug=professor).first()
+            grades = grades.filter(professor=professor)
+        if course:
+            course = Course.objects.filter(name=course).first()
+            grades = grades.filter(course=course)
+        if semester:
+            grades = grades.filter(semester=semester)
+        if section:
+            grades = grades.filter(section=section)
+        if not spring_2020:
+            grades = grades.exclude(semester=202001)
+
+        average_gpa = grades.average_gpa()
+        num_students = grades.num_students()
+        grades = grades.grade_totals_aggregate()
+
+        return (average_gpa, num_students, grades)
+
+    @staticmethod
+    def compose_grade_data(professor, course, semester, section, spring_2020):
+        (average_gpa, num_students, grades) = GradeData.__grade_data(professor,
+        course, semester, section, spring_2020)
+
+        return GradeData.__get_data(average_gpa, num_students, grades)
+
+    @staticmethod
+    def compose_course_grade_data(professor, spring_2020):
+        grade_data = GradeData.__course_grade_data(professor, spring_2020)
+        data = {
+            "professor_slug": grade_data.pop("professor_slug"),
+            "average_gpa": grade_data.pop("average_gpa"),
+            "num_students": grade_data.pop("num_students"),
+            "data": {}
+        }
+
+        for course_name, course_data in grade_data.items():
+            (course_average_gpa, course_num_students, course_grades) = course_data
+
+            if course_num_students and course_average_gpa:
+                data['data'][course_name] = GradeData.__get_data(
+                    course_average_gpa, course_num_students, course_grades)
+        return data
