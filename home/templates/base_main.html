@@ -77,6 +77,10 @@
             });
             }
 
+            $.ajaxSetup({
+                data: {"csrfmiddlewaretoken": "{{ csrf_token }}"}
+            })
+
             /* Modified from: https://millionclues.com/internet/tracking-outbound-links-google-analytics/ (partially from https://stackoverflow.com/a/8496919/8255629) */
             function onclickCallback(e) {
                 var e = window.e || e;
