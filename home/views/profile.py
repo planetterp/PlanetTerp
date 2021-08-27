@@ -8,7 +8,8 @@ from django.template.context_processors import csrf
 from crispy_forms.utils import render_crispy_form
 from home.models import ResetCode
 from home.tables.reviews_table import ProfileReviewsTable
-from home.forms.basic import ProfileForm, ResetPasswordForm
+from home.forms.basic import ProfileForm
+from home.forms.auth_forms import ResetPasswordForm
 from planetterp.settings import DATE_FORMAT
 
 # LoginRequiredMixin needs to be first

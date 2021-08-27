@@ -13,7 +13,7 @@ from django.urls import reverse
 from django.views import View
 
 from home.models import User, ResetCode
-from home.forms.basic import LoginForm, RegisterForm, ForgotPasswordForm
+from home.forms.auth_forms import LoginForm, RegisterForm, ForgotPasswordForm
 
 class Login(View):
     template = "login_register.html"
