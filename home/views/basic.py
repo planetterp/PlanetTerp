@@ -67,7 +67,6 @@ class Sitemap(View):
         return render(request, "sitemap.xml", context,
             content_type="application/xml")
 
-# TODO reimplement this page
 class Grades(View):
     template_name = "grades.html"
 
@@ -78,7 +77,11 @@ class Grades(View):
         return render(request, self.template_name, context)
 
     def post(self, request):
-        form = HistoricCourseGradeLookupForm(request.POST["course"], data=request.POST)
+        course = request.POST["course"]
+        semester = request.POST["semester"]
+        semester = semester if semester != '' else None
+        form = HistoricCourseGradeLookupForm(course, semester, data=request.POST)
+
         ctx = {}
         ctx.update(csrf(request))
         context = {
@@ -99,8 +102,7 @@ class Grades(View):
                 context['data'] = GradeData.compose_course_grade_data(professor, spring_2020)
             else:
                 context['data'] = GradeData.compose_grade_data(professor, course, semester, section, spring_2020)
-        else:
-            print(form.errors)
+
         context["form"] = render_crispy_form(form, form.helper, context=ctx)
         return JsonResponse(context)
 

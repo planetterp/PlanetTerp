@@ -1,4 +1,3 @@
-from typing import Optional
 from enum import Enum, auto
 from functools import lru_cache, wraps
 import time
@@ -176,7 +175,7 @@ class GradeData:
             course = Course.objects.filter(name=course).first()
             grades = grades.filter(course=course)
         if semester:
-            grades = grades.filter(semester=semester)
+            grades = grades.filter(semester=semester_number(semester))
         if section:
             grades = grades.filter(section=section)
         if not spring_2020:

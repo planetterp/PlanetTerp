@@ -60,13 +60,12 @@
 
 			<div class="form-group row justify-content-center">
 				<label for="professor-search" class="col-form-label">Professor</label>
-				<div class="col-sm-3">
-					<input type="text" class="form-control autocomplete" id="professor-search" placeholder="Professor..." name="professor">
+				<div class="col-sm-5">
+					<input type="text" class="form-control autocomplete" id="professor-search" placeholder="Search for a professor..." name="professor">
 				</div>
 			</div>
 		</div>
 	</div>
-
 
 	<div id="include-spring2020-input" style="text-align: center; display: none;">
 		<label>
@@ -76,7 +75,6 @@
 	</div>
 
 	<p id="grades-information" class="text-center" style="margin-bottom: 0;"></p>
-	<div id="grades-information-error"></div>
 	<div id="grades-graphs"></div>
 </div>
 
@@ -92,38 +90,39 @@
 
 <script type="text/javascript" src="../static/js/chart.min.js"></script>
 <script>
-	var gradesGraph;
+	const ENTER_KEY = 13;
 	var canvasCount = 0;
+	var gradesGraph;
 	var lastSearch;
 
 	$(function() {
-		initializeCourseLookupAutoComplete();
+		initializeCourseSearchAutoComplete();
 
-		$("#course-search").keypress(function (e) { // Allow course search when user
-													// presses enter (rather than clicking
-													// on autocomplete option)
-
-			if (e.which == 13) { // User pressed enter
-				courseGrades($("#course-search").val());
+		// Allow course search when user presses the enter key
+		$("#course-search").keypress(function (e) {
+			if (e.which == ENTER_KEY) {
+				// TODO Figure out why pressing enter twice causes the event to
+				// handle the ajax request, despite explicity telling it not to
+				// via preventDefault().
+				submitCourseSearch();
+				e.preventDefault();
 			}
 		});
 
-		$("#professor-search").keypress(function (e) { // Allow professor search when user
-													// presses enter (rather than clicking
-													// on autocomplete option)
+		// Allow professor search when user presses the enter key
+		$("#professor-search").keypress(function (e) {
 			$("#semester-search-input").hide();
 			$("#section-search-input").hide();
 
-			if (e.which == 13) { // User pressed enter
+			if (e.which == ENTER_KEY) {
 				professorGrades($("#professor-search").val());
 			}
 		});
 
 		$('#include-spring2020').on('change', function() {
-			if (lastSearch === "course") {
-				courseGrades($("#course-search").val());
-			}
-			else if (lastSearch === "professor") {
+			if (lastSearch == "course") {
+				submitCourseSearch();
+			} else if (lastSearch == "professor") {
 				professorGrades($("#professor-search").val());
 			}
 		});
@@ -184,14 +183,14 @@
 			})
 		}
 
-			$("#professor-search").autocomplete({
-				minLength: 3,
-				source: function(request, response) {
-					$.ajax({
-						url: "{% url 'autocomplete' %}",
-						dataType: 'json',
-						data: {
-							"query": request.term,
+		$("#professor-search").autocomplete({
+			minLength: 3,
+			source: function(request, response) {
+				$.ajax({
+					url: "{% url 'autocomplete' %}",
+					dataType: 'json',
+					data: {
+						"query": request.term,
 						"types[]": ["professor"],
 						"return_attrs[]": ["name"]
 					},
@@ -207,43 +206,18 @@
 		});
 	});
 
-	function courseGrades(course) {
-		lastSearch = "course";
-		$("#semester-search").val("");
-
-		$.ajax({
-			url: "{% url 'grades' %}",
-			type: "POST",
-			dataType: 'json',
-			data: {
-				'course': course,
-				'spring_2020': $('#include-spring2020').is(':checked')
-			},
-			success: function(data) {
-				$("html").find('.graph-wrapper').remove(); // Remove all previously created graphs
-				$("html").find('.grades-info').remove(); // Remove all previously created course information
-				$("#grades-information").html("");
-				$("#course-lookup-form-container").html(data.form);
-				initializeCourseLookupAutoComplete();
-
-				if (data["success"]) {
-					$(".lookup-error").hide();
-
-					$("#include-spring2020-input").show();
-					$("#semester-search").prop('checked', false);
-					$("#semester-search-input").show();
-
-					generate_graph(course, data.data);
-				} else {
-					$("#section-search-input").hide();
-					$(".lookup-error").show();
-				}
-			},
-		})
+	function getCourseSearchParams() {
+		var course = $("#course-search").val();
+		var semester = $("#semester-search").val();
+		var section = $("#section-search").val();
+		return {
+			course: course,
+			semester: semester,
+			section: section
+		}
 	}
 
-
-	function initializeCourseLookupAutoComplete() {
+	function initializeCourseSearchAutoComplete() {
 		$("#course-search").autocomplete({
 			minLength: 3,
 			source: function(request, response) {
@@ -260,16 +234,15 @@
 					}
 				})
 			},
-			select: function(event, ui) {
-				var course = ui.item.result.name;
-				courseGrades(course);
+			select: function(e, ui) {
+				$("#course-search").val(ui.item.result.name);
+				submitCourseSearch();
+				e.preventDefault();
 			}
 		});
 	}
 
-
-	function generate_graph(course, grade_data) {
-		console.log(grade_data);
+	function generate_graph(course, semester, section, grade_data) {
 		course = course.toUpperCase();
 		$("#grades-graphs").append('<p id="grades-text' + canvasCount + '" class="text-center grades-info"></p>')
 		$("#grades-graphs").append('<div class="graph-wrapper"><canvas id="grades' + canvasCount + '" width="500px" height="500px" style="margin: 0 auto;"></canvas></div>')
@@ -277,10 +250,11 @@
 		var graph = document.getElementById('grades' + canvasCount).getContext("2d");
 		var grades_text = `Showing data for <a href="/course/${course}" target="_blank">${course}</a>`
 
-		if (arguments.length == 3) {
-			grades_text += ` ${arguments[2]}`
-		} else if (arguments.length == 4) {
-			grades_text += ` ${arguments[2]} (Section ${arguments[3]})`
+		if ($("#semester-search").is(':visible')) {
+			grades_text += ` ${semester}`
+		}
+		if ($("#section-search").is(':visible') && $("#section-search").val()) {
+			grades_text += ` (Section ${section})`
 		}
 
 		grades_text += `<br>Average GPA: ${grade_data.average_gpa.toFixed(2)} between ${grade_data.num_students} students`
@@ -382,83 +356,55 @@
 		});
 	}
 
-	function semesterSearch() {
+	function submitCourseSearch() {
+		lastSearch = "course";
+		var params = getCourseSearchParams();
+		var course = params.course;
+		var semester = params.semester;
+		var section = params.section;
+
 		$.ajax({
 			url: "{% url 'grades' %}",
 			type: "POST",
 			dataType: 'json',
 			data: {
-				'course': $("#course-search").val(),
-				'semester': $("#semester-search").val()
+				'course': course,
+				'semester': semester,
+				'section': section,
+				'spring_2020': $('#include-spring2020').is(':checked')
 			},
 			success: function(data) {
-				$("#grades-information").html("");
 				$("html").find('.graph-wrapper').remove(); // Remove all previously created graphs
 				$("html").find('.grades-info').remove(); // Remove all previously created course information
+				$("#grades-information").html("");
 				$("#course-lookup-form-container").html(data.form);
-				initializeCourseLookupAutoComplete();
-				$("#semester-search-input").show();
+				initializeCourseSearchAutoComplete();
 
-				if(data["success"]) {
+				if (data["success"]) {
 					$(".lookup-error").hide();
+					$("#semester-search-input").show();
+					$("#semester-search").prop('checked', false);
+					// TODO Don't show Spring 2020 option if selected course
+					// doesn't have spring 2020 data
+					$("#include-spring2020-input").show();
+					if (semester) {
+						var course_department = semester.split(" ")[0];
+						var course_number = semester.split(" ")[1];
+						if (!(course_department == "Spring" || Number(course_number) >= 2020)) {
+							$("#include-spring2020-input").hide();
+						}
+					}
 
-					if ($("#semester-search").val() == "") {
-						//($("#course-search").val(), data);
-						$("#include-spring2020-input").show();
+					if ($("#semester-search").val()) {
+						$("#section-search-input").show();
 					}
-					else {
-						var course = $("#course-search").val();
-						var semester = $("#semester-search :selected").text();
-						generate_graph(course, data.data, semester);
-					}
-					$("#section-search-input").show();
+
+					generate_graph(course, semester, section, data.data);
 				} else {
 					$(".lookup-error").show();
 				}
 			}
-		});
-
-		$("#include-spring2020-input").hide();
-		$("#section-search").val("");
-	}
-
-	function sectionSearch(e) {
-		if (e.which == 13) { // User pressed enter
-			$.ajax({
-				url: "{% url 'grades' %}",
-				type: "POST",
-				dataType: 'json',
-				data: {
-					'course': $("#course-search").val(),
-					'semester': $("#semester-search").val(),
-					'section': $("#section-search").val()
-				},
-				success: function(data) {
-					$("html").find('.graph-wrapper').remove(); // Remove all previously created graphs
-					$("html").find('.grades-info').remove(); // Remove all previously created course information
-					$("#grades-information").html("");
-					$("#course-lookup-form-container").html(data.form);
-					initializeCourseLookupAutoComplete();
-					$("#semester-search-input").show();
-					$("#section-search-input").show();
-
-					if (data["success"]) {
-						$(".lookup-error").hide();
-						var course = $("#course-search").val();
-						var semester = $("#semester-search :selected").text();
-						if ($("#section-search").val() == "") {
-							generate_graph(course, data.data, semester);
-						}
-						else {
-							var section = $("#section-search").val();
-							generate_graph(course, data.data, semester, section);
-						}
-					} else {
-						$(".lookup-error").show();
-					}
-				}
-			})
-		}
+		})
 	}
 </script>
 {% endblock %}

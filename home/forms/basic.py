@@ -10,7 +10,7 @@ from crispy_forms.helper import FormHelper
 
 from home.models import User, Grade, Course
 from planetterp.settings import DATE_FORMAT
-from home.utils import semester_name
+from home.utils import semester_name, semester_number
 
 class ProfileForm(ModelForm):
     username = CharField(
@@ -120,32 +120,49 @@ class ProfileForm(ModelForm):
 class HistoricCourseGradeLookupForm(Form):
     course = CharField(required=True)
     semester = CharField(required=False, widget=Select())
-    # TODO: change section into select menue with all sections offered during
-    #   the specified scourse/semester
-    section = CharField(required=False)
+    section = CharField(required=False, widget=Select())
 
-    def __init__(self, course_name=None, **kwargs):
+    def __init__(self, course_name=None, semester=None, **kwargs):
         super().__init__(**kwargs)
-        if course_name:
+        self.course_name = course_name
+        self.semester = semester
+        self.initialize_semester()
+        self.initialize_section()
+        self.field_errors = self.create_field_errors()
+
+        self.helper = FormHelper()
+        self.helper.field_class = 'col-sm-4'
+        self.helper.label_class = 'col-form-label'
+        self.helper.form_id = "course-lookup-form"
+        self.helper.form_show_errors = False
+        self.helper.layout = self.generate_layout()
+
+    def initialize_semester(self):
+        if self.course_name and self.course_name != '':
             # If user specified the course, only display semesters when
             # that course was offered
-            course_obj = Course.objects.filter(name=course_name).first()
+            course_obj = Course.objects.filter(name=self.course_name).first()
             grades = Grade.objects.filter(course=course_obj).values('semester').distinct()
         else:
             # Otherwise, only display semesters we have data for
             grades = Grade.objects.values('semester').distinct()
 
-        semester_choices = [(grade['semester'], semester_name(grade['semester'])) for grade in grades]
+        def _semester_tuple(num):
+            return (semester_name(num), semester_name(num))
+
+        semester_choices = [_semester_tuple(grade['semester']) for grade in grades]
         self.fields['semester'].widget.choices = [("", "Select a semester...")] + semester_choices
 
-        self.field_errors = self.create_field_errors()
+    def initialize_section(self):
+        if self.semester and self.semester != '':
+            course = Course.objects.filter(name=self.course_name).first()
 
-        self.helper = FormHelper()
-        self.helper.field_class = 'col-sm-3'
-        self.helper.label_class = 'col-form-label'
-        self.helper.form_id = "course-lookup-form"
-        self.helper.form_show_errors = False
-        self.helper.layout = self.generate_layout()
+            grades = Grade.objects.filter(
+                course=course, semester=semester_number(self.semester)
+            ).values('section').distinct()
+
+            section_choices = [(grade['section'], grade['section']) for grade in grades]
+            self.fields['section'].widget.choices = [("", "Select a section...")] + section_choices
 
     def create_field_errors(self):
         field_errors = {}
@@ -154,8 +171,8 @@ class HistoricCourseGradeLookupForm(Form):
             if_condition = f'{{% if form.{field}.errors %}} '
             error_html = (
                 f'<div id="{{{{ form.{field}.name }}}}_errors"'
-                ' class="invalid-feedback lookup-error" style="font-size: 15px">'
-                f' {{{{ form.{field}.errors|striptags }}}}</div>'
+                ' class="invalid-feedback lookup-error" style="font-size: 13px">'
+                f' {{{{ form.{field}.errors|first|striptags }}}}</div>'
             )
             endif = ' {% endif %}'
             field_errors[field] = HTML(if_condition + error_html + endif)
@@ -166,18 +183,20 @@ class HistoricCourseGradeLookupForm(Form):
         return Layout(
             Field(
                 'course',
-                placeholder="Enter a course...",
+                placeholder="Search for a course...",
                 id="course-search",
                 css_class="autocomplete",
-                wrapper_class="row justify-content-center"
+                wrapper_class="row justify-content-center mb-0"
             ),
+            self.field_errors['course'],
             Div(
                 Field(
                     'semester',
                     id="semester-search",
-                    wrapper_class="row justify-content-center",
-                    onChange="semesterSearch()"
+                    wrapper_class="row justify-content-center mb-0 mt-3",
+                    onChange="submitCourseSearch()"
                 ),
+                self.field_errors['semester'],
                 css_id="semester-search-input",
                 style="display: none;"
             ),
@@ -187,9 +206,10 @@ class HistoricCourseGradeLookupForm(Form):
                     placeholder="Enter a section...",
                     id="section-search",
                     css_class="autocomplete",
-                    wrapper_class="row justify-content-center",
-                    onkeypress="sectionSearch(event)"
+                    wrapper_class="row justify-content-center mb-0 mt-3",
+                    onChange="submitCourseSearch()"
                 ),
+                self.field_errors['section'],
                 css_id="section-search-input",
                 style="display: none;"
             )
@@ -198,19 +218,15 @@ class HistoricCourseGradeLookupForm(Form):
     def clean(self):
         super().clean()
         clean_course = self.cleaned_data['course']
-        clean_section = self.cleaned_data.get('section', None)
 
         course = Course.objects.filter(name=clean_course).first()
         course_data = Grade.objects.filter(course=course).first()
-        section = Grade.objects.filter(section=clean_section).first()
+
         if not course:
             message = "We don't have record of that course"
             self.add_error('course', ValidationError(message, code="INVALID_COURSE"))
         if not course_data:
             message = "No grade data available for that course"
             self.add_error('course', ValidationError(message, code="NO_DATA"))
-        if clean_section and not section:
-            message = "We don't have record of that section for this course"
-            self.add_error('section', ValidationError(message, code="INVALID_SECTION"))
 
         return self.cleaned_data
