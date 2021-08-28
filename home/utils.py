@@ -109,7 +109,7 @@ def send_updates_webhook(*, include_professors=True, include_reviews=True):
     webhook.execute()
 
 class GradeData:
-    def __get_data(average_gpa, num_students, grades):
+    def _get_data(average_gpa, num_students, grades):
         def _statistic(name):
             if not num_students:
                 return 0
@@ -141,7 +141,7 @@ class GradeData:
             ]
         }
 
-    def __course_grade_data(professor, spring_2020):
+    def _course_grade_data(professor, spring_2020):
         professor = Professor.objects.verified.filter(name=professor).first()
         courses = Course.objects.filter(professors=professor)
         grades = Grade.objects.filter(professor=professor)
@@ -166,7 +166,7 @@ class GradeData:
         return grade_data
 
     @ttl_cache(24 * 60 * 60)
-    def __grade_data(professor, course, semester, section, spring_2020):
+    def _grade_data(professor, course, semester, section, spring_2020):
         grades = Grade.objects.all()
 
         if professor:
@@ -190,14 +190,14 @@ class GradeData:
 
     @staticmethod
     def compose_grade_data(professor, course, semester, section, spring_2020):
-        (average_gpa, num_students, grades) = GradeData.__grade_data(professor,
+        (average_gpa, num_students, grades) = GradeData._grade_data(professor,
         course, semester, section, spring_2020)
 
-        return GradeData.__get_data(average_gpa, num_students, grades)
+        return GradeData._get_data(average_gpa, num_students, grades)
 
     @staticmethod
     def compose_course_grade_data(professor, spring_2020):
-        grade_data = GradeData.__course_grade_data(professor, spring_2020)
+        grade_data = GradeData._course_grade_data(professor, spring_2020)
         data = {
             "professor_slug": grade_data.pop("professor_slug"),
             "average_gpa": grade_data.pop("average_gpa"),
@@ -209,6 +209,6 @@ class GradeData:
             (course_average_gpa, course_num_students, course_grades) = course_data
 
             if course_num_students and course_average_gpa:
-                data['data'][course_name] = GradeData.__get_data(
+                data['data'][course_name] = GradeData._get_data(
                     course_average_gpa, course_num_students, course_grades)
         return data
