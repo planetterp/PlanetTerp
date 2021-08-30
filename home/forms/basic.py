@@ -1,6 +1,8 @@
 from django.forms import CharField, DateTimeField
+from django.forms.fields import BooleanField
 from django.forms.widgets import DateInput, Select
 from django.core.exceptions import ValidationError
+from django.template.defaultfilters import default
 from django.utils.safestring import mark_safe
 from django.forms import ModelForm, Form
 
@@ -8,7 +10,7 @@ from crispy_forms.layout import Layout, Div, Field, HTML, Button
 from crispy_forms.bootstrap import PrependedText
 from crispy_forms.helper import FormHelper
 
-from home.models import User, Grade, Course
+from home.models import Professor, User, Grade, Course
 from planetterp.settings import DATE_FORMAT
 from home.utils import semester_name, semester_number
 
@@ -117,8 +119,8 @@ class ProfileForm(ModelForm):
         return layout
 
 # The "Lookup by course" feature on /grades
-class HistoricCourseGradeLookupForm(Form):
-    course = CharField(required=True)
+class HistoricCourseGradeForm(Form):
+    course = CharField(required=False)
     semester = CharField(required=False, widget=Select())
     section = CharField(required=False, widget=Select())
 
@@ -156,7 +158,6 @@ class HistoricCourseGradeLookupForm(Form):
     def initialize_section(self):
         if self.semester and self.semester != '':
             course = Course.objects.filter(name=self.course_name).first()
-
             grades = Grade.objects.filter(
                 course=course, semester=semester_number(self.semester)
             ).values('section').distinct()
@@ -217,16 +218,74 @@ class HistoricCourseGradeLookupForm(Form):
 
     def clean(self):
         super().clean()
-        clean_course = self.cleaned_data['course']
+        clean_course = self.cleaned_data.get('course', None)
 
-        course = Course.objects.filter(name=clean_course).first()
-        course_data = Grade.objects.filter(course=course).first()
+        if clean_course:
+            course = Course.objects.filter(name=clean_course).first()
+            course_data = Grade.objects.filter(course=course).first()
 
-        if not course:
-            message = "We don't have record of that course"
-            self.add_error('course', ValidationError(message, code="INVALID_COURSE"))
-        if not course_data:
-            message = "No grade data available for that course"
-            self.add_error('course', ValidationError(message, code="NO_DATA"))
+            if not course:
+                message = "We don't have record of that course"
+                self.add_error('course', ValidationError(message, code="INVALID_COURSE"))
+            elif not course_data:
+                message = "No grade data available for that course"
+                self.add_error('course', ValidationError(message, code="NO_DATA"))
+
+        return self.cleaned_data
+
+class HistoricProfessorGradeForm(Form):
+    professor = CharField(required=False)
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+        self.field_errors = self.create_field_errors()
+
+        self.helper = FormHelper()
+        self.helper.form_class = 'justify-content-right'
+        self.helper.field_class = 'col-sm-5'
+        self.helper.label_class = 'col-form-label'
+        self.helper.form_id = "professor-lookup-form"
+        self.helper.form_show_errors = False
+        self.helper.layout = self.generate_layout()
+
+    def create_field_errors(self):
+        field_errors = {}
+
+        for field in self.fields:
+            if_condition = f'{{% if form.{field}.errors %}} '
+            error_html = (
+                f'<div id="{{{{ form.{field}.name }}}}_errors"'
+                ' class="invalid-feedback lookup-error" style="font-size: 13px">'
+                f' {{{{ form.{field}.errors|first|striptags }}}}</div>'
+            )
+            endif = ' {% endif %}'
+            field_errors[field] = HTML(if_condition + error_html + endif)
+
+        return field_errors
+
+    def generate_layout(self):
+        return Layout(
+            Field(
+                'professor',
+                placeholder="Search for a professor...",
+                id="professor-search",
+                css_class="autocomplete",
+                wrapper_class="row justify-content-center mb-0"
+            )
+        )
+
+    def clean(self):
+        clean_professor = self.cleaned_data.get('professor', None)
+
+        if clean_professor:
+            professor = Professor.objects.filter(name=clean_professor).first()
+            professor_data = Grade.objects.filter(professor=professor).first()
+            if not professor:
+                message = "We don't have record of that professor"
+                self.add_error('professor', ValidationError(message, code="INVALID_PROFESSOR"))
+            elif not professor_data:
+                message = "No grade data available for that professor"
+                self.add_error('professor', ValidationError(message, code="NO_DATA"))
 
         return self.cleaned_data

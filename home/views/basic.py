@@ -9,7 +9,7 @@ from crispy_forms.utils import render_crispy_form
 
 from home.models import Organization, Professor, Course, Review, Grade
 from home.tables.reviews_table import VerifiedReviewsTable
-from home.forms.basic import HistoricCourseGradeLookupForm
+from home.forms.basic import HistoricCourseGradeForm, HistoricProfessorGradeForm
 from home.utils import GradeData
 
 
@@ -72,38 +72,45 @@ class Grades(View):
 
     def get(self, request):
         context = {
-            "form": HistoricCourseGradeLookupForm()
+            "course_form": HistoricCourseGradeForm(),
+            "professor_form": HistoricProfessorGradeForm()
         }
         return render(request, self.template_name, context)
 
     def post(self, request):
-        course = request.POST["course"]
-        semester = request.POST["semester"]
+        course = request.POST.get('course', None)
+        semester = request.POST.get('semester', None)
         semester = semester if semester != '' else None
-        form = HistoricCourseGradeLookupForm(course, semester, data=request.POST)
+        spring_2020 = request.POST.get("spring_2020", False) == "true"
+
+        course_form = HistoricCourseGradeForm(course, semester, data=request.POST)
+        professor_form = HistoricProfessorGradeForm(data=request.POST)
 
         ctx = {}
         ctx.update(csrf(request))
         context = {
-            "success": False
+            "course_search_success": False,
+            "professor_search_success": False
         }
 
-        if form.is_valid():
-            context["success"] = True
-            data = request.POST
+        if professor_form.is_valid():
+            context["professor_search_success"] = True
+            data = professor_form.cleaned_data
             professor = data.get("professor", None)
-            professor_courses = data.get("professor_courses", False)
+            context['professor_data'] = GradeData.compose_course_grade_data(professor, spring_2020)
+
+        if course_form.is_valid():
+            context["course_search_success"] = True
+            data = course_form.cleaned_data
+            professor = data.get("professor", None)
             course = data.get("course", None)
             semester = data.get("semester", None)
             section = data.get("section", None)
-            spring_2020 = data.get("spring_2020", False) == "true"
+            context['course_data'] = GradeData.compose_grade_data(professor, course, semester, section, spring_2020)
 
-            if professor_courses:
-                context['data'] = GradeData.compose_course_grade_data(professor, spring_2020)
-            else:
-                context['data'] = GradeData.compose_grade_data(professor, course, semester, section, spring_2020)
+        context["course_form"] = render_crispy_form(course_form, course_form.helper, context=ctx)
+        context["professor_form"] = render_crispy_form(professor_form, professor_form.helper, context=ctx)
 
-        context["form"] = render_crispy_form(form, form.helper, context=ctx)
         return JsonResponse(context)
 
 class CourseReviews(View):
