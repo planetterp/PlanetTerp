@@ -1,7 +1,6 @@
 import os
 import web
 
-from home.models import Professor
 from home.models import Gened
 from planetterp.config import USER, PASSWORD
 
@@ -10,35 +9,6 @@ db = web.database(dbn='mysql', db=db_name, user=USER, pw=PASSWORD, charset='utf8
 
 
 # queries to be rewritten
-
-def verify_professor(id_, verified_status: Professor.Status, slug):
-    if verified_status is not Professor.Status.VERIFIED:
-        db.update('reviews', where='professor_id=$id', verified=verified_status.value, vars={'id': id_})
-
-    db.update('professors', where='id=$id', verified=verified_status.value, slug=slug, vars={'id': id_})
-
-def merge_professors(subject_id, target_id):
-    db.update("professor_courses", where="professor_id=$id", professor_id=target_id, vars={"id": subject_id})
-    db.update("reviews", where="professor_id=$id", professor_id=target_id, vars={"id": subject_id})
-    db.update("grades", where="professor_id=$id", professor_id=target_id, vars={"id": subject_id})
-    db.query("DELETE FROM professors WHERE id=$id", vars={"id": subject_id})
-
-def delete_professor(id_):
-    db.query("DELETE FROM professor_courses WHERE professor_id=$id", vars={"id": id_})
-    db.query("DELETE FROM reviews WHERE professor_id=$id", vars={"id": id_})
-    db.query("DELETE FROM professors WHERE id=$id", vars={"id": id_})
-
-def update_professor_name(professor_id, new_name):
-    db.update("professors", where="id=$prof_id", name=new_name, vars={"prof_id": professor_id})
-
-def update_professor_slug(professor_id, new_slug):
-    db.update("professors", where="id=$prof_id", slug=new_slug, vars={"prof_id": professor_id})
-
-def update_professor_type(professor_id, new_type):
-    db.update("professors", where="id=$prof_id", type=new_type, vars={"prof_id": professor_id})
-
-def count_professors_slugs(slug):
-    return int(db.query('SELECT COUNT(name) FROM professors WHERE slug=$slug', vars={"slug": slug})[0]['COUNT(name)'])
 
 def get_all_sections():
     return db.query('SELECT id FROM sections WHERE active=1;')
