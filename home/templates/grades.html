@@ -97,6 +97,14 @@
 		initializeChangeEvent();
 	});
 
+	function clearCourseSearchForm() {
+		$("#course-search").val("");
+		$("#semester-search").val("");
+		$("#div_id_semester").hide();
+		$("#section-search").val("");
+		$("#section-search-input").hide();
+	}
+
 	function getCourseSearchParams() {
 		var course = $("#course-search").val();
 		var semester = $("#semester-search").val();
@@ -324,6 +332,7 @@
 				$("html").find('.grades-info').remove(); // Remove all previously created course information
 				$("#grades-information").html("");
 				$("#course-lookup-form-container").html(data.course_form);
+				$("#professor-search").val("");
 				initalizeKeypressEvent("#course-search");
 				initalizeKeypressEvent("#professor-search");
 				initializeCourseSearchAutoComplete();
@@ -360,6 +369,7 @@
 				'spring_2020': $('#include-spring2020').is(':checked')
 			},
 			success: function(data) {
+				clearCourseSearchForm()
 				$("#grades-information").html("");
 				$("#grades-information-error").html("");
 				$("html").find('.graph-wrapper').remove(); // Remove all previously created graphs
