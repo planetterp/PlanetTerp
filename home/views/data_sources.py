@@ -3,8 +3,7 @@ from django.db.models import Sum
 from django.views import View
 
 from home.models import Professor, Grade, Course, Gened
-from home.utils import ttl_cache, GradeData
-
+from home.utils import ttl_cache
 
 class GradeData(View):
     def get(self, request):

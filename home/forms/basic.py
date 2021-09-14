@@ -1,8 +1,6 @@
 from django.forms import CharField, DateTimeField
-from django.forms.fields import BooleanField
 from django.forms.widgets import DateInput, Select
 from django.core.exceptions import ValidationError
-from django.template.defaultfilters import default
 from django.utils.safestring import mark_safe
 from django.forms import ModelForm, Form
 
@@ -11,8 +9,8 @@ from crispy_forms.bootstrap import PrependedText
 from crispy_forms.helper import FormHelper
 
 from home.models import Professor, User, Grade, Course
-from planetterp.settings import DATE_FORMAT
 from home.utils import semester_name, semester_number
+from planetterp.settings import DATE_FORMAT
 
 class ProfileForm(ModelForm):
     username = CharField(

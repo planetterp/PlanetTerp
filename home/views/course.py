@@ -1,11 +1,12 @@
 import re
 from collections import defaultdict
 
+from django.shortcuts import render, redirect
+from django.http import HttpResponse
+from django.views import View
+
 from home import utils
 from home.models import ProfessorCourse, Course as CourseModel
-from django.shortcuts import render, redirect
-from django.views import View
-from django.http import HttpResponse
 
 class Course(View):
     template = "course.html"

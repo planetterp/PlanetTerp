@@ -5,9 +5,9 @@ from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 from django.template.context_processors import csrf
 
-import django_tables2 as tables
-
 from crispy_forms.utils import render_crispy_form
+
+import django_tables2 as tables
 
 from home.models import Review, Grade
 from home.forms.admin_forms import ReviewUnverifyForm, ReviewVerifyForm, ProfessorVerifyForm, ReviewRejectForm, ReviewHelpForm, ProfessorRejectForm, ProfessorDeleteForm

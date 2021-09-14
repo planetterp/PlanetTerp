@@ -2,7 +2,6 @@ from django.shortcuts import redirect, render
 from django.views import View
 from django.http import HttpResponse
 
-from home import model
 from home.models import Course
 from home import queries
 

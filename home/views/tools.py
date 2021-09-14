@@ -6,7 +6,6 @@ from django.db.models import Sum
 from home.models import Grade
 from home import model
 
-
 class Tools(TemplateView):
     template_name = "tools.html"
 

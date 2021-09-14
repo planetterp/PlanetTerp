@@ -1,5 +1,6 @@
-from django.contrib.auth.backends import BaseBackend
 import bcrypt
+
+from django.contrib.auth.backends import BaseBackend
 
 from home.models import User
 

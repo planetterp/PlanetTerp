@@ -1,7 +1,6 @@
 from typing import List
 
 from django.db.models.query import QuerySet
-from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 from django.core.handlers.wsgi import WSGIRequest
 

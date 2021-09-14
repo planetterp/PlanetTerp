@@ -7,14 +7,13 @@ from django.db.models import QuerySet
 from django.urls import reverse
 from django.forms import Form
 
-from discord_webhook import DiscordWebhook
-from discord_webhook.webhook import DiscordEmbed
-
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Fieldset, Layout, Div, Field, HTML, Button
 from crispy_forms.bootstrap import FormActions, Alert, InlineRadios
-from django.utils.safestring import mark_safe
 from django.utils.html import format_html
+
+from discord_webhook import DiscordWebhook
+from discord_webhook.webhook import DiscordEmbed
 
 from home.forms.layout_objects.bootstrap_modal import BootstrapModal
 from home.models import Review, Professor, Course

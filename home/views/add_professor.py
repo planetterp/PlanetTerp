@@ -1,12 +1,12 @@
 from django.views import View
 from django.http import JsonResponse
 from django.template.context_processors import csrf
+
 from crispy_forms.utils import render_crispy_form
 
 from home.forms.professor_forms import ProfessorFormAdd
 from home.models import Professor, Review, Course
 from home.utils import send_updates_webhook
-
 
 class AddProfessor(View):
     def post(self, request):

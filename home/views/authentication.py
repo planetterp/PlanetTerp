@@ -3,7 +3,6 @@ from datetime import timedelta
 
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.template.context_processors import csrf
-from crispy_forms.utils import render_crispy_form
 from django.utils.safestring import mark_safe
 from django.shortcuts import redirect, render
 from django.contrib.auth import login, logout
@@ -11,6 +10,8 @@ from django.http.response import JsonResponse
 from django.utils.timezone import now
 from django.urls import reverse
 from django.views import View
+
+from crispy_forms.utils import render_crispy_form
 
 from home.models import User, ResetCode
 from home.forms.auth_forms import LoginForm, RegisterForm, ForgotPasswordForm
