@@ -47,11 +47,13 @@
 		<div class="col-md-6 course-professors">
 			{% for semester, professors in grouped_professors.items %}
 				<h3 class="text-center">{{ semester }}</h3>
+				{% comment %}
 				<!--
 					conveniently, the `sm` breakpoint lines up almost exatly with our mobile styling breakpoint.
 					Since on mobile we put the graph above and the professors below, the professors suddenly have a
 					lot more space and can be put into 2 columns again.
 				-->
+				{% endcomment %}
 				<div class="row row-cols-1 row-cols-sm-2 row-cols-md-1 row-cols-lg-2">
 					{% for professor in professors %}
 						<div class="col px-2 pb-3">
