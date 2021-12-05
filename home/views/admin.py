@@ -286,9 +286,8 @@ class Admin(View):
 
                 if query.exists():
                     response["error_msg"] = (
-                    "This professor is likely a"
-                        f"duplicate because a similar {professor.type}"
-                        "already exists. Please reject or delete this professor."
+                        f"This {professor.type} might be a duplicate of "
+                        f"{query[0]}. Please merge or delete this {professor.type}."
                     )
 
                     return JsonResponse(response)

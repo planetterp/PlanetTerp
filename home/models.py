@@ -155,7 +155,7 @@ class Professor(Model):
         return reverse("professor", kwargs={"slug": self.slug})
 
     def __str__(self):
-        return f"{self.name} ({self.slug})"
+        return f"{self.name} ({self.id})"
 
 
 class ProfessorSection(Model):
