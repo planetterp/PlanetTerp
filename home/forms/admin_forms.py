@@ -1,6 +1,7 @@
 from django.core.exceptions import ValidationError
 from django.forms import CharField, IntegerField, DateField, ChoiceField
 from django.forms.widgets import DateInput, HiddenInput, TextInput
+from django.utils.html import format_html
 from django.forms import Form, ModelForm
 
 from crispy_forms.helper import FormHelper
@@ -439,7 +440,7 @@ class ProfessorUpdateForm(ModelForm):
                 ),
                 css_id="edit-professor-modal",
                 title_id="edit-professor-label",
-                title=f'Viewing info for {self.professor.name}. Click a field to edit its contents.'
+                title=format_html('Viewing info for <b>{}</b>. Click a field to edit its contents.', (self.professor.name))
             )
         )
         return layout
