@@ -185,8 +185,8 @@ function mergeProfessorSuccess(data, args) {
         location.pathname = `/professor/${data["target_slug"]}`;
     } else {
         var successText = '<div class="alert alert-success text-center success-alert">'
-            successText += 'Professor merged successfully!'
-            successText += '</div>'
+            successText += 'Professor merged successfully! </div>'
+
         $("#id_merge_subject").removeClass("is-invalid").val("");
         $("#id_merge_target").removeClass("is-invalid").val("");
 

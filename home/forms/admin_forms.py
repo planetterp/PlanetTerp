@@ -74,7 +74,6 @@ class ReviewRejectForm(Form):
             FormActions(submit_button)
         )
 
-
 # For sending a help webhook of an unverified review
 class ReviewHelpForm(Form):
     review_id = IntegerField(required=True, widget=HiddenInput)
@@ -102,7 +101,6 @@ class ReviewHelpForm(Form):
             'action_type',
             FormActions(submit_button)
         )
-
 
 # For unverifying a verified review. Currently used on /professor
 class ReviewUnverifyForm(Form):
@@ -165,7 +163,6 @@ class ProfessorVerifyForm(Form):
             FormActions(submit_button)
         )
 
-
 # For rejecting unverified professors
 class ProfessorRejectForm(Form):
     professor_id = IntegerField(required=True, widget=HiddenInput)
@@ -196,7 +193,6 @@ class ProfessorRejectForm(Form):
             'action_type',
             FormActions(submit_button)
         )
-
 
 # For deleting unverified professors. This action cannot be undone.
 # Use carefully: Once a professor is deleted, all their data is lost
@@ -231,11 +227,9 @@ class ProfessorDeleteForm(Form):
             FormActions(submit_button)
         )
 
-
 # For manually entering a professor's slug when
 # the system couldn't automatically generate one
 class ProfessorSlugForm(Form):
-    # TODO: add strip=True to every CharField
     slug = CharField(required=False, widget=TextInput, label=False)
     professor_id = IntegerField(required=True, widget=HiddenInput)
     action_type = CharField(required=True, widget=HiddenInput, initial=AdminAction.PROFESSOR_SLUG.value)
