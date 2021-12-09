@@ -540,8 +540,8 @@ class ProfessorMergeForm(Form):
 
     def __init__(self, request, merge_subject: Professor=None, use_large_inputs=False, **kwargs):
         super().__init__(**kwargs)
-        self.input_css_classes = "form-control-lg" if use_large_inputs else ""
-        self.button_css_classes = "btn-lg w-100" if use_large_inputs else ""
+        self.input_css_classes = " form-control-lg" if use_large_inputs else ""
+        self.button_css_classes = " btn-lg " if use_large_inputs else ""
 
         self.helper = FormHelper()
         self.helper.form_id = "merge-professor-form"
@@ -567,65 +567,76 @@ class ProfessorMergeForm(Form):
 
     def generate_layout(self):
         layout = Layout(
-            'source_page',
-            'action_type',
-            HTML(
-                '''
-                <div id="merge-professor-errors" class="merge-errors invalid-feedback hidden text-center mb-1">
-                    {% if form.merge_subject.errors or form.merge_subject.errors and form.merge_target.errors %}
-                        {{ form.merge_subject.errors|striptags }}
-                    {% elif form.merge_target.errors %}
-                        {{ form.merge_target.errors|striptags }}
-                    {% endif %}
-                </div>
-                '''
-            ),
             Div(
                 Div(
-                    # font-awesome icons don't render with the crispy_forms Button()
-                    # element so this was my work around.
+                    'source_page',
+                    'action_type',
                     HTML(
                         '''
-                        <button class="btn btn-outline-secondary fas fa-question-circle" type="button"
-                        data-toggle="tooltip" data-placement="left"
-                        title="All data for the instructor on the left will be merged into the
-                        instructor on the right. The instructor on the left will be
-                        deleted after the merge."></button>
-
-                        <button class="btn btn-outline-secondary fas fa-sync-alt" type="button"
-                        data-toggle="tooltip" data-placement="top" title="Swap inputs"
-                        onclick="swapInputs()"></button>
+                        <div id="merge-professor-errors" class="merge-errors invalid-feedback hidden text-center mb-1">
+                            {% if form.merge_subject.errors or form.merge_subject.errors and form.merge_target.errors %}
+                                {{ form.merge_subject.errors|striptags }}
+                            {% elif form.merge_target.errors %}
+                                {{ form.merge_target.errors|striptags }}
+                            {% endif %}
+                        </div>
                         '''
                     ),
-                    css_class="input-group-prepend"
+                    Div(
+                        Div(
+                            # font-awesome icons don't render with the crispy_forms Button()
+                            # element so this was my work around.
+                            HTML(
+                                '''
+                                <button class="btn btn-outline-secondary fas fa-question-circle" type="button"
+                                data-toggle="tooltip" data-placement="left"
+                                title="All data for the instructor on the left will be merged into the
+                                instructor on the right. The instructor on the left will be
+                                deleted after the merge."></button>
+
+                                <button class="btn btn-outline-secondary fas fa-sync-alt" type="button"
+                                data-toggle="tooltip" data-placement="top" title="Swap inputs"
+                                onclick="swapInputs()"></button>
+                                '''
+                            ),
+                            css_class="input-group-prepend"
+                        ),
+                        Field(
+                            'merge_subject',
+                            placeholder="Merge Subject",
+                            type="search",
+                            css_class="rounded-0 " + self.input_css_classes,
+                            wrapper_class="mb-0"
+                        ),
+                        'subject_id',
+                        Div(
+                            HTML('<button class="input-group-text fas fa-arrow-right" type="button"></button>'),
+                            css_class="input-group-prepend"
+                        ),
+                        Field(
+                            'merge_target',
+                            placeholder="Merge Target",
+                            type="search",
+                            css_class="rounded-right " + self.input_css_classes,
+                            wrapper_class="mb-0"
+                        ),
+                        'target_id',
+                        css_class="input-group justify-content-center mb-1"
+                    ),
+                    css_class="row"
                 ),
-                Field(
-                    'merge_subject',
-                    placeholder="Merge Subject",
-                    type="search",
-                    css_class="rounded-0 " + self.input_css_classes,
-                    wrapper_class="mb-0"
-                ),
-                'subject_id',
                 Div(
-                    HTML('<button class="input-group-text fas fa-arrow-right" type="button"></button>'),
-                    css_class="input-group-prepend"
+                    Button(
+                        'merge',
+                        'Merge',
+                        css_class="btn-primary mt-3 w-100" + self.button_css_classes,
+                        onClick='sendResponse($("#merge-professor-form").serialize(), "professor_merge")'
+                    ),
+                    css_class="row justify-content-center"
                 ),
-                Field(
-                    'merge_target',
-                    placeholder="Merge Target",
-                    type="search",
-                    css_class="rounded-right " + self.input_css_classes,
-                    wrapper_class="mb-0"
-                ),
-                'target_id',
-                css_class="input-group justify-content-center mb-1"
-            ),
-            Button(
-                'merge',
-                'Merge',
-                css_class="btn-primary float-right mt-3 " + self.button_css_classes,
-                onClick='sendResponse($("#merge-professor-form").serialize(), "professor_merge")'
+                css_class="container",
+                style="width: fit-content",
+                css_id="merge-form-container"
             )
         )
 
