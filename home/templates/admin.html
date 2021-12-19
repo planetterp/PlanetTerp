@@ -18,9 +18,6 @@
 	<li class="nav-item">
 		<a class="nav-link" data-toggle="tab" href="#professors-noscroll" id="professors-tab" role="tab" onclick="hideReviews()">Unverified Professors <span id="professor-counter" class="badge badge-primary">{{ professors|length}}</span></a>
 	</li>
-	<li class="nav-item">
-		<a class="nav-link" data-toggle="tab" href="#merge-noscroll" id="merge-tab" role="tab" onclick="hideReviews()">Merge Professors</a>
-	</li>
 </ul>
 
 <div class="tab-content container admin-panel" id="adminPageContent">
@@ -31,21 +28,22 @@
 		{% render_table professors_table %}
 		<div id="slug-modal-container"></div>
 	</div>
-
-	<div class="tab-pane fade" id="merge-noscroll" role="tabpanel">
-		<h1 class="text-center my-3">Professor Merge Tool</h1>
-		<div id="merge-professor-container">
-			{% crispy merge_professor_form %}
-		</div>
-	</div>
 </div>
 
-<script>
+<script type="text/javascript">
 	var prof_count = Number({{ professors|length }});
 	var num_reviews = Number({{ reviews|length }});
 
 	$(function() {
-		initalizeAutoComplete('{{ csrf_token }}');
+		var hash = window.location.hash;
+		// when we change `window.location.hash`, if there is an element with id equal to that hash,
+		// the browser will scroll to it automatically. We don't want this so we need to have our
+		// tabs have a different id than the hash. We accomplish this by appending "Tab" to the hash
+		// to get the corresponding tab element.
+
+		if (hash)
+			$('.nav-tabs a[href="' + hash + '-noscroll"]').tab('show');
+
 		$("#review-counter").html(`${num_reviews}`);
 
 		if (num_reviews == 0) {
@@ -72,33 +70,20 @@
 
 	function verifyProfessor(form) {
 		var professor_counter = (prof_count > 0 ? --prof_count : 0)
-
 		args = {"count" : professor_counter, "num_reviews" : num_reviews}
 		sendResponse($(form).serialize(), "professor_verify", args);
 	}
 
 	function verifySlug(form) {
 		var professor_counter = (prof_count > 0 ? --prof_count : 0)
-
 		sendResponse($(form).serialize(), "professor_slug", {"count" : professor_counter});
 	}
 
 	function deleteProfessor(form) {
 		var professor_counter = (prof_count > 0 ? --prof_count : 0)
-
 		var args = {"count" : professor_counter, "num_reviews" : num_reviews, "form": form};
 		sendResponse($(form).serialize(), "professor_verify", args);
 	}
-
-	$(function() {
-		var hash = window.location.hash;
-		// when we change `window.location.hash`, if there is an element with id equal to that hash,
-		// the browser will scroll to it automatically. We don't want this so we need to have our
-		// tabs have a different id than the hash. We accomplish this by appending "Tab" to the hash
-		// to get the corresponding tab element.
-		if (hash)
-			$('.nav-tabs a[href="' + hash + '-noscroll"]').tab('show');
-	});
 
 	// when a user changes tabs, change url hash as well
 	$('.nav-tabs a').on('shown.bs.tab', function (e) {

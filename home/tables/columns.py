@@ -9,9 +9,11 @@ from crispy_forms.utils import render_crispy_form
 
 import django_tables2 as tables
 
-from home.models import Review, Grade
-from home.forms.admin_forms import ReviewUnverifyForm, ReviewVerifyForm, ProfessorVerifyForm, ReviewRejectForm, ReviewHelpForm, ProfessorRejectForm, ProfessorDeleteForm
 from planetterp.settings import DATE_FORMAT
+from home.models import Review, Grade
+from home.forms.admin_forms import (ReviewUnverifyForm, ReviewVerifyForm,
+ProfessorVerifyForm, ReviewRejectForm, ReviewHelpForm, ProfessorRejectForm,
+ProfessorDeleteForm, ProfessorMergeForm)
 
 class InformationColumn(tables.Column):
     def __init__(self, *args, **kwargs):
@@ -163,7 +165,6 @@ class StatusColumn(tables.Column):
 
 class ActionColumn(tables.Column):
     def __init__(self, *args, **kwargs):
-
         attrs = {
             "th": {"class": "action"},
             "td": {"class": "action"}
@@ -225,12 +226,14 @@ class UnverifiedProfessorsActionColumn(ActionColumn):
         request = value.pop("request")
         model_obj = value.pop("model_obj")
 
+        csrf_token = csrf(request)
         ctx = {}
-        ctx.update(csrf(request))
+        ctx.update(csrf_token)
 
         verify_form = ProfessorVerifyForm(model_obj.pk)
         reject_form = ProfessorRejectForm(model_obj.pk)
         delete_form = ProfessorDeleteForm(model_obj)
+        merge_form = ProfessorMergeForm(request, model_obj)
 
         column_html = '''
             <div style="white-space: nowrap;">
@@ -238,14 +241,24 @@ class UnverifiedProfessorsActionColumn(ActionColumn):
                     {verify_form}
                     {reject_form}
                 </div>
-                <div class="btn-group">
+                <div class="btn-group" style="align-items: flex-start;">
                     {delete_form}
+                    <button class="btn btn-primary rounded-right"
+                        data-toggle="modal" data-target="#merge-modal-{id}"
+                        onclick="initalizeAutoComplete('{csrf}', {id})">Merge
+                    </button>
+                    <div id="merge-container-{id}">
+                        {merge_form}
+                    </div>
                 </div>
             </div>
         '''
         kwargs = {
             "verify_form": render_crispy_form(verify_form, verify_form.helper, context=ctx),
             "reject_form": render_crispy_form(reject_form, reject_form.helper, context=ctx),
-            "delete_form": render_crispy_form(delete_form, delete_form.helper, context=ctx)
+            "delete_form": render_crispy_form(delete_form, delete_form.helper, context=ctx),
+            "merge_form": render_crispy_form(merge_form, merge_form.helper, context=ctx),
+            "id": model_obj.pk,
+            "csrf": csrf_token['csrf_token']
         }
         return format_html(column_html, **kwargs)

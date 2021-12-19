@@ -6,7 +6,7 @@ from django.forms import Form, ModelForm
 
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Div, Field, Layout, Button, HTML
-from crispy_forms.bootstrap import FormActions, UneditableField
+from crispy_forms.bootstrap import FormActions, StrictButton, UneditableField
 
 from .layout_objects.bootstrap_modal import BootstrapModal
 from home.utils import AdminAction, slug_in_use_err
@@ -215,11 +215,11 @@ class ProfessorDeleteForm(Form):
         self.helper.layout = self.generate_layout()
 
     def generate_layout(self):
-        submit_button = Button(
-            "delete",
+        submit_button = StrictButton(
             "Delete",
             css_class="btn-dark",
-            onClick=f"deleteProfessor('#{self.helper.form_id}')"
+            onClick=f"deleteProfessor('#{self.helper.form_id}')",
+            style="border-bottom-right-radius: 0; border-top-right-radius: 0;"
         )
         return Layout(
             'professor_id',
@@ -516,7 +516,8 @@ class ProfessorMergeForm(Form):
     )
 
     merge_subject = CharField(
-        required=False
+        required=False,
+        disabled=True
     )
 
     subject_id = IntegerField(
@@ -538,89 +539,85 @@ class ProfessorMergeForm(Form):
         widget=HiddenInput
     )
 
-    def __init__(self, request, merge_subject: Professor=None, use_large_inputs=False, **kwargs):
+    def __init__(self, request, merge_subject: Professor, **kwargs):
         super().__init__(**kwargs)
-        self.input_css_classes = " form-control-lg" if use_large_inputs else ""
-        self.button_css_classes = " btn-lg " if use_large_inputs else ""
 
+        self.professor = merge_subject
         self.helper = FormHelper()
-        self.helper.form_id = "merge-professor-form"
+        self.helper.form_id = f"merge-form-{merge_subject.pk}"
         self.helper.form_show_errors = False
         self.helper.form_show_labels = False
         self.helper.layout = self.generate_layout()
 
         if request:
             self.fields['source_page'].initial = request.path
+            if "admin" in request.path:
+                self.helper.form_class = "unverified_professor_form"
 
         # subject_id and/or target_id have hard-coded negative values to determine if the input belongs to a real professor.
         # If it does, the value will be replaced with that professor's id. These values must be different or the validation
         # will think the inputs are the same and return an error. These values must also be negative because a professor
         # could have an id of any non-negative number.
-        if merge_subject:
-            self.professor = merge_subject
-            self.fields['merge_subject'].initial = merge_subject.name
-            self.fields['subject_id'].initial = merge_subject.pk
-            self.fields['target_id'].initial = "-1"
-        else:
-            self.fields['subject_id'].initial = "-1"
-            self.fields['target_id'].initial = "-2"
+        self.fields['merge_subject'].initial = merge_subject
+        self.fields['subject_id'].initial = merge_subject.pk
+        self.fields['target_id'].initial = "-1"
 
     def generate_layout(self):
-        layout = Layout(
+        fields = Layout(
             Div(
+                'source_page',
+                'action_type',
                 Div(
-                    'source_page',
-                    'action_type',
-                    HTML(
-                        '''
-                        <div id="merge-professor-errors" class="merge-errors invalid-feedback hidden text-center mb-1">
-                            {% if form.merge_subject.errors or form.merge_subject.errors and form.merge_target.errors %}
-                                {{ form.merge_subject.errors|striptags }}
-                            {% elif form.merge_target.errors %}
-                                {{ form.merge_target.errors|striptags }}
-                            {% endif %}
-                        </div>
-                        '''
-                    ),
+                    HTML('''
+                        {% if form.merge_target.errors %}
+                            {{ form.merge_target.errors|striptags }}
+                        {% else %}
+                            {{ form.merge_subject.errors|striptags }}
+                        {% endif %}
+                    '''),
+                    css_id=f"merge-errors-{self.professor.pk}",
+                    css_class="row justify-content-center merge-errors invalid-feedback mb-1",
+                    style="display: none;"
+                ),
+                Div(
                     Div(
                         Div(
                             # font-awesome icons don't render with the crispy_forms Button()
                             # element so this was my work around.
                             HTML(
                                 '''
-                                <button class="btn btn-outline-secondary fas fa-question-circle" type="button"
+                                <button class="btn btn-outline-secondary fas fa-question-circle"
                                 data-toggle="tooltip" data-placement="left"
                                 title="All data for the instructor on the left will be merged into the
                                 instructor on the right. The instructor on the left will be
-                                deleted after the merge."></button>
-
-                                <button class="btn btn-outline-secondary fas fa-sync-alt" type="button"
-                                data-toggle="tooltip" data-placement="top" title="Swap inputs"
-                                onclick="swapInputs()"></button>
+                                deleted after the merge." type="button" onClick="null"></button>
                                 '''
                             ),
                             css_class="input-group-prepend"
                         ),
                         Field(
                             'merge_subject',
-                            placeholder="Merge Subject",
-                            type="search",
-                            css_class="rounded-0 " + self.input_css_classes,
+                            css_class="rounded-0",
                             wrapper_class="mb-0"
                         ),
                         'subject_id',
                         Div(
-                            HTML('<button class="input-group-text fas fa-arrow-right" type="button"></button>'),
+                            HTML('<button class="input-group-text fas fa-arrow-right" disabled></button>'),
                             css_class="input-group-prepend"
                         ),
                         Field(
                             'merge_target',
+                            id=f"id_merge_target_{self.professor.pk}",
+                            css_class="rounded-right",
+                            wrapper_class="mb-0",
                             placeholder="Merge Target",
                             type="search",
-                            css_class="rounded-right " + self.input_css_classes,
-                            wrapper_class="mb-0"
+                            style="border-top-left-radius: 0; border-bottom-left-radius: 0;",
                         ),
-                        'target_id',
+                        Field(
+                            'target_id',
+                            id=f"id_target_id_{self.professor.pk}"
+                        ),
                         css_class="input-group justify-content-center mb-1"
                     ),
                     css_class="row"
@@ -629,17 +626,22 @@ class ProfessorMergeForm(Form):
                     Button(
                         'merge',
                         'Merge',
-                        css_class="btn-primary mt-3 w-100" + self.button_css_classes,
-                        onClick='sendResponse($("#merge-professor-form").serialize(), "professor_merge")'
+                        css_class="btn-primary mt-3 w-100",
+                        onClick=f'sendResponse($("#{self.helper.form_id}").serialize(), "professor_merge", {{ "prof_id": {self.professor.pk} }})'
                     ),
-                    css_class="row justify-content-center"
+                    css_class="row"
                 ),
                 css_class="container",
                 style="width: fit-content",
                 css_id="merge-form-container"
             )
         )
-
+        layout = BootstrapModal(
+            fields,
+            css_id=f"merge-modal-{self.professor.pk}",
+            title_id="merge-professor-label",
+            title='Search for a professor/TA to merge with'
+        )
         return layout
 
     def clean(self):
@@ -650,11 +652,13 @@ class ProfessorMergeForm(Form):
         merge_subject = merge_subject_id >= 0
         merge_target = merge_target_id >= 0
         if not (merge_subject and merge_target):
-            error_msg = "Please fill in both fields"
-            error = ValidationError(error_msg, code='Empty')
             if not merge_subject:
+                error_msg = "This field cannot be empty"
+                error = ValidationError(error_msg, code='Empty')
                 self.add_error('merge_subject', error)
             if not merge_target:
+                error_msg = "You must enter a professor to merge with"
+                error = ValidationError(error_msg, code='Empty')
                 self.add_error('merge_target', error)
         else:
             if merge_subject_id == merge_target_id:
@@ -672,17 +676,3 @@ class ProfessorMergeForm(Form):
                     self.add_error('merge_target', error)
 
         return cleaned_data
-
-# Same form as above placed inside a bootstrap modal.
-# Works anywhere modals work.
-class ProfessorMergeFormModal(ProfessorMergeForm):
-    def generate_layout(self):
-        layout = Layout(
-            BootstrapModal(
-                super().generate_layout(),
-                css_id="merge-professor-modal",
-                title_id="merge-professor-label",
-                title='Search for a professor/TA to merge with'
-            )
-        )
-        return layout

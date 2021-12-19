@@ -185,23 +185,21 @@ function mergeProfessorSuccess(data, args) {
         location.pathname = `/professor/${data["target_slug"]}`;
     } else {
         var successText = '<div class="alert alert-success text-center success-alert">'
-            successText += 'Professor merged successfully! </div>'
+            successText += 'Professor merged successfully!</div>'
 
-        $("#id_merge_subject").removeClass("is-invalid").val("");
-        $("#id_merge_target").removeClass("is-invalid").val("");
+        $(`#id_merge_subject_${args['prof_id']}`).removeClass("is-invalid").val("");
+        $(`#id_merge_target_${args['prof_id']}`).removeClass("is-invalid").val("");
 
-        addAdminResponse("#merge-professor-errors", successText);
+        addAdminResponse(`#merge-errors-${args["prof_id"]}`, successText);
     }
 }
 function mergeProfessorError(data, args) {
-    $("#merge-professor-container").html(data["form"]);
-    var csrf_token = $('#merge-professor-form > input[name="csrfmiddlewaretoken"]').val();
-    if (location.pathname.includes("professor")) {
-        $(".modal-backdrop").remove();
-        $("#merge-professor-modal").modal('show');
-    }
-    initalizeAutoComplete(csrf_token);
-    $("#merge-professor-errors").show()
+    $(`#merge-container-${args["prof_id"]}`).html(data["form"]);
+    $(`#merge-errors-${args["prof_id"]}`).css("display", "flex");
+    var csrf_token = $(`#merge-form-${args["prof_id"]} > input[name="csrfmiddlewaretoken"]`).val();
+    $(".modal-backdrop").remove();
+    $(`#merge-modal-${args["prof_id"]}`).modal('show');
+    initalizeAutoComplete(csrf_token, args["prof_id"]);
 }
 
 /* ********* SLUG PROFESSOR FUNCTIONS ********* */
@@ -239,29 +237,14 @@ function slugProfessorError(data, args) {
 }
 
 /* SHARED FUNCTIONS */
-function swapInputs() {
-    var subject = $("#id_merge_subject").val();
-    var target = $("#id_merge_target").val();
-
-    var subject_id = $("#id_subject_id").val();
-    var target_id = $("#id_target_id").val();
-
-    $("#id_merge_target").val(subject);
-    $("#id_merge_subject").val(target);
-
-    $("#id_subject_id").val(target_id);
-    $("#id_target_id").val(subject_id);
-}
-
-function initalizeAutoComplete(csrf_token) {
-    $("#id_merge_target").autocomplete({
+function initalizeAutoComplete(csrf_token, prof_id) {
+    $(`#id_merge_target_${prof_id}`).autocomplete({
         minLength: 3,
         source: function(request, response) {
             $.ajax({
                 url: "/autocomplete",
                 dataType: 'json',
                 data: {
-                    'from_professor_page': true,
                     'query': request.term,
                     "types[]": ["professor"],
                     "return_attrs[]": ["pk", "name"],
@@ -273,32 +256,8 @@ function initalizeAutoComplete(csrf_token) {
             })
         },
         select: function(event, ui) {
-            $("#id_merge_target").val(ui.item.result.name);
-            $("#id_target_id").val(ui.item.result.pk);
-        }
-    });
-
-    $("#id_merge_subject").autocomplete({
-        minLength: 3,
-        source: function(request, response) {
-            $.ajax({
-                url: "/autocomplete",
-                dataType: 'json',
-                data: {
-                    'from_professor_page': true,
-                    'query': request.term,
-                    "types[]": ["professor"],
-                    "return_attrs[]": ["pk", "name"],
-                    'csrfmiddlewaretoken': csrf_token
-                },
-                success: function(data) {
-                    response(data);
-                }
-            })
-        },
-        select: function(event, ui) {
-            $("#id_merge_subject").val(ui.item.result.name);
-            $("#id_subject_id").val(ui.item.result.pk);
+            $(`#id_merge_target_${prof_id}`).val(ui.item.result.name);
+            $(`#id_target_id_${prof_id}`).val(ui.item.result.pk);
         }
     });
 }

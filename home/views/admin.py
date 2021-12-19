@@ -1,7 +1,7 @@
 from typing import Optional
 
 from django.shortcuts import redirect, render
-from django.views.generic.list import View
+from django.views import View
 from django.db.models import Q
 from django.http import JsonResponse
 from django.template.context_processors import csrf
@@ -16,7 +16,7 @@ from home.models import Review, Professor, ProfessorCourse, Grade, User
 from home.utils import AdminAction
 from home.tables.reviews_table import UnverifiedReviewsTable
 from home.tables.basic import ProfessorsTable
-from home.forms.admin_forms import ProfessorMergeForm, ProfessorMergeFormModal, ProfessorSlugForm, ProfessorUpdateForm
+from home.forms.admin_forms import ProfessorMergeForm, ProfessorSlugForm, ProfessorUpdateForm
 from planetterp import config
 
 class Admin(View):
@@ -25,6 +25,7 @@ class Admin(View):
     def get(self, request):
         user = request.user
 
+        # TODO: use Django's access perms
         if not (user.is_staff or user.is_superuser):
             return redirect('/')
 
@@ -33,14 +34,12 @@ class Admin(View):
 
         reviews_table = UnverifiedReviewsTable(reviews, request)
         professors_table = ProfessorsTable(professors, request)
-        merge_professor_form = ProfessorMergeForm(request, use_large_inputs=True)
 
         context = {
             "reviews": reviews,
             "professors": professors,
             "reviews_table": reviews_table,
-            "professors_table": professors_table,
-            "merge_professor_form": merge_professor_form
+            "professors_table": professors_table
         }
 
         return render(request, "admin.html", context)
@@ -137,10 +136,9 @@ class Admin(View):
             return JsonResponse(context)
 
         elif action_type is AdminAction.PROFESSOR_MERGE:
-            if 'professor' in data['source_page']:
-                form = ProfessorMergeFormModal(request, data=request.POST)
-            else:
-                form = ProfessorMergeForm(request, use_large_inputs=True, data=request.POST)
+            subject_id = request.POST['subject_id']
+            merge_subject = Professor.objects.get(pk=subject_id)
+            form = ProfessorMergeForm(request, merge_subject, data=request.POST)
 
             ctx = {}
             ctx.update(csrf(request))
@@ -149,9 +147,7 @@ class Admin(View):
             }
 
             if form.is_valid():
-                subject_id = form.cleaned_data['subject_id']
                 target_id = form.cleaned_data['target_id']
-                merge_subject = Professor.objects.get(pk=subject_id)
                 merge_target = Professor.objects.get(pk=target_id)
 
                 ProfessorCourse.objects.filter(professor__id=subject_id).update(professor=merge_target)

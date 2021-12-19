@@ -25,14 +25,14 @@
 					<h1 class="input-group">
 						<span id="professor-name"><strong>{{ professor.name }}</strong></span>
 						<div class="input-group-append"><i class="fas fa-pencil-alt pl-3 pt-2 admin-tool-icon" data-toggle="modal" data-target="#edit-professor-modal"></i></div>
-						<div class="input-group-append"><i class="fas fa-people-arrows pl-3 pt-2 admin-tool-icon" data-toggle="modal" data-target="#merge-professor-modal"></i></div>
+						<div class="input-group-append"><i class="fas fa-people-arrows pl-3 pt-2 admin-tool-icon" data-toggle="modal" data-target="#merge-modal-{{ professor.pk }}"></i></div>
 					</h1>
 				</div>
 
 				{% crispy edit_professor_form %}
 				{% crispy unverify_professor_form %}
 
-				<div id="merge-professor-container">
+				<div id="merge-container-{{ professor.pk }}">
 					{% crispy merge_professor_form %}
 				</div>
 
@@ -142,7 +142,7 @@
 		}
 
 		if (is_admin) {
-			initalizeAutoComplete('{{ csrf_token }}');
+			initalizeAutoComplete('{{ csrf_token }}', "{{ professor.pk }}");
 		}
 	});
 
@@ -218,7 +218,7 @@
 		function() {
 			$("#edit-professor-modal").modal('hide');
 			$(".modal-backdrop").hide();
-			$("#merge-professor-modal").modal('show');
+			$("#merge-modal-{{ professor.pk }}").modal('show');
 		}
 	)
 
