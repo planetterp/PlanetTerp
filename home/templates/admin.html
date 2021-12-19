@@ -36,10 +36,12 @@
 
 	$(function() {
 		var hash = window.location.hash;
+		{% comment %}
 		// when we change `window.location.hash`, if there is an element with id equal to that hash,
 		// the browser will scroll to it automatically. We don't want this so we need to have our
 		// tabs have a different id than the hash. We accomplish this by appending "Tab" to the hash
 		// to get the corresponding tab element.
+		{% endcomment %}
 
 		if (hash)
 			$('.nav-tabs a[href="' + hash + '-noscroll"]').tab('show');
@@ -85,7 +87,9 @@
 		sendResponse($(form).serialize(), "professor_verify", args);
 	}
 
+	{% comment %}
 	// when a user changes tabs, change url hash as well
+	{% endcomment %}
 	$('.nav-tabs a').on('shown.bs.tab', function (e) {
 		window.location.hash = e.target.hash.replace("-noscroll", "");
 	});

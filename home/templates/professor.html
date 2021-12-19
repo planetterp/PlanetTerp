@@ -108,11 +108,13 @@
 			<div class="modal-body text-center">
 				<script>
 					function callback(chart) {
+						{% comment %}
 						// hack to make graphs look better on mobile devices. On mobile you have more vertical real estate
 						// than horizontal, so when we generate our graph and stop when we reach the horizontal limit, it's
 						// still not very tall. By making the aspect ratio 1:1 we get a taller graph which looks better.
 						// The default aspect ratio for chartjs is, I believe, 2, so this is what we get on all other devices
 						// (when aspectRatio is null).
+						{% endcomment %}
 						var aspectRatio = $(window).width() > 800 ? null : 1;
 						if (aspectRatio) {
 							// https://stackoverflow.com/a/58816740
