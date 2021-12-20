@@ -271,13 +271,13 @@ class Admin(View):
                 return JsonResponse(response)
             if not professor.slug and slug is None:
                 # Attempt to create slug automatically
-                split_name = str(professor.name).split(" ")
+                split_name = str(professor.name).strip().split(" ")
                 first_name = split_name[0].lower().strip()
                 last_name = split_name[-1].lower().strip()
 
                 query = Professor.objects.filter(
-                    (Q(name__istartswith=first_name) & Q(name__iendswith=last_name)) |
-                    Q(slug=last_name),
+                    (Q(name__icontains=first_name) & Q(name__icontains=last_name)) |
+                    Q(slug="_".join(reversed(split_name)).lower()),
                     status=verified_status)
 
                 if query.exists():
@@ -305,7 +305,7 @@ class Admin(View):
                     response["success_msg"] = modal_msg
                     return JsonResponse(response)
 
-                professor.slug = last_name
+                professor.slug = "_".join(reversed(split_name)).lower()
         else:
             professor.slug = None
             if verified_status is Professor.Status.REJECTED:
