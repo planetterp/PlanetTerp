@@ -302,6 +302,7 @@ class Admin(View):
                     ctx.update(csrf(request))
                     form = ProfessorSlugForm(professor, modal_title=modal_msg)
                     response["form"] = render_crispy_form(form, form.helper, context=ctx)
+                    response["success_msg"] = modal_msg
                     return JsonResponse(response)
 
                 professor.slug = last_name
