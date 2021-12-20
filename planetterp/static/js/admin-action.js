@@ -52,6 +52,8 @@ function addAdminResponse(target, msg) {
 function verifyReviewSuccess(data, args) {
     var msg = data['success_msg'];
     var verified_status = data['verified_status'];
+    var unverified_count = Number($("#unverified_count").html());
+    $("#unverified_count").html(unverified_count - 1);
     var successText = '<div class="alert alert-success text-center success-alert">'
         successText += `<strong>Successfully ${verified_status} review</strong>`
 
@@ -65,6 +67,7 @@ function verifyReviewSuccess(data, args) {
     }
 
     $("#review-counter").html(args["count"]);
+
     $(`#review-${data["review_id"]}`).remove();
     addAdminResponse("#admin-tool-response", successText);
 }
@@ -89,6 +92,7 @@ function verifyProfessorSuccess(data, args) {
         $("#slug-modal-container").html(`${data['form']}`);
         $(`#slug-modal-${data['id']}`).modal('show');
     } else {
+        var unverified_count;
         if (data['success_msg'] != "unverified") {
             var successText = '<div class="alert alert-success text-center success-alert">'
             var msg = data['success_msg'];
@@ -116,6 +120,8 @@ function verifyProfessorSuccess(data, args) {
             successText += "</div><br />";
             $(`#professor-${data['id']}`).remove();
             addAdminResponse("#admin-tool-response", successText);
+            unverified_count = Number($("#unverified_count").html());
+            $("#unverified_count").html(unverified_count - 1);
         } else
             window.location.href = "/";
     }
