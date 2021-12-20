@@ -262,7 +262,7 @@ class ProfessorSlugForm(Form):
                 Field(
                     'slug',
                     id=f"slug-form-slug-{self.professor.pk}",
-                    placeholder="Enter a slug"
+                    placeholder="EX: Andres De Los Reyes = reyes_los_de_andres"
                 ),
                 slug_errors,
                 Field(
