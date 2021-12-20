@@ -288,14 +288,12 @@ class Admin(View):
 
                     return JsonResponse(response)
 
-                modal_msg = None
                 if len(split_name) > 2:
                     modal_msg = (
                         f"The name '{professor.name}' is too long and"
                         "can't be slugged automatcially. Please enter a slug below."
                     )
 
-                if modal_msg:
                     # Create the modal form to manualy enter
                     #   a slug and add it to the response. The
                     #   form creates the modal, though it's
