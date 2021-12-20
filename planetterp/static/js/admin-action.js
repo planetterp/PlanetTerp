@@ -61,7 +61,7 @@ function verifyReviewSuccess(data, args) {
     successText += "</div><br />";
 
     if (verified_status == "unverified") {
-        generateProfessorStats();
+        location.reload();
     }
 
     $("#review-counter").html(args["count"]);
