@@ -187,7 +187,7 @@ function mergeProfessorSuccess(data, args) {
         $(`#id_merge_subject_${args['prof_id']}`).removeClass("is-invalid").val("");
         $(`#id_merge_target_${args['prof_id']}`).removeClass("is-invalid").val("");
 
-        addAdminResponse(`#merge-errors-${args["prof_id"]}`, successText);
+        location.reload();
     }
 }
 function mergeProfessorError(data, args) {
