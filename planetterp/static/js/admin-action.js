@@ -50,7 +50,6 @@ function addAdminResponse(target, msg) {
 
 /* ********* VERIFY REVIEW FUNCTIONS ********* */
 function verifyReviewSuccess(data, args) {
-    var num_reviews = Number(args["count"]);
     var msg = data['success_msg'];
     var verified_status = data['verified_status'];
     var successText = '<div class="alert alert-success text-center success-alert">'
@@ -65,7 +64,7 @@ function verifyReviewSuccess(data, args) {
         generateProfessorStats(num_reviews);
     }
 
-    $("#review-counter").html(`${num_reviews}`);
+    $("#review-counter").html(args["count"]);
     $(`#review-${data["review_id"]}`).remove();
     addAdminResponse("#admin-tool-response", successText);
 }
@@ -88,20 +87,18 @@ function verifyHelpSuccess(data, args) {
 function verifyProfessorSuccess(data, args) {
     if (data['form'] != null) {
         $("#slug-modal-container").html(`${data['form']}`);
-        $(`#slug-modal-${Number(data['id'])}`).modal('show');
+        $(`#slug-modal-${data['id']}`).modal('show');
     } else {
         if (data['success_msg'] != "unverified") {
             var successText = '<div class="alert alert-success text-center success-alert">'
-            var num_professors = Number(args["count"]);
-            var id = Number(data['id']);
             var msg = data['success_msg'];
 
-            $("#professor-counter").html(`${num_professors}`);
+            $("#professor-counter").html(args["count"]);
 
             if (msg != null) {
                 successText += `<strong>Successfully ${msg} ${data["type"]}.`
                 if (msg != "verified") {
-                    var professor_reviews = $(`div.unverified_review_${id}`);
+                    var professor_reviews = $(`div.unverified_review_${data['id']}`);
 
                     if (professor_reviews.length > 0) {
                         var num_reviews = Number(args["num_reviews"]) - professor_reviews.length;
@@ -117,7 +114,7 @@ function verifyProfessorSuccess(data, args) {
                 successText += `<strong>Successfully slugged and verified ${data["type"]}.</strong>`
 
             successText += "</div><br />";
-            $(`#professor-${id}`).remove();
+            $(`#professor-${data['id']}`).remove();
             addAdminResponse("#admin-tool-response", successText);
         } else
             window.location.href = "/";
@@ -204,36 +201,33 @@ function mergeProfessorError(data, args) {
 
 /* ********* SLUG PROFESSOR FUNCTIONS ********* */
 function slugProfessorSuccess(data, args) {
-    var id = Number(data['id']);
     if (!data["success"]) {
-        var modal_title = $(`#slug-modal-label-${id}`).html();
+        var modal_title = $(`#slug-modal-label-${data['id']}`).html();
         $(".modal-backdrop").remove();
         $("#slug-modal-container").html(`${data['form']}`);
-        $(`#slug-modal-label-${id}`).html(modal_title);
+        $(`#slug-modal-label-${data['id']}`).html(modal_title);
         $("#slug_errors").show()
-        $(`#slug-modal-${id}`).modal('show');
+        $(`#slug-modal-${data['id']}`).modal('show');
     } else {
-        var num_professors = Number(args["count"]);
         var successText = "<div class=\"alert alert-success text-center success-alert\">";
             successText += `<strong>Successfully slugged and verified ${data["type"]}.</strong>`
             successText += "</div><br />"
 
-        $("#professor-counter").html(num_professors);
+        $("#professor-counter").html(args["count"]);
 
-        $(`#verified_${id}`).parents("tr").remove();
+        $(`#verified_${data['id']}`).parents("tr").remove();
         addAdminResponse("#admin-tool-response", successText);
 
         $(".modal").modal('hide');
         $(".slug-errors").html();
-        $(`#slug-form-slug-${id}`).removeClass("is-invalid");
+        $(`#slug-form-slug-${data['id']}`).removeClass("is-invalid");
     }
 }
 function slugProfessorError(data, args) {
-    var id = Number(data['id']);
     var msg = data['error_msg'];
     $(".slug-errors").html(msg);
     $(".slug-errors").show();
-    $(`#slug-form-slug-${id}`).addClass("is-invalid");
+    $(`#slug-form-slug-${data['id']}`).addClass("is-invalid");
 }
 
 /* SHARED FUNCTIONS */
