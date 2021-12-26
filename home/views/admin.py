@@ -20,8 +20,6 @@ from home.forms.admin_forms import ProfessorMergeForm, ProfessorSlugForm, Profes
 from planetterp import config
 
 class Admin(View):
-    BAD_REQUEST = 400
-
     def get(self, request):
         user = request.user
 
@@ -47,8 +45,8 @@ class Admin(View):
     def post(self, request):
         data = request.POST
         action_type = AdminAction(data["action_type"])
-
         user = request.user
+
         if not (user.is_staff or user.is_superuser):
             return redirect('/')
 

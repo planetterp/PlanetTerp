@@ -13,6 +13,8 @@ class AddProfessor(View):
         user = request.user
 
         form = ProfessorFormAdd(user, data=request.POST)
+        ctx = {}
+        ctx.update(csrf(request))
 
         if form.is_valid():
             cleaned_data = form.cleaned_data
@@ -39,8 +41,6 @@ class AddProfessor(View):
 
             send_updates_webhook()
 
-            ctx = {}
-            ctx.update(csrf(request))
             form = ProfessorFormAdd(user)
             form_html = render_crispy_form(form, form.helper, context=ctx)
 
@@ -49,8 +49,6 @@ class AddProfessor(View):
                 "form": form_html
             }
         else:
-            ctx = {}
-            ctx.update(csrf(request))
             form_html = render_crispy_form(form, form.helper, context=ctx)
 
             context = {
