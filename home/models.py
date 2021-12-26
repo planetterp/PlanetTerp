@@ -204,7 +204,6 @@ class User(AbstractUser):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-
         email = self._meta.get_field('email')
         username = self._meta.get_field('username')
         password = self._meta.get_field('password')
@@ -212,14 +211,14 @@ class User(AbstractUser):
         email.error_messages['unique'] = self.error_message_unique("email")
 
         username.help_text = "Once a username is set, it cannot be changed."
-        username.error_messages['required'] = "You must enter a username"
+        username.error_messages.update({"required":"You must enter a username"})
         username.error_messages['unique'] = self.error_message_unique("username")
         username.validators += [
             validators.MaxLengthValidator(20, "Username must be less than 20 characters"),
             validators.MinLengthValidator(2, "Username must be at least 2 characters")
         ]
 
-        password.error_messages['required'] = "You must enter a password"
+        password.error_messages.update({"required":"You must enter a password"})
         password.validators += [
             validators.MinLengthValidator(8, "Password must be at least 8 characters")
         ]

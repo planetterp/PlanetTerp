@@ -21,17 +21,16 @@ class LoginForm(ModelForm):
         widgets = {
             "password": PasswordInput()
         }
-        error_messages = {
-            "username": {
-                "required": User._meta.get_field("username").error_messages["required"]
-            },
-            "password": {
-                "required": User._meta.get_field("password").error_messages["required"]
-            }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['username'].error_messages = {
+            "required": User._meta.get_field("username").error_messages["required"]
         }
 
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
+        self.fields['password'].error_messages = {
+            "required": User._meta.get_field("password").error_messages["required"]
+        }
         self.field_errors = self.create_field_errors()
 
         self.helper = FormHelper()
@@ -114,17 +113,18 @@ class RegisterForm(ModelForm):
         help_text = {
             "username": User._meta.get_field("username").help_text
         }
-        error_messages = {
-            "username": {
-                'required': User._meta.get_field("username").error_messages['required']
-            },
-            "password": {
-                'required': User._meta.get_field("password").error_messages['required']
-            }
-        }
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        self.fields['username'].error_messages = {
+            "required": User._meta.get_field("username").error_messages["required"]
+        }
+
+        self.fields['password'].error_messages = {
+            "required": User._meta.get_field("password").error_messages["required"]
+        }
+
+
         self.field_errors = self.create_field_errors()
 
         self.helper = FormHelper()
