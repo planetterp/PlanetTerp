@@ -7,7 +7,9 @@ from planetterp.config import USER, PASSWORD
 db_name = os.environ.get("PLANETTERP_MYSQL_DB_NAME", "planetterp")
 db = web.database(dbn='mysql', db=db_name, user=USER, pw=PASSWORD, charset='utf8mb4')
 
+
 os.system("python3 manage.py makemigrations")
+os.system("python3 manage.py migrate")
 db.query('''
     DROP TABLE
     `planetterp`.`home_professor_section`,
