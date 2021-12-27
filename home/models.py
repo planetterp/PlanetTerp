@@ -225,7 +225,7 @@ class User(AbstractUser):
 
     @staticmethod
     def error_message_unique(value, include_anchor=True):
-        error_message = 'A user with that {} already exists.'
+        error_message = 'A user with that {} already exists. '
 
         if include_anchor:
             error_message += (
