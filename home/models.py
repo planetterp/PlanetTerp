@@ -265,15 +265,6 @@ class Discussion(Model):
     removed = BooleanField(default=False)
     created_at = DateTimeField(auto_now_add=True)
 
-
-class Fall2020Search(Model):
-    class Meta:
-        db_table = "home_fall_2020_search"
-
-    query = TextField()
-    created_at = DateTimeField(auto_now_add=True)
-
-
 class Gened(Model):
     GENEDS = [
         "FSAW", "FSAR", "FSMA", "FSOC", "FSPW", "DSHS", "DSHU", "DSNS", "DSNL",
