@@ -4,7 +4,7 @@ from home.views.add_professor import AddProfessor
 from home.views.admin import Admin
 from home.views.authentication import Login, Logout, ForgotPassword, Register
 from home.views.basic import (About, Contact, PrivacyPolicy, TermsOfUse, Courses,
-    Professors, Fall2020, Documents, SetColorScheme, Robots, Sitemap, Grades,
+    Professors, Documents, SetColorScheme, Robots, Sitemap, Grades,
     CourseReviews, Index, SortReviewsTable)
 from home.views.course import Course
 from home.views.data_sources import GradeData, CourseDifficultyData, GenedData
@@ -51,7 +51,6 @@ urlpatterns = [
     path('privacypolicy', PrivacyPolicy.as_view(), name='privacy-policy'),
     path('termsofuse', TermsOfUse.as_view(), name='terms-of-use'),
     path("documents", Documents.as_view(), name="documents"),
-    path("fall2020", Fall2020.as_view(), name="fall2020"),
     path("contact", Contact.as_view(), name="contact"),
     path('set_colors_cheme', SetColorScheme.as_view(), name='set-color-scheme'),
     path('courses', Courses.as_view(), name='courses'),

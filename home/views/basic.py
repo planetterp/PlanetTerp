@@ -39,9 +39,6 @@ class Professors(ListView):
     queryset = Professor.objects.verified
     template_name = "professor_list.html"
 
-class Fall2020(TemplateView):
-    template_name = "fall2020.html"
-
 class Documents(TemplateView):
     template_name = "documents.html"
 
