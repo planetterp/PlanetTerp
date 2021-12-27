@@ -265,6 +265,7 @@ class Discussion(Model):
     removed = BooleanField(default=False)
     created_at = DateTimeField(auto_now_add=True)
 
+
 class Gened(Model):
     GENEDS = [
         "FSAW", "FSAR", "FSMA", "FSOC", "FSPW", "DSHS", "DSHU", "DSNS", "DSNL",
@@ -277,6 +278,7 @@ class Gened(Model):
 
     def __str__(self):
         return f"{self.course} ({self.name})"
+
 
 class Review(Model):
     class Status(TextChoices):
@@ -326,6 +328,7 @@ class Review(Model):
     created_at = DateTimeField(auto_now_add=True)
     updated_at = DateTimeField(auto_now=True)
 
+
 class Grade(Model):
     POSSIBLE_GRADES = [choice[0] for choice in Review.Grades.choices]
     VOWEL_GRADES = ["A", "A-", "A+", "F"]
@@ -362,6 +365,7 @@ class Grade(Model):
             f"{self.d_plus} {self.d} {self.d_minus}, "
             f"{self.f} {self.w} {self.other}"
         )
+
 
 class GroupmeUser(Model):
     class Meta:
