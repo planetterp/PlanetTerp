@@ -63,9 +63,9 @@
 		</div>
 	</div>
 
-	<div id="include-spring2020-input" style="text-align: center; display: none;">
-		<label for="include-spring2020">Include Spring 2020</label>
-		<input type="checkbox" id="include-spring2020" style="top: 2px; position: relative;">
+	<div id="includePFSemesters-input" style="text-align: center; display: none;">
+		<label for="includePFSemesters">Include P/F semesters</label>
+		<input type="checkbox" id="includePFSemesters" style="top: 2px; position: relative;" checked>
 	</div>
 
 	<p id="grades-information" class="text-center" style="margin-bottom: 0;"></p>
@@ -117,7 +117,7 @@
 	}
 
 	function initializeChangeEvent() {
-		$('#include-spring2020').on('change', function(e) {
+		$('#includePFSemesters').on('change', function(e) {
 			if (lastSearch == "course") {
 				submitCourseSearch();
 			} else if (lastSearch == "professor") {
@@ -310,6 +310,7 @@
 		var course = params.course;
 		var semester = params.semester;
 		var section = params.section;
+		var PF_semesters = ["Spring 2020", "Fall 2020", "Spring 2021"];
 
 		$.ajax({
 			url: "{% url 'grades' %}",
@@ -319,12 +320,12 @@
 				'course': course,
 				'semester': semester,
 				'section': section,
-				'spring_2020': function() {
-					if (semester == "Spring 2020") {
-						$("#include-spring2020-input").hide()
-						$("#include-spring2020").prop('checked', true);
+				'PF_semesters': function() {
+					if (semester in PF_semesters) {
+						$("#includePFSemesters-input").hide()
+						$("#includePFSemesters").prop('checked', true);
 					}
-					return $('#include-spring2020').is(':checked');
+					return $('#includePFSemesters').is(':checked');
 				}
 			},
 			success: function(data) {
@@ -342,8 +343,8 @@
 					$(".lookup-error").hide();
 					$("#semester-search-input").show();
 
-					if (semester != "Spring 2020"){
-						$("#include-spring2020-input").show();
+					if (!(semester in PF_semesters)){
+						$("#includePFSemesters-input").show();
 					}
 					if ($("#semester-search").val()) {
 						$("#section-search-input").show();
@@ -366,7 +367,7 @@
 			dataType: 'json',
 			data: {
 				'professor': $("#professor-search").val(),
-				'spring_2020': $('#include-spring2020').is(':checked')
+				'PF_semesters': $('#includePFSemesters').is(':checked')
 			},
 			success: function(data) {
 				clearCourseSearchForm()
@@ -394,7 +395,7 @@
 						generate_graph(course_data, course_name);
 					}
 
-					$("#include-spring2020-input").show();
+					$("#includePFSemesters-input").show();
 				} else {
 					$(".lookup-error").show();
 				}

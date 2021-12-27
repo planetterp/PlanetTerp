@@ -1,9 +1,13 @@
 from django.http import JsonResponse
-from django.db.models import Sum
+from django.db.models import Sum, Q
 from django.views import View
 
 from home.models import Professor, Grade, Course, Gened
 from home.utils import ttl_cache
+
+SPRING_2020 = 202001
+FALL_2020 = 202012
+SPRING_2021 = 202101
 
 class GradeData(View):
     def get(self, request):
@@ -13,10 +17,10 @@ class GradeData(View):
         course = data.get("course", None)
         semester = data.get("semester", None)
         section = data.get("section", None)
-        spring_2020 = data.get("spring_2020", False) == "true"
+        PF_semesters = data.get("PF_semesters", False) == "true"
 
         if professor_courses:
-            grade_data = self._course_grade_data(professor, spring_2020)
+            grade_data = self._course_grade_data(professor, PF_semesters)
             data = {
                 "professor_slug": grade_data.pop("professor_slug"),
                 "average_gpa": grade_data.pop("average_gpa"),
@@ -32,7 +36,7 @@ class GradeData(View):
                         course_average_gpa, course_num_students, course_grades)
         else:
             (average_gpa, num_students, grades) = self._grade_data(professor,
-                course, semester, section, spring_2020)
+                course, semester, section, PF_semesters)
 
             data = self._get_data(average_gpa, num_students, grades)
 
@@ -72,12 +76,17 @@ class GradeData(View):
         }
 
     @staticmethod
-    def _course_grade_data(professor, spring_2020):
+    def _course_grade_data(professor, PF_semesters):
         professor = Professor.objects.verified.filter(name=professor).first()
         courses = Course.objects.filter(professors=professor)
         grades = Grade.objects.filter(professor=professor)
-        if not spring_2020:
-            grades = grades.exclude(semester=202001)
+
+        if not PF_semesters:
+            grades = grades.exclude(
+                Q(semester=SPRING_2020) |
+                Q(semester=FALL_2020) |
+                Q(semester=SPRING_2021)
+            )
 
         grade_data = {
             "professor_slug": professor.slug,
@@ -98,7 +107,7 @@ class GradeData(View):
 
     @staticmethod
     @ttl_cache(24 * 60 * 60)
-    def _grade_data(professor, course, semester, section, spring_2020):
+    def _grade_data(professor, course, semester, section, PF_semesters):
         grades = Grade.objects.all()
 
         if professor:
@@ -111,8 +120,12 @@ class GradeData(View):
             grades = grades.filter(semester=semester)
         if section:
             grades = grades.filter(section=section)
-        if not spring_2020:
-            grades = grades.exclude(semester=202001)
+        if not PF_semesters:
+            grades = grades.exclude(
+                Q(semester=SPRING_2020) |
+                Q(semester=FALL_2020) |
+                Q(semester=SPRING_2021)
+            )
 
         average_gpa = grades.average_gpa()
         num_students = grades.num_students()

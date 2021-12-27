@@ -77,7 +77,7 @@ class Grades(View):
         course = request.POST.get('course', None)
         semester = request.POST.get('semester', None)
         semester = semester if semester != '' else None
-        spring_2020 = request.POST.get("spring_2020", False) == "true"
+        PF_semesters = request.POST.get("PF_semesters", False) == "true"
 
         course_form = HistoricCourseGradeForm(course, semester, data=request.POST)
         professor_form = HistoricProfessorGradeForm(data=request.POST)
@@ -93,7 +93,7 @@ class Grades(View):
             context["professor_search_success"] = True
             data = professor_form.cleaned_data
             professor = data.get("professor", None)
-            context['professor_data'] = GradeData.compose_course_grade_data(professor, spring_2020)
+            context['professor_data'] = GradeData.compose_course_grade_data(professor, PF_semesters)
 
         if course_form.is_valid():
             context["course_search_success"] = True
@@ -102,7 +102,7 @@ class Grades(View):
             course = data.get("course", None)
             semester = data.get("semester", None)
             section = data.get("section", None)
-            context['course_data'] = GradeData.compose_grade_data(professor, course, semester, section, spring_2020)
+            context['course_data'] = GradeData.compose_grade_data(professor, course, semester, section, PF_semesters)
 
         context["course_form"] = render_crispy_form(course_form, course_form.helper, context=ctx)
         context["professor_form"] = render_crispy_form(professor_form, professor_form.helper, context=ctx)
