@@ -344,7 +344,7 @@ class Grade(Model):
     f       = PositiveIntegerField(db_column="F")
     w       = PositiveIntegerField(db_column="W")
     other   = PositiveIntegerField(db_column="OTHER")
-    historical = BooleanField()
+    historical = BooleanField(default=False)
 
     objects = GradeQuerySet.as_manager()
 
