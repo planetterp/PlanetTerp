@@ -257,15 +257,6 @@ class AuditLog(Model):
         return f"{self.summary} (action by {self.username})"
 
 
-class Discussion(Model):
-    author = ForeignKey(User, CASCADE)
-    title = CharField(max_length=200)
-    num_views = PositiveIntegerField(default=0)
-    content = TextField()
-    removed = BooleanField(default=False)
-    created_at = DateTimeField(auto_now_add=True)
-
-
 class Gened(Model):
     GENEDS = [
         "FSAW", "FSAR", "FSMA", "FSOC", "FSPW", "DSHS", "DSHU", "DSNS", "DSNL",
@@ -413,19 +404,6 @@ class ProfessorCourse(Model):
 
     def __str__(self):
         return f"{self.professor} teaching {self.course}"
-
-
-class DiscussionReply(Model):
-    class Meta:
-        db_table = "home_discussion_reply"
-
-    user = ForeignKey(User, CASCADE)
-    discussion = ForeignKey(Discussion, CASCADE)
-    content = TextField()
-    created_at = DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return f"Reply on {self.discussion} by {self.user}"
 
 
 class ResetCode(Model):
