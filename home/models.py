@@ -132,9 +132,7 @@ class Professor(Model):
     objects = ProfessorManager()
 
     name = CharField(max_length=100)
-    # TODO: make this field unique when the db migration is finished so we can
-    # deal with the fallout more cleanly
-    slug = SlugField(max_length=100, null=True)
+    slug = SlugField(max_length=100, null=True, unique=True)
     type = CharField(choices=Type.choices, max_length=50)
     status = CharField(choices=Status.choices, default=Status.PENDING,
         max_length=50)
