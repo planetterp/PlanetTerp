@@ -1,6 +1,7 @@
 from enum import Enum
 
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import (AbstractUser,
+    UserManager as DjangoUserManager)
 from django.utils.safestring import mark_safe
 from django.db.models.functions import Concat
 from django.utils.html import format_html
@@ -52,6 +53,12 @@ class CourseManager(Manager):
                 name=Concat("department", "course_number")
             )
         )
+
+class UserManager(DjangoUserManager):
+    def create_ourumd_user(self, username, email=None, **kwargs):
+        # password=None is equivalent to calling user#set_unusable_password()
+        return self.create_user(username, email=email, password=None,
+            from_ourumd=True, **kwargs)
 
 
 class ReviewManager(Manager):
@@ -197,6 +204,12 @@ class User(AbstractUser):
             '</span>'
         )
     )
+
+    # accounts which are from ourumd are given an unusable password so nobody
+    # can log in to the accounts
+    from_ourumd = BooleanField(default=False)
+
+    objects = UserManager()
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
