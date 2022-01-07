@@ -77,13 +77,8 @@ def migrate_courses():
         "description": "description",
     }
 
-    mapping["historical"] = False
     courses = _create_table("courses", Course, mapping)
     return courses
-    # TODO migrate historical courses too that aren't already in the courses
-    # table
-    # mapping["historical"] = True
-    # courses_historical = _create_table("courses_historical", Course, mapping)
 
 def migrate_professors():
     def _type(row):

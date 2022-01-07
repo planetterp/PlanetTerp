@@ -91,7 +91,6 @@ class Course(Model):
     title = TextField(null=True)
     credits = IntegerField(null=True)
     description = TextField(null=True)
-    historical = BooleanField()
     created_at = DateTimeField(auto_now_add=True)
 
     professors = ManyToManyField("Professor", blank=True,
@@ -342,7 +341,6 @@ class Grade(Model):
     f       = PositiveIntegerField(db_column="F")
     w       = PositiveIntegerField(db_column="W")
     other   = PositiveIntegerField(db_column="OTHER")
-    historical = BooleanField(default=False)
 
     objects = GradeQuerySet.as_manager()
 
