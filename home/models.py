@@ -354,8 +354,11 @@ class Grade(Model):
 
 class Organization(Model):
     name = TextField()
-    website_url = TextField()
+    url = TextField()
     alt_text = TextField()
+    image_file_name = TextField(null=True)
+    width = IntegerField(null=True)
+    height = IntegerField(null=True)
 
     def __str__(self):
         return f"{self.name} ({self.website_url})"
