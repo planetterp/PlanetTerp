@@ -1,5 +1,3 @@
-# You can exectue `db_setup.py full` to completely migrate your db to django
-
 import os
 import web
 from planetterp.config import USER, PASSWORD
@@ -22,14 +20,8 @@ db.query('''
     `planetterp`.`django_session`,
     `planetterp`.`home_audit_log`,
     `planetterp`.`home_course`,
-    `planetterp`.`home_discussion`,
-    `planetterp`.`home_discussion_reply`,
-    `planetterp`.`home_fall_2020_search`,
     `planetterp`.`home_gened`,
     `planetterp`.`home_grade`,
-    `planetterp`.`home_groupme_group`,
-    `planetterp`.`home_groupme_user`,
-    `planetterp`.`home_groupme_user_groups`,
     `planetterp`.`home_organization`,
     `planetterp`.`home_professor`,
     `planetterp`.`home_professor_course`,
@@ -41,6 +33,7 @@ db.query('''
     `planetterp`.`home_user_groups`,
     `planetterp`.`home_user_schedule`,
     `planetterp`.`home_user_user_permissions`,
+    `planetterp`.`home_group`,
     `planetterp`.`home_view`;
 ''')
 os.system("python3 manage.py migrate home zero --fake")
