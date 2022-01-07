@@ -84,7 +84,6 @@ class ProfessorManager(Manager):
 
 # The db_table Meta option changes the name of the table in the db viewer. It's
 # purely for aesthetics.
-
 class Course(Model):
     department = CharField(max_length=4)
     course_number = CharField(max_length=6)
@@ -352,32 +351,6 @@ class Grade(Model):
             f"{self.d_plus} {self.d} {self.d_minus}, "
             f"{self.f} {self.w} {self.other}"
         )
-
-
-class GroupmeUser(Model):
-    class Meta:
-        db_table = "home_groupme_user"
-
-    user = ForeignKey(User, CASCADE)
-    groups = ManyToManyField("GroupmeGroup")
-    access_token = CharField(max_length=100)
-    groupme_username = CharField(max_length=100)
-    created_at = DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return f"groupme user {self.groupme_username} (planetterp user {self.user})"
-
-
-class GroupmeGroup(Model):
-    class Meta:
-        db_table = "home_groupme_group"
-
-    name = CharField(max_length=191)
-    group_id = IntegerField()
-    created_at = DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return f"groupme group {self.name}"
 
 
 class Organization(Model):
