@@ -352,7 +352,6 @@ class Grade(Model):
             f"{self.f} {self.w} {self.other}"
         )
 
-
 class Organization(Model):
     name = TextField()
     website_url = TextField()
@@ -416,6 +415,10 @@ class UserSchedule(Model):
     def __str__(self):
         return f"schedule by {self.user} for {self.semester}"
 
+class Group(Model):
+    name = TextField()
+    group_id = IntegerField()
+    created = DateTimeField(auto_now_add=True)
 
 class View(Model):
     page = TextField()
