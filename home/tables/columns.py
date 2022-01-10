@@ -82,14 +82,14 @@ class InformationColumn(tables.Column):
         if review.grade:
             column_html += self.grade_to_element(review.grade)
 
-        if is_staff:
-            if review.anonymous and review.user:
+        if is_staff and review.user:
+            if review.anonymous:
                 column_html += '''
                      <span class="noselect" data-toggle="tooltip" data-placement="right" title="This reviewer posted anonymously">
                         <i class="fa fa-eye-slash"></i>
                     </span>
                 '''
-            elif not review.anonymous and review.user:
+            else:
                 column_html += '''
                      <span class="noselect" data-toggle="tooltip" data-placement="right" title="This reviewer posted publicly">
                         <i class="fa fa-eye"></i>
