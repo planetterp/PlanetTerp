@@ -10,15 +10,15 @@ os.system("python3 manage.py makemigrations")
 os.system("python3 manage.py migrate")
 db.query('''
     DROP TABLE
-    `planetterp`.`home_professor_section`,
     `planetterp`.`auth_group`,
-    `planetterp`.`auth_group_permissions`,
     `planetterp`.`auth_permission`,
+    `planetterp`.`auth_group_permissions`,
     `planetterp`.`django_admin_log`,
     `planetterp`.`django_content_type`,
     `planetterp`.`django_migrations`,
     `planetterp`.`django_session`,
     `planetterp`.`home_audit_log`,
+    `planetterp`.`home_professor_section`,
     `planetterp`.`home_course`,
     `planetterp`.`home_gened`,
     `planetterp`.`home_grade`,
@@ -29,10 +29,10 @@ db.query('''
     `planetterp`.`home_review`,
     `planetterp`.`home_section`,
     `planetterp`.`home_section_meeting`,
-    `planetterp`.`home_user`,
     `planetterp`.`home_user_groups`,
     `planetterp`.`home_user_schedule`,
     `planetterp`.`home_user_user_permissions`,
+    `planetterp`.`home_user`,
     `planetterp`.`home_group`,
     `planetterp`.`home_view`;
 ''')

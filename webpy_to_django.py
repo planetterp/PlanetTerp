@@ -1,22 +1,9 @@
-# This script can be run on its own but `db_setup.py full` will perform a full
-# db migration. If you decide to run this script alone, do the following before:
-# * delete any users with stupidly long emails (or set their email to NULL)
-# * delete any professor with a negative id
-# * ensure all blank emails are set to NULL
-# * run wipe_django.py
-# * change any reviews or professors with a NULL status to either verified,
-#   pending, or rejected
-
-# not necessary but will need to be addressed in the future:
-# * set any professors with duplicate slugs to a null slug (or some other
-#   resolution). My db has a bunch of professors with the slug "test", not put
-#   there by me.
+# DO NOT RUN THIS SCRIPT YOURSELF
 
 import os
 import web
 from django.core.wsgi import get_wsgi_application
 from planetterp.config import USER, PASSWORD
-
 # https://stackoverflow.com/a/43391786
 os.environ['DJANGO_SETTINGS_MODULE'] = 'planetterp.settings'
 application = get_wsgi_application()
@@ -50,7 +37,8 @@ def _create_table(table, model, mapping):
         # because of bad design decisions in the original database, we have a
         # dummy user with a pk of 0 that we need to ignore
         if table == "users" and id_ == 0:
-            continue
+                continue
+
         obj = _instantiate(model, row, mapping)
         objs[id_] = obj
 
@@ -65,7 +53,6 @@ def _foreign_key(objects, row, name, nullable=False):
     if id_ is None and nullable:
         return None
     return objects[id_]
-
 
 def migrate_courses():
     mapping = {
@@ -117,13 +104,16 @@ def link_courses_and_professors(courses, professors):
 def migrate_users():
     def _send_review_email(row):
         val = row["send_review_email"]
-        return True if val is None else bool(val)
+        return False if val is None or str(row["email"]).isspace() else bool(val)
+
+    def _email(row):
+        return None if str(row["email"]).isspace() else row['email']
 
     mapping = {
         "send_review_email": _send_review_email,
         "username": "username",
         "password": "password",
-        "email": "email",
+        "email": _email,
         "is_staff": "is_admin"
     }
     return _create_table("users", User, mapping)
@@ -142,6 +132,9 @@ def migrate_reviews(users, courses, professors):
         }
         return mapping[row["verified"]]
 
+    def _anonymous(row):
+        return row['reviewer_id'] == 0 and row['reviewer_name'] == "Anonymous"
+
     mapping = {
         "professor": lambda row: _foreign_key(professors, row, "professor_id"),
         "course": lambda row: _foreign_key(courses, row, "course_id", True),
@@ -151,7 +144,7 @@ def migrate_reviews(users, courses, professors):
         "rating": "rating",
         "grade": "expected_grade",
         "status": _status,
-        "anonymous": "anonymous",
+        "anonymous": _anonymous,
         "from_ourumd": "from_ourumd",
     }
     return _create_table("reviews", Review, mapping)
@@ -177,8 +170,7 @@ def migrate_grades(courses, professors):
         "d_minus": "DMINUS",
         "f": "F",
         "w": "W",
-        "other": "OTHER",
-        "historical": False
+        "other": "OTHER"
     }
     return _create_table("grades", Grade, mapping)
 
@@ -240,6 +232,28 @@ def migrate_section_meetings(sections):
 
     return _create_table("section_meetings", SectionMeeting, mapping)
 
+def migrate_organizations():
+    mapping = {
+        "name": "name",
+        "url": "url",
+        "alt_text": "alt",
+        "width": "width",
+        "height": "height",
+        "image_file_name": "image"
+    }
+
+    return _create_table("organizations", Organization, mapping)
+
+def migrate_groups():
+    mapping = {
+        "name": "group_name",
+        "group_id": "group_id",
+        "created": "created"
+    }
+
+    return _create_table("groups", Group, mapping)
+
+
 
 courses = migrate_courses()
 professors = migrate_professors()
@@ -251,4 +265,9 @@ grades = migrate_grades(courses, professors)
 geneds = migrate_geneds(courses)
 sections = migrate_sections(courses)
 link_sections_and_professors(professors, sections)
-#migrate_section_meetings(sections)
+migrate_section_meetings(sections)
+
+migrate_organizations()
+#migrate_groups() TODO: figure out why this errors
+
+#TODO: schedules
