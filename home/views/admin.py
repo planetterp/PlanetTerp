@@ -5,6 +5,7 @@ from django.views import View
 from django.db.models import Q
 from django.http import JsonResponse
 from django.template.context_processors import csrf
+from django.contrib.admin.views.decorators import staff_member_required
 
 from crispy_forms.utils import render_crispy_form
 
@@ -20,13 +21,9 @@ from home.forms.admin_forms import ProfessorMergeForm, ProfessorSlugForm, Profes
 from planetterp import config
 
 class Admin(View):
+
+    @staff_member_required
     def get(self, request):
-        user = request.user
-
-        # TODO: use Django's access perms
-        if not (user.is_staff or user.is_superuser):
-            return redirect('/')
-
         reviews = Review.objects.pending
         professors = Professor.objects.pending
 
@@ -42,13 +39,11 @@ class Admin(View):
 
         return render(request, "admin.html", context)
 
+    @staff_member_required
     def post(self, request):
         data = request.POST
         action_type = AdminAction(data["action_type"])
         user = request.user
-
-        if not (user.is_staff or user.is_superuser):
-            return redirect('/')
 
         if action_type is AdminAction.REVIEW_VERIFY:
             verified_status = Review.Status(data["verified"])
