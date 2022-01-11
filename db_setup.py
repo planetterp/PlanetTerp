@@ -31,11 +31,6 @@ db.query('DELETE FROM planetterp.grades_historical WHERE professor_id < 0')
 db.query('DELETE FROM planetterp.professor_courses WHERE professor_id < 0')
 db.query('DELETE FROM planetterp.professors WHERE id < 0')
 
-# All reviews with reviewer_id = -1 are updated to reviewer_id = 1. This is a
-# temporary solution until the User subclass has been implemented.
-db.query('UPDATE planetterp.reviews SET reviewer_id = 1 WHERE reviewer_id = -1')
-db.query('DELETE FROM planetterp.users WHERE id = -1')
-
 # Merge professors with duplicate slugs and delete all duplicate professors.
 # Only keep the professor that was created first
 professors = db.query('SELECT * FROM planetterp.professors WHERE slug IS NOT NULL ORDER BY created DESC')
