@@ -4,6 +4,7 @@ import os
 import web
 from django.core.wsgi import get_wsgi_application
 from planetterp.config import USER, PASSWORD
+
 # https://stackoverflow.com/a/43391786
 os.environ['DJANGO_SETTINGS_MODULE'] = 'planetterp.settings'
 application = get_wsgi_application()
@@ -119,9 +120,20 @@ def migrate_users():
     return _create_table("users", User, mapping)
 
 def migrate_reviews(users, courses, professors):
+
+    ourumd_users = {}
+    for row in db.select("reviews"):
+        if row["reviewer_id"] == -1:
+            # from ourumd, create new user
+            username = row["reviewer_name"]
+            user = User.objects.create_ourumd_user(username)
+            ourumd_users[row["reviewer_id"]] = user
+
     def _user(row):
         if row["reviewer_id"] == 0:
             return None
+        if row["reviewer_id"] in ourumd_users:
+            return ourumd_users[row["reviewer_id"]]
         return _foreign_key(users, row, "reviewer_id")
 
     def _status(row):
@@ -204,11 +216,11 @@ def link_sections_and_professors(professors, sections):
     for row in db.select("sections"):
         section = sections[row["id"]]
         professor_ids = str(row["professor_ids"]).split(",")
-        for id in professor_ids:
+        for id_ in professor_ids:
             # sections.professor_ids use 0 to represent no professor so try to
             # get a professor by the id or use None instead
             try:
-                professor = professors[int(id)]
+                professor = professors[int(id_)]
             except KeyError:
                 professor = None
 
