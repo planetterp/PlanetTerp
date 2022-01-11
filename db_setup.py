@@ -2,7 +2,7 @@ import os
 import web
 from django.core.wsgi import get_wsgi_application
 from planetterp.config import USER, PASSWORD
-import time
+
 # https://stackoverflow.com/a/43391786
 os.environ['DJANGO_SETTINGS_MODULE'] = 'planetterp.settings'
 application = get_wsgi_application()
