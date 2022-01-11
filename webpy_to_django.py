@@ -37,7 +37,7 @@ def _create_table(table, model, mapping):
         # because of bad design decisions in the original database, we have a
         # dummy user with a pk of 0 that we need to ignore
         if table == "users" and id_ == 0:
-                continue
+            continue
 
         obj = _instantiate(model, row, mapping)
         objs[id_] = obj
