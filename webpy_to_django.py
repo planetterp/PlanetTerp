@@ -11,6 +11,7 @@ application = get_wsgi_application()
 
 from home.models import *
 
+web.config.debug = False
 db_name = os.environ.get("PLANETTERP_MYSQL_DB_NAME", "planetterp")
 db = web.database(dbn='mysql', db=db_name, user=USER, pw=PASSWORD, charset='utf8mb4')
 

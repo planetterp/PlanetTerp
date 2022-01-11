@@ -7,6 +7,7 @@ from planetterp.config import USER, PASSWORD
 os.environ['DJANGO_SETTINGS_MODULE'] = 'planetterp.settings'
 application = get_wsgi_application()
 
+web.config.debug = False
 db_name = os.environ.get("PLANETTERP_MYSQL_DB_NAME", "planetterp")
 db = web.database(dbn='mysql', db=db_name, user=USER, pw=PASSWORD, charset='utf8mb4')
 
