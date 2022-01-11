@@ -435,14 +435,3 @@ class Group(Model):
     name = TextField()
     group_id = IntegerField()
     created = DateTimeField(auto_now_add=True)
-
-class View(Model):
-    page = TextField()
-    status = TextField()
-    ip = TextField()
-    user_agent = TextField()
-    method = CharField(max_length=10)
-    created_at = DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return f"viewed {self.page} on {self.created_at}"
