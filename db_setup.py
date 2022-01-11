@@ -10,7 +10,7 @@ application = get_wsgi_application()
 web.config.debug = False
 db_name = os.environ.get("PLANETTERP_MYSQL_DB_NAME", "planetterp")
 db = web.database(dbn='mysql', db=db_name, user=USER, pw=PASSWORD, charset='utf8mb4')
-
+# print("    Dropping useless tables...")
 #db.query('DROP TABLE planetterp.views')
 #db.query('DROP TABLE planetterp.discussions')
 #db.query('DROP TABLE planetterp.fall_2020_searches')
@@ -25,6 +25,7 @@ db = web.database(dbn='mysql', db=db_name, user=USER, pw=PASSWORD, charset='utf8
 #db.query('DROP TABLE planetterp.organizations_review')
 
 # Handling random things that need to be changed
+print("    Handling werid edge cases...")
 db.query("UPDATE planetterp.users SET email = NULL WHERE CHARACTER_LENGTH(email) > 254 OR email = ''")
 db.query('DELETE FROM planetterp.reviews WHERE professor_id < 0')
 db.query('DELETE FROM planetterp.grades WHERE professor_id < 0')
@@ -34,6 +35,7 @@ db.query('DELETE FROM planetterp.professors WHERE id < 0')
 
 # Merge professors with duplicate slugs and delete all duplicate professors.
 # Only keep the professor that was created first
+print("    Removing duplicate professors...")
 professors = db.query('SELECT * FROM planetterp.professors WHERE slug IS NOT NULL ORDER BY created DESC')
 for professor in professors:
     query = db.query('SELECT id FROM planetterp.professors WHERE slug = $slug ORDER BY created DESC', vars={"slug": professor["slug"]})
@@ -53,6 +55,7 @@ for professor in professors:
 
 # Select all historical courses that are NOT in planetterp.courses.
 # Inverse join: https://www.sitepoint.com/community/t/how-to-do-an-inverse-join/3224/2
+print("    Adding neccessary historical courses to courses (will take a while)...")
 distinct_historical_courses = db.query(
     "SELECT planetterp.courses_historical.id, planetterp.courses_historical.department, planetterp.courses_historical.course_number, planetterp.courses_historical.created FROM planetterp.courses_historical LEFT JOIN planetterp.courses ON planetterp.courses.department = planetterp.courses_historical.department AND planetterp.courses.course_number = planetterp.courses_historical.course_number WHERE planetterp.courses.department IS NULL AND planetterp.courses.course_number IS NULL"
 )
@@ -94,6 +97,7 @@ for idx, course in enumerate(historical_courses):
     )
 
 # Move all historical grades to planetterp.grades
+print("    Moving all historical grades to grades (will take a while)...")
 grades = db.query('SELECT * FROM planetterp.grades_historical')
 for grade in grades:
     db.query(

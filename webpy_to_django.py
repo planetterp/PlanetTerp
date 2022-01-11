@@ -57,6 +57,8 @@ def _foreign_key(objects, row, name, nullable=False):
     return objects[id_]
 
 def migrate_courses():
+    print("    Migrating courses...")
+
     mapping = {
         "department": "department",
         "course_number": "course_number",
@@ -70,6 +72,8 @@ def migrate_courses():
     return courses
 
 def migrate_professors():
+    print("    Migrating professors...")
+
     def _type(row):
         return Professor.Type.PROFESSOR if row["type"] == 0 else Professor.Type.TA
     def _status(row):
@@ -94,6 +98,8 @@ def migrate_professors():
     return _create_table("professors", Professor, mapping)
 
 def link_courses_and_professors(courses, professors):
+    print("    Linking courses and professors...")
+
     for row in db.select("professor_courses"):
         professor = professors[row["professor_id"]]
         course = courses[row["course_id"]]
@@ -104,6 +110,8 @@ def link_courses_and_professors(courses, professors):
         course.professors.add(professor, through_defaults=through)
 
 def migrate_users():
+    print("    Migrating users...")
+
     def _send_review_email(row):
         val = row["send_review_email"]
         return False if val is None or str(row["email"]).isspace() else bool(val)
@@ -121,6 +129,7 @@ def migrate_users():
     return _create_table("users", User, mapping)
 
 def migrate_reviews(users, courses, professors):
+    print("    Migrating reviews...")
 
     ourumd_users = {}
     for row in db.select("reviews"):
@@ -168,6 +177,8 @@ def migrate_reviews(users, courses, professors):
     return _create_table("reviews", Review, mapping)
 
 def migrate_grades(courses, professors):
+    print("    Migrating grades...")
+
     mapping = {
         "course": lambda row: _foreign_key(courses, row, "course_id"),
         "professor": lambda row: _foreign_key(professors, row, "professor_id", True),
@@ -193,6 +204,8 @@ def migrate_grades(courses, professors):
     return _create_table("grades", Grade, mapping)
 
 def migrate_geneds(courses):
+    print("    Migrating geneds...")
+
     mapping = {
         "name": "gened",
         "course": lambda row: _foreign_key(courses, row, "course_id")
@@ -201,6 +214,8 @@ def migrate_geneds(courses):
     return _create_table("geneds", Gened, mapping)
 
 def migrate_sections(courses):
+    print("    Migrating sections...")
+
     def _active(row):
         val = row['active']
         return bool(val)
@@ -219,6 +234,8 @@ def migrate_sections(courses):
     return _create_table("sections", Section, mapping)
 
 def link_sections_and_professors(professors, sections):
+    print("    Linking sections and professors...")
+
     for row in db.select("sections"):
         section = sections[row["id"]]
         professor_ids = str(row["professor_ids"]).split(",")
@@ -233,6 +250,8 @@ def link_sections_and_professors(professors, sections):
             section.professors.add(professor)
 
 def migrate_section_meetings(sections):
+    print("    Migrating section meetings...")
+
     def _building(row):
         val = row['building']
         return None if not val or val == '' else val
@@ -251,6 +270,8 @@ def migrate_section_meetings(sections):
     return _create_table("section_meetings", SectionMeeting, mapping)
 
 def migrate_organizations():
+    print("    Migrating organizations...")
+
     mapping = {
         "name": "name",
         "url": "url",
