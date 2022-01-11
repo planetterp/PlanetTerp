@@ -137,8 +137,8 @@ def migrate_reviews(users, courses, professors):
     def _user(row):
         if row["reviewer_id"] == 0:
             return None
-        if row["username"] in ourumd_users:
-            return ourumd_users[row["username"]]
+        if row["reviewer_name"] in ourumd_users:
+            return ourumd_users[row["reviewer_name"]]
         return _foreign_key(users, row, "reviewer_id")
 
     def _status(row):
