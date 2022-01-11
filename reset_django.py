@@ -32,8 +32,7 @@ db.query('''
     `planetterp`.`home_user_groups`,
     `planetterp`.`home_user_schedule`,
     `planetterp`.`home_user_user_permissions`,
-    `planetterp`.`home_user`,
-    `planetterp`.`home_group`
+    `planetterp`.`home_user`
 ''')
 os.system("python3 manage.py migrate home zero --fake")
 os.system("python3 manage.py migrate")

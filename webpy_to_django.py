@@ -261,16 +261,6 @@ def migrate_organizations():
 
     return _create_table("organizations", Organization, mapping)
 
-def migrate_groups():
-    mapping = {
-        "name": "group_name",
-        "group_id": "group_id",
-        "created": "created"
-    }
-
-    return _create_table("groups", Group, mapping)
-
-
 
 courses = migrate_courses()
 professors = migrate_professors()
@@ -283,8 +273,4 @@ geneds = migrate_geneds(courses)
 sections = migrate_sections(courses)
 link_sections_and_professors(professors, sections)
 migrate_section_meetings(sections)
-
 migrate_organizations()
-#migrate_groups() TODO: figure out why this errors
-
-#TODO: schedules
