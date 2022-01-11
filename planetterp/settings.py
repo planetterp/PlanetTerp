@@ -62,6 +62,8 @@ INSTALLED_APPS = [
     'home.apps.HomeConfig',
     'crispy_forms',
     'django_tables2',
+    "rest_framework",
+    "api"
 ]
 
 MIDDLEWARE = [
@@ -91,6 +93,18 @@ TEMPLATES = [
         },
     },
 ]
+
+# djangorestframework settings
+# django rest displays this weird fancy page by default, we don't want any of
+# that nonensense, just good ol' json
+REST_FRAMEWORK = {
+    'DEFAULT_RENDERER_CLASSES': [
+        'rest_framework.renderers.JSONRenderer',
+    ],
+    'DEFAULT_PARSER_CLASSES': [
+        'rest_framework.parsers.JSONParser',
+    ]
+}
 
 WSGI_APPLICATION = 'planetterp.wsgi.application'
 

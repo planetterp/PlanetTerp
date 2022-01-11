@@ -10,3 +10,5 @@ mysqlclient
 discord-webhook
 django-tables2
 django-crispy-forms
+# for the api
+djangorestframework

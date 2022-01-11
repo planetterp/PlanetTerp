@@ -4,7 +4,7 @@ from django.db.models import Q
 
 from home.models import Professor, Course
 
-def search(search, num_results, *, professors=False, courses=False):
+def search(search, num_results, *, offset=0, professors=False, courses=False):
     # TODO: allow option to search all professors
     professors_q = (
         Professor.objects
@@ -23,4 +23,4 @@ def search(search, num_results, *, professors=False, courses=False):
         iterables.append(courses_q)
 
     results = chain(*iterables)
-    return list(islice(results, num_results))
+    return list(islice(results, offset, num_results))
