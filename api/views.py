@@ -126,7 +126,6 @@ class Grades(APIView):
                 raise ValidationError("professor not found")
             grades = professor.grade_set
 
-        # TODO validate semseter and section
         if semester:
             grades = grades.filter(semester=semester)
         if section:
