@@ -88,6 +88,9 @@ class SearchResultSerializer(Serializer):
 
 
 class GradeSerializer(ModelSerializer):
+    course = CourseField()
+    professor = ProfessorField()
+
     class Meta:
         model = Grade
         exclude = ["id", "num_students"]
