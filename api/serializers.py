@@ -1,6 +1,6 @@
 from rest_framework.serializers import (ModelSerializer, Serializer,
     SerializerMethodField, RelatedField as _RelatedField, CharField,
-    DateTimeField, IntegerField)
+    DateTimeField)
 
 from home.models import Course, Professor, Review, Grade
 
@@ -11,12 +11,12 @@ class RelatedField(_RelatedField):
         super().__init__(*args, **kwargs, read_only=True)
 
 class CourseField(RelatedField):
-    def to_representation(self, course):
-        return course.name
+    def to_representation(self, value):
+        return value.name
 
 class ProfessorField(RelatedField):
-    def to_representation(self, professor):
-        return professor.name
+    def to_representation(self, value):
+        return value.name
 
 
 class ReviewsSerializer(ModelSerializer):
