@@ -337,7 +337,6 @@
 				initalizeKeypressEvent("#course-search");
 				initalizeKeypressEvent("#professor-search");
 				initializeCourseSearchAutoComplete();
-				initializeChangeEvent();
 
 				if (data["course_search_success"] && Object.keys(data.course_data).length > 0) {
 					$(".lookup-error").hide();
@@ -379,7 +378,6 @@
 				initalizeKeypressEvent("#course-search");
 				initalizeKeypressEvent("#professor-search");
 				initializeCourseSearchAutoComplete();
-				initializeChangeEvent();
 
 				if (data['professor_search_success'] && Object.keys(data.professor_data.data).length > 0) {
 					$(".lookup-error").hide();
