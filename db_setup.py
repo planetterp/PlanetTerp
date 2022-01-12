@@ -24,7 +24,7 @@ db.query('DROP TABLE planetterp.professors_copy')
 db.query('DROP TABLE planetterp.reviews_copy')
 db.query('DROP TABLE planetterp.organizations_review')
 
-Handling random things that need to be changed
+# Handling random things that need to be changed
 print("  Handling werid edge cases...")
 db.query("UPDATE planetterp.users SET email = NULL WHERE CHARACTER_LENGTH(email) > 254 OR email = ''")
 db.query('DELETE FROM planetterp.reviews WHERE professor_id < 0')
