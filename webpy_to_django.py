@@ -138,17 +138,17 @@ def migrate_reviews(users, courses, professors):
             username = row["reviewer_name"]
 
             # ...unless a user by that name already exists
-            if username.lower() in ourumd_users:
+            if username in ourumd_users:
                 continue
 
             user = User.objects.create_ourumd_user(username)
-            ourumd_users[username.lower()] = user
+            ourumd_users[username] = user
 
     def _user(row):
         if row["reviewer_id"] == 0:
             return None
-        if row["reviewer_name"].lower() in ourumd_users:
-            return ourumd_users[row["reviewer_name"].lower()]
+        if row["reviewer_name"] in ourumd_users:
+            return ourumd_users[row["reviewer_name"]]
         return _foreign_key(users, row, "reviewer_id")
 
     def _status(row):
