@@ -155,7 +155,7 @@
     var params = {
         course: "{{ course }}",
         professor: "{{ professor }}",
-        PF_semesters: $("#includePFSemesters").is(":checked")
+        pf_semesters: $("#includePFSemesters").is(":checked")
     }
 
     $(function() {
@@ -176,7 +176,7 @@
     });
 
     $("#includePFSemesters").on("change", function() {
-        params.PF_semesters = $("#includePFSemesters").is(":checked");
+        params.pf_semesters = $("#includePFSemesters").is(":checked");
         updateGraph(params);
     });
 

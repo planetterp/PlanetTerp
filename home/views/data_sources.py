@@ -17,10 +17,10 @@ class GradeData(View):
         course = data.get("course", None)
         semester = data.get("semester", None)
         section = data.get("section", None)
-        PF_semesters = data.get("PF_semesters", False) == "true"
+        pf_semesters = data.get("pf_semesters", False) == "true"
 
         if professor_courses:
-            grade_data = self._course_grade_data(professor, PF_semesters)
+            grade_data = self._course_grade_data(professor, pf_semesters)
             data = {
                 "professor_slug": grade_data.pop("professor_slug"),
                 "average_gpa": grade_data.pop("average_gpa"),
@@ -36,7 +36,7 @@ class GradeData(View):
                         course_average_gpa, course_num_students, course_grades)
         else:
             (average_gpa, num_students, grades) = self._grade_data(professor,
-                course, semester, section, PF_semesters)
+                course, semester, section, pf_semesters)
 
             data = self._get_data(average_gpa, num_students, grades)
 
@@ -76,12 +76,12 @@ class GradeData(View):
         }
 
     @staticmethod
-    def _course_grade_data(professor, PF_semesters):
+    def _course_grade_data(professor, pf_semesters):
         professor = Professor.objects.verified.filter(name=professor).first()
         courses = Course.objects.filter(professors=professor)
         grades = Grade.objects.filter(professor=professor)
 
-        if not PF_semesters:
+        if not pf_semesters:
             grades = grades.exclude(
                 Q(semester=SPRING_2020) |
                 Q(semester=FALL_2020) |
@@ -107,7 +107,7 @@ class GradeData(View):
 
     @staticmethod
     @ttl_cache(24 * 60 * 60)
-    def _grade_data(professor, course, semester, section, PF_semesters):
+    def _grade_data(professor, course, semester, section, pf_semesters):
         grades = Grade.objects.all()
 
         if professor:
@@ -120,7 +120,7 @@ class GradeData(View):
             grades = grades.filter(semester=semester)
         if section:
             grades = grades.filter(section=section)
-        if not PF_semesters:
+        if not pf_semesters:
             grades = grades.exclude(
                 Q(semester=SPRING_2020) |
                 Q(semester=FALL_2020) |

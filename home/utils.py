@@ -140,11 +140,11 @@ class GradeData:
             ]
         }
 
-    def _course_grade_data(self, professor, PF_semesters):
+    def _course_grade_data(self, professor, pf_semesters):
         professor = Professor.objects.verified.filter(name=professor).first()
         courses = Course.objects.filter(professors=professor)
         grades = Grade.objects.filter(professor=professor)
-        if not PF_semesters:
+        if not pf_semesters:
             grades = grades.exclude(semester=202001)
 
         grade_data = {
@@ -165,7 +165,7 @@ class GradeData:
         return grade_data
 
     @ttl_cache(24 * 60 * 60)
-    def _grade_data(self, professor, course, semester, section, PF_semesters):
+    def _grade_data(self, professor, course, semester, section, pf_semesters):
         grades = Grade.objects.all()
 
         if professor:
@@ -178,7 +178,7 @@ class GradeData:
             grades = grades.filter(semester=semester_number(semester))
         if section:
             grades = grades.filter(section=section)
-        if not PF_semesters:
+        if not pf_semesters:
             grades = grades.exclude(semester=202001)
 
         average_gpa = grades.average_gpa()
@@ -188,15 +188,15 @@ class GradeData:
         return (average_gpa, num_students, grades)
 
     @staticmethod
-    def compose_grade_data(professor, course, semester, section, PF_semesters):
+    def compose_grade_data(professor, course, semester, section, pf_semesters):
         (average_gpa, num_students, grades) = GradeData()._grade_data(professor,
-        course, semester, section, PF_semesters)
+        course, semester, section, pf_semesters)
 
         return GradeData()._get_data(average_gpa, num_students, grades)
 
     @staticmethod
-    def compose_course_grade_data(professor, PF_semesters):
-        grade_data = GradeData()._course_grade_data(professor, PF_semesters)
+    def compose_course_grade_data(professor, pf_semesters):
+        grade_data = GradeData()._course_grade_data(professor, pf_semesters)
         data = {
             "professor_slug": grade_data.pop("professor_slug"),
             "average_gpa": grade_data.pop("average_gpa"),

@@ -310,7 +310,7 @@
 		var course = params.course;
 		var semester = params.semester;
 		var section = params.section;
-		var PF_semesters = ["Spring 2020", "Fall 2020", "Spring 2021"];
+		var pf_semesters = ["Spring 2020", "Fall 2020", "Spring 2021"];
 
 		$.ajax({
 			url: "{% url 'grades' %}",
@@ -320,8 +320,8 @@
 				'course': course,
 				'semester': semester,
 				'section': section,
-				'PF_semesters': function() {
-					if (semester in PF_semesters) {
+				'pf_semesters': function() {
+					if (semester in pf_semesters) {
 						$("#includePFSemesters-input").hide()
 						$("#includePFSemesters").prop('checked', true);
 					}
@@ -342,7 +342,7 @@
 					$(".lookup-error").hide();
 					$("#semester-search-input").show();
 
-					if (!(semester in PF_semesters)){
+					if (!(semester in pf_semesters)){
 						$("#includePFSemesters-input").show();
 					}
 					if ($("#semester-search").val()) {
@@ -366,7 +366,7 @@
 			dataType: 'json',
 			data: {
 				'professor': $("#professor-search").val(),
-				'PF_semesters': $('#includePFSemesters').is(':checked')
+				'pf_semesters': $('#includePFSemesters').is(':checked')
 			},
 			success: function(data) {
 				clearCourseSearchForm()
