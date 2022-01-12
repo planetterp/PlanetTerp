@@ -77,9 +77,6 @@ class Professor(APIView):
         serializer = Serializer(professor)
         return Response(serializer.data)
 
-# TODO old api returns "type": "ta", we return "type": "TA"
-# https://api.planetterp.com/v1/professors
-# http://127.0.0.1:8000/api/v1/professors
 class Professors(ListAPIView):
     serializer_class = ProfessorSerializer
 

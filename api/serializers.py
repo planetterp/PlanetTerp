@@ -54,6 +54,7 @@ class CourseSerializer(ModelSerializer):
 class ProfessorSerializer(ModelSerializer):
     courses = CourseField(many=True, source="course_set")
     average_rating = SerializerMethodField()
+    type = SerializerMethodField()
 
     class Meta:
         model = Professor
@@ -61,6 +62,12 @@ class ProfessorSerializer(ModelSerializer):
 
     def get_average_rating(self, professor):
         return professor.average_rating()
+
+    def get_type(self, professor):
+        # maintain backwards compatability
+        if professor.type == "TA":
+            return "ta"
+        return professor.type
 
 
 class ProfessorWithReviewsSerializer(ProfessorSerializer):
