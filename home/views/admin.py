@@ -269,7 +269,7 @@ class Admin(View):
                 last_name = split_name[-1].lower().strip()
 
                 query = Professor.objects.filter(
-                    (Q(name__icontains=first_name) & Q(name__icontains=last_name)) |
+                    (Q(name__istartswith=first_name) & Q(name__iendswith=last_name)) |
                     Q(slug="_".join(reversed(split_name)).lower()),
                     status=verified_status)
 
