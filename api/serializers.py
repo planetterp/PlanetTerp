@@ -1,6 +1,6 @@
 from rest_framework.serializers import (ModelSerializer, Serializer,
     SerializerMethodField, RelatedField as _RelatedField, CharField,
-    DateTimeField)
+    DateTimeField, ListSerializer)
 
 from home.models import Course, Professor, Review, Grade
 
@@ -18,6 +18,11 @@ class ProfessorField(RelatedField):
     def to_representation(self, value):
         return value.name
 
+# only return verified reviews. https://stackoverflow.com/a/28354281/12164878
+class VerifiedListSerializer(ListSerializer):
+    def to_representation(self, data):
+        data = data.verified.all()
+        return super().to_representation(data)
 
 class ReviewsSerializer(ModelSerializer):
     course = CourseField()
@@ -30,6 +35,7 @@ class ReviewsSerializer(ModelSerializer):
         model = Review
         fields = ["professor", "course", "review", "rating", "expected_grade",
             "created"]
+        list_serializer_class = VerifiedListSerializer
 
     # necessary for compatability with the pre-django api, which returned ""
     # for reviews with a null expected grade.
@@ -71,7 +77,6 @@ class ProfessorSerializer(ModelSerializer):
 
 
 class ProfessorWithReviewsSerializer(ProfessorSerializer):
-    # TODO unapproved reviews will be returned here, filter them out
     reviews = ReviewsSerializer(many=True, source="review_set")
 
 class CourseWithReviewsSerializer(CourseSerializer):
