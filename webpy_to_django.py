@@ -160,7 +160,7 @@ def migrate_reviews(users, courses, professors):
         return mapping[row["verified"]]
 
     def _anonymous(row):
-        return row['reviewer_id'] == 0 and row['reviewer_name'] == "Anonymous"
+        return row['reviewer_name'].lower() == "anonymous"
 
     mapping = {
         "professor": lambda row: _foreign_key(professors, row, "professor_id"),
