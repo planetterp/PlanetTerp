@@ -79,12 +79,6 @@ urlpatterns = [
     path('profile', Profile.as_view(), name='profile'),
     path('profile/resetpassword/<reset_code:reset_code>', ResetPassword.as_view(), name='reset-password'),
 
-    # schedule
-    #path('schedule', schedule.Schedule.as_view(), name='schedule'),
-    #path('schedule/new', newschedule.NewSchedule.as_view(), name='schedule-new'),
-    #path('schedule/groups/auth', groupmeauth.GroupMeAuth.as_view(), name='schedule-groupme-auth'),
-    #path('schedule/groups', groups.Groups.as_view(), name='schedule-groups'),
-
     # tools
     path('tools', Tools.as_view(), name='tools'),
     path('tools/demographics', ToolDemographics.as_view(), name='tools-demographics'),
