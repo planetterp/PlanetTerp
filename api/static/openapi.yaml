@@ -3,23 +3,34 @@ servers:
   - description: "PlanetTerp API"
     url: https://api.planetterp.com/v1
 info:
-  description: >
-    Welcome to <a href="https://planetterp.com">PlanetTerp</a>'s API. This API provides access to data relating to courses, professors, and grade data at the <a href="https://umd.edu">University of Maryland &mdash; College Park</a> (UMD).
-    <br /><br />
-    The primary purpose of this API is to provide access to grade and review data. There is already a student-run API that provides access to professor and course data: <a href="https://umd.io">umd.io</a>.
-    <br /><br />
-    The course and professor data on this website was obtained using a combination of umd.io and <a href="https://app.testudo.umd.edu/soc/">UMD's Schedule of Classes</a>. The grade data is from the <a href="https://www.irpa.umd.edu"">UMD Office of Institutional Research, Planning &amp; Assessment</a> (IRPA) and obtained through <a href="https://www.umd.edu/administration/public-information-request">a request</a> under <a href="http://www.marylandattorneygeneral.gov/OpenGov%20Documents/PIA_manual_printable.pdf">the state of Maryland's Public Information Act</a> (PIA).
-    <br /><br />
-    For support, please email <a href="mailto:admin@planetterp.com">admin@planetterp.com</a>.
-  version: "1"
+  description: >-
+    Welcome to [PlanetTerp](https://planetterp.com)'s API. This API provides access to data relating to courses, professors, and grade data at the UMD.
+
+
+    The API does not require any authentication, but please be respectful and don't hammer the api. We have a [Python wrapper](https://github.com/planetterp/PlanetTerp-API-Python-Wrapper), and we've also written an [example program](https://gist.github.com/tybug/3fcebc8a2b63d471270bda86f0756cdf) in python if you want a step by step walkthrough.
+
+
+    If you're looking for a more general umd api, check out [umd.io](https://umd.io). For support, please email us at the email above.
+
+
+    The course and professor data on this website was obtained using a combination of [umd.io](https://umd.io) and UMD's [Schedule of Classes](https://app.testudo.umd.edu/soc/). The grade data is from the [IRPA](https://www.irpa.umd.edu) and obtained through a [PIA](https://www.umd.edu/administration/public-information-request) request.
+  version: "v1"
   title: PlanetTerp API
-  # license:
-    # name: Apache 2.0
-    # url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+  contact:
+    email: admin@planetterp.com
 tags:
   - name: Courses
+    description: >-
+      This set of endpoints lets you get data about a course or courses, including professors that have taught it and reviews for the course.
   - name: Professors
+    description: >-
+      This set of endpoints lets you get data about a professor or professors, including courses they've taught and reviews for them.
   - name: Grades
+    description: >-
+      This endpoint lets you get data about grades, limited to either a course, professor, semester, section, or combination thereof.
+  - name: Search
+    description: >-
+      This endpoint lets you programmatically search planetterp. It returns the same results as if you had used the search bar on planetterp.
 paths:
   /course:
     get:
