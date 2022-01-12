@@ -4,7 +4,7 @@ servers:
     url: https://api.planetterp.com/v1
 info:
   description: >-
-    Welcome to [PlanetTerp](https://planetterp.com)'s API. This API provides access to data relating to courses, professors, and grade data at the UMD.
+    Welcome to [PlanetTerp](https://planetterp.com)'s API. This API provides access to data relating to courses, professors, and grade data at UMD.
 
 
     The API does not require any authentication, but please be respectful and don't hammer the api. We have a [Python wrapper](https://github.com/planetterp/PlanetTerp-API-Python-Wrapper), and we've also written an [example program](https://gist.github.com/tybug/3fcebc8a2b63d471270bda86f0756cdf) in python if you want a step by step walkthrough.
