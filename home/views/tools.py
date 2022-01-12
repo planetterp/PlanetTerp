@@ -59,6 +59,8 @@ class ToolGradeInflation(TemplateView):
         if 'search' not in data:
             return HttpResponseBadRequest("Invalid search.")
 
+        # TODO rewrite this
+
         if len(data["search"]) != 0 and len(data["search"]) != 4 and len(data["search"]) != 7 and len(data["search"]) != 8:
             return HttpResponseBadRequest("Invalid department or course.")
 
