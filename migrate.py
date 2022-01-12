@@ -2,7 +2,7 @@
 
 import os
 
-print("Migrating DB to django\Resetting django tables...")
+print("Migrating DB to django:\nResetting django tables...")
 os.system("python3 reset_django.py")
 
 print("DB successfully reset\nPreparing DB for migration (will take a while)...")
