@@ -165,6 +165,7 @@ DATE_FORMAT = '%m/%d/%y'
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     BASE_DIR / "planetterp/static",
+    BASE_DIR / "api/static",
 ]
 
 # Allows us to use the collectstatic command.

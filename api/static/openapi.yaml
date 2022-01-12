@@ -1,0 +1,428 @@
+openapi: 3.0.0
+servers:
+  - description: "PlanetTerp API"
+    url: https://api.planetterp.com/v1
+info:
+  description: >
+    Welcome to <a href="https://planetterp.com">PlanetTerp</a>'s API. This API provides access to data relating to courses, professors, and grade data at the <a href="https://umd.edu">University of Maryland &mdash; College Park</a> (UMD).
+    <br /><br />
+    The primary purpose of this API is to provide access to grade and review data. There is already a student-run API that provides access to professor and course data: <a href="https://umd.io">umd.io</a>.
+    <br /><br />
+    The course and professor data on this website was obtained using a combination of umd.io and <a href="https://app.testudo.umd.edu/soc/">UMD's Schedule of Classes</a>. The grade data is from the <a href="https://www.irpa.umd.edu"">UMD Office of Institutional Research, Planning &amp; Assessment</a> (IRPA) and obtained through <a href="https://www.umd.edu/administration/public-information-request">a request</a> under <a href="http://www.marylandattorneygeneral.gov/OpenGov%20Documents/PIA_manual_printable.pdf">the state of Maryland's Public Information Act</a> (PIA).
+    <br /><br />
+    For support, please email <a href="mailto:admin@planetterp.com">admin@planetterp.com</a>.
+  version: "1"
+  title: PlanetTerp API
+  # license:
+    # name: Apache 2.0
+    # url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+tags:
+  - name: Courses
+  - name: Professors
+  - name: Grades
+paths:
+  /course:
+    get:
+      operationId: Get a course
+      tags:
+        - Courses
+      description: Gets the specified courses
+      parameters:
+        - in: query
+          name: name
+          description: "Show the given course."
+          required: true
+          example: MATH140
+          schema:
+            type: string
+        - in: query
+          name: reviews
+          description: "Show reviews for the course (reviews for professors that taught the course and have this course listed as the one being reviewed). Default: <code>false</code>"
+          required: false
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: "Returns course matching query"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Course'
+        '400':
+          description: "bad input parameter"
+  /courses:
+    get:
+      operationId: Get courses
+      tags:
+        - Courses
+      description: Get all courses, in alphabetical order
+      parameters:
+        - in: query
+          name: department
+          description: "Only get courses in a department. Must be four characters. Default: all departments"
+          required: false
+          example: MATH
+          schema:
+            type: string
+        - in: query
+          name: reviews
+          description: "Show reviews for the course (reviews for professors that taught the course and have this course listed as the one being reviewed). Default: <code>false</code>"
+          required: false
+          schema:
+            type: boolean
+        - $ref: "#/components/parameters/limit-100-1000"
+        - $ref: "#/components/parameters/offset"
+      responses:
+        '200':
+          description: "Returns courses matching query"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Course'
+        '400':
+          description: "bad input parameter"
+  /professor:
+    get:
+      operationId: Get a professor
+      tags:
+        - Professors
+      description: |
+        Get the specified professor.
+
+        <aside class="notice">
+        <code>slug</code> is PlanetTerp's identifier for professors. Slugs are unique to a professor and is often, but not always, their last name.
+        <br/><br/>
+        You may find a professor's slug useful to get a unique identifier for professors, or to link to a professor's page on PlanetTerp (via <code>https://planetterp.com/professor/SLUG</code>).
+        <br/><br/>
+        For example, Jon Snow's slug might be <code>snow</code>.
+        <br/><br/>
+        </aside>
+      parameters:
+        - in: query
+          name: name
+          description: "Show the given professor."
+          required: true
+          example: "Jon Snow"
+          schema:
+            type: string
+        - in: query
+          name: reviews
+          description: "Show reviews for the professor. Default: <code>false</code>"
+          required: false
+          example: true
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: "Returns professor matching query"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Professor'
+        '400':
+          description: "bad input parameter"
+  /professors:
+    get:
+      operationId: Get all professors
+      tags:
+        - Professors
+      description: Get all professors, in alphabetical order
+      parameters:
+        - in: query
+          name: type
+          description: "Show only reviews for professors or teaching assistants. Default: show both. Options: <code>professor</code>, <code>ta</code>"
+          required: false
+          schema:
+            type: string
+            enum: [professor, ta]
+        - in: query
+          name: reviews
+          description: "Show reviews for the professors. Default: <code>false</code>"
+          required: false
+          example: true
+          schema:
+            type: boolean
+        - $ref: "#/components/parameters/limit-100-1000"
+        - $ref: "#/components/parameters/offset"
+      responses:
+        '200':
+          description: "Returns professors matching query"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Professor'
+        '400':
+          description: "bad input parameter"
+  /grades:
+    get:
+      operationId: Get grades
+      tags:
+        - Grades
+      description: |
+        Get grades for a course, a professor, or both. If by course, returns all of the grades available by section.
+
+        <aside class="notice">
+        At least one of <code>course</code> and <code>professor</code> is required.
+        </aside>
+      parameters:
+        - in: query
+          name: course
+          description: "Show only grades for the given course."
+          required: false
+          schema:
+            type: string
+            example: "MATH140"
+        - in: query
+          name: professor
+          description: "Show only grades for the given professor."
+          required: false
+          example: "Jon Snow"
+          schema:
+            type: string
+            example: "Jon Snow"
+        - in: query
+          name: semester
+          description: "Show only grades for the given semester. Semester should be provided as the year followed by the semester code. `01` means Spring and `08` means Fall. For example, `202001` means Spring 2020. Default: all semesters"
+          required: false
+          example: "202001"
+          schema:
+            type: string
+            example: "202001"
+        - in: query
+          name: section
+          description: "Show only grades for the given section. Default: all sections"
+          required: false
+          example: "0101"
+          schema:
+            type: string
+            example: "0101"
+      responses:
+        '200':
+          description: "Returns grades matching query"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Grades'
+        '400':
+          description: "bad input parameter"
+  /search:
+    get:
+      operationId: Search
+      tags:
+        - Search
+      description: Search both professors and courses with a query string. This will match professors and courses which have the query string as a substring of their name.
+      parameters:
+        - in: query
+          name: query
+          description: "The query to search for"
+          required: true
+          schema:
+            type: string
+            example: "CMSC13"
+        - $ref: "#/components/parameters/limit-30-100"
+        - $ref: "#/components/parameters/offset"
+      responses:
+        '200':
+          description: "Returns professors and courses matching the query"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Search_Result'
+        '400':
+          description: "bad input parameter"
+components:
+  schemas:
+    Course:
+      type: object
+      required:
+        - department
+        - course_number
+        - title
+        - description
+        - credits
+        - professors
+      properties:
+        department:
+          type: string
+          example: MATH
+        course_number:
+          type: string
+          example: 140
+        title:
+          type: string
+          example: 'Calculus I'
+        description:
+          type: string
+          example: 'Introduction to calculus, including functions, limits, continuity, derivatives and applications of the derivative, sketching of graphs of functions, definite and indefinite integrals, and calculation of area. The course is especially recommended for science, engineering and mathematics majors.'
+        credits:
+          type: integer
+          example: 3
+        professors:
+          type: array
+          items:
+            type: string
+            example: ["Jon Snow", "Tyrion Lannister"]
+    Professor:
+      required:
+        - name
+        - slug
+        - type
+        - courses
+        - average_rating
+      properties:
+        name:
+          type: string
+          example: 'Jon Snow'
+        slug:
+          type: string
+          example: 'snow'
+        type:
+          type: string
+          enum: [professor, ta]
+          example: 'professor'
+        courses:
+          type: array
+          items:
+            type: string
+            example: 'MATH140'
+        average_rating:
+          type: number
+          example: 4.125
+      type: object
+    Grades:
+      required:
+        - course
+        - professor
+        - semester
+        - section
+        - A+
+        - A
+        - A-
+        - B+
+        - B
+        - B-
+        - C+
+        - C
+        - C-
+        - D+
+        - D
+        - D-
+        - F
+        - W
+        - Other
+      properties:
+        course:
+          type: string
+          example: 'MATH140'
+        professor:
+          type: string
+          example: 'Jon Snow'
+        semester:
+          type: string
+          example: '202001'
+        section:
+          type: string
+          example: '0101'
+        A+:
+          type: integer
+          example: 1
+        A:
+          type: integer
+          example: 1
+        A-:
+          type: integer
+          example: 1
+        B+:
+          type: integer
+          example: 1
+        B:
+          type: integer
+          example: 1
+        B-:
+          type: integer
+          example: 1
+        C+:
+          type: integer
+          example: 1
+        C:
+          type: integer
+          example: 1
+        C-:
+          type: integer
+          example: 1
+        D+:
+          type: integer
+          example: 1
+        D:
+          type: integer
+          example: 1
+        D-:
+          type: integer
+          example: 1
+        F:
+          type: integer
+          example: 1
+        W:
+          type: integer
+          example: 1
+        Other:
+          type: integer
+          example: 1
+      type: object
+    Search_Result:
+      required:
+        - name
+        - slug
+        - type
+      properties:
+        name:
+          type: string
+          example: 'CMSC131'
+        slug:
+          type: string
+          example: 'CMSC131'
+        type:
+          type: string
+          enum: [professor, course]
+          example: 'course'
+      type: object
+  parameters:
+    limit-30-100:
+      in: query
+      name: limit
+      description: "Maximum number of records to return. Must be between 1 and 100. Default: <code>30</code>"
+      required: false
+      example: 1
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 30
+    limit-100-1000:
+      in: query
+      name: limit
+      description: "Maximum number of records to return. Must be between 1 and 1000. Default: <code>100</code>"
+      required: false
+      example: 1
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 1000
+        default: 100
+    offset:
+      in: query
+      name: offset
+      description: "Number of records to skip for pagination. Default: <code>0</code>"
+      required: false
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
