@@ -10,10 +10,6 @@
 {% block content %}
 <br />
 
-<a href="/course/{{course.department}}{{ course.course_number }}/reviews" class="btn btn-primary" id="course-reviews-button">View reviews for professors for this course</a>
-
-<a href="https://app.testudo.umd.edu/soc/search?courseId={{course.department}}{{ course.course_number }}&sectionId=&termId=202101&_openSectionsOnly=on&creditCompare=&credits=&courseLevelFilter=ALL&instructor=&_facetoface=on&_blended=on&_online=on&courseStartCompare=&courseStartHour=&courseStartMin=&courseStartAM=&courseEndHour=&courseEndMin=&courseEndAM=&teachingCenter=ALL&_classDay1=on&_classDay2=on&_classDay3=on&_classDay4=on&_classDay5=on" target="_blank" class="btn btn-primary" id="testudo-button">View On Testudo</a>
-
 <div class="container">
 	<div class="row">
 		<div class="col">
@@ -21,6 +17,14 @@
 			{% if course.title %}
 				<h2 class="text-center">{{ course.title }}</h2>
 			{% endif %}
+			<div class="d-flex justify-content-center">
+				<a href="/course/{{course.department}}{{ course.course_number }}/reviews" class="btn btn-primary">
+					Reviews for this course
+				</a>
+				<a target="_blank" class="ml-2 btn btn-primary text-center" href="https://app.testudo.umd.edu/soc/search?courseId={{course.department}}{{ course.course_number }}&sectionId=&termId=202101&_openSectionsOnly=on&creditCompare=&credits=&courseLevelFilter=ALL&instructor=&_facetoface=on&_blended=on&_online=on&courseStartCompare=&courseStartHour=&courseStartMin=&courseStartAM=&courseEndHour=&courseEndMin=&courseEndAM=&teachingCenter=ALL&_classDay1=on&_classDay2=on&_classDay3=on&_classDay4=on&_classDay5=on">
+					Testudo
+				</a>
+			</div>
 
 			{% if course.description %}
 				<div class="row">

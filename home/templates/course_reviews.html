@@ -4,7 +4,7 @@
 
 {% block title %}{{ course.name }} | PlanetTerp{% endblock %}
 {% block description %}
-View reviews for professors for {{ course.department }}{{ course.course_number }} at the University of Maryland &mdash; College Park."
+View reviews for {{ course.department }}{{ course.course_number }} at the University of Maryland &mdash; College Park."
 {% endblock %}
 
 {% block content %}
@@ -14,7 +14,7 @@ View reviews for professors for {{ course.department }}{{ course.course_number }
 <div class="container">
 	<div class="row">
 		<div class="col">
-			<h1 class="text-center">Reviews for professors for <strong><a href="/course/{{ course.department }}{{ course.course_number }}">{{ course.department }}{{ course.course_number }}</a></strong></h1>
+			<h1 class="text-center">Reviews for <strong><a href="/course/{{ course.department }}{{ course.course_number }}">{{ course.department }}{{ course.course_number }}</a></strong></h1>
 		</div>
 	</div>
 </div>
