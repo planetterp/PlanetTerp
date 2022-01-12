@@ -48,10 +48,11 @@ paths:
             type: string
         - in: query
           name: reviews
-          description: "Show reviews for the course (reviews for professors that taught the course and have this course listed as the one being reviewed). Default: <code>false</code>"
+          description: "Show reviews for the course (reviews for professors that taught the course and have this course listed as the one being reviewed)."
           required: false
           schema:
             type: boolean
+            default: false
       responses:
         '200':
           description: "Returns course matching query"
@@ -77,10 +78,11 @@ paths:
             type: string
         - in: query
           name: reviews
-          description: "Show reviews for the course (reviews for professors that taught the course and have this course listed as the one being reviewed). Default: <code>false</code>"
+          description: "Show reviews for the course (reviews for professors that taught the course and have this course listed as the one being reviewed)."
           required: false
           schema:
             type: boolean
+            default: false
         - $ref: "#/components/parameters/limit-100-1000"
         - $ref: "#/components/parameters/offset"
       responses:
@@ -120,11 +122,12 @@ paths:
             type: string
         - in: query
           name: reviews
-          description: "Show reviews for the professor. Default: <code>false</code>"
+          description: "Show reviews for the professor."
           required: false
           example: true
           schema:
             type: boolean
+            default: false
       responses:
         '200':
           description: "Returns professor matching query"
@@ -143,18 +146,19 @@ paths:
       parameters:
         - in: query
           name: type
-          description: "Show only reviews for professors or teaching assistants. Default: show both. Options: <code>professor</code>, <code>ta</code>"
+          description: "Show only reviews for professors or teaching assistants. Default: show both."
           required: false
           schema:
             type: string
             enum: [professor, ta]
         - in: query
           name: reviews
-          description: "Show reviews for the professors. Default: <code>false</code>"
+          description: "Show reviews for the professors."
           required: false
           example: true
           schema:
             type: boolean
+            default: false
         - $ref: "#/components/parameters/limit-100-1000"
         - $ref: "#/components/parameters/offset"
       responses:
@@ -409,7 +413,7 @@ components:
     limit-30-100:
       in: query
       name: limit
-      description: "Maximum number of records to return. Must be between 1 and 100. Default: <code>30</code>"
+      description: "Maximum number of records to return."
       required: false
       example: 1
       schema:
@@ -420,7 +424,7 @@ components:
     limit-100-1000:
       in: query
       name: limit
-      description: "Maximum number of records to return. Must be between 1 and 1000. Default: <code>100</code>"
+      description: "Maximum number of records to return."
       required: false
       example: 1
       schema:
@@ -431,7 +435,7 @@ components:
     offset:
       in: query
       name: offset
-      description: "Number of records to skip for pagination. Default: <code>0</code>"
+      description: "Number of records to skip for pagination."
       required: false
       schema:
         type: integer
