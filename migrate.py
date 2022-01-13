@@ -11,4 +11,4 @@ print("DB prepared successfully\nMigrating to django. This might take a few minu
 
 os.system("python3 webpy_to_django.py")
 
-print("Sucess!")
+print("Success!")
