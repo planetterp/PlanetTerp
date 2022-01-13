@@ -135,7 +135,7 @@ def migrate_reviews(users, courses, professors):
 
     ourumd_users = {}
     for row in db.select("reviews"):
-        if row["reviewer_id"] == -1:
+        if row["from_ourumd"]:
             # from ourumd, create new user
             username = row["reviewer_name"]
 
