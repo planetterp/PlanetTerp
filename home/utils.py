@@ -9,26 +9,26 @@ from home.models import Course, Professor, Review, Grade
 from planetterp.config import discord_webhook_updates_url
 
 def semester_name(semester_number):
-    seasons = {"01": "Spring", "05": "Summer", "08": "Fall", "12": "Winter"}
+    seasons = {"01": "spring", "05": "summer", "08": "fall", "12": "winter"}
     season = seasons[semester_number[4:6]]
 
     year = int(semester_number[:4])
 
     # The winter semester starting in january 2021 is actually called 202012
     # internally, not 202112, so return the next year for winter to adjust.
-    if season == "Winter":
+    if season == "winter":
         year += 1
 
     return f"{season} {year}"
 
 def semester_number(semester_name: str):
-    seasons = {"Spring": "01", "Summer": "05", "Fall": "08", "Winter": "12"}
+    seasons = {"spring": "01", "summer": "05", "fall": "08", "winter": "12"}
     season, year = semester_name.strip().split(' ')
 
-    if season == "Winter":
+    if season.lower() == "winter":
         year = int(year) + 1
 
-    return f"{year}{seasons[season]}"
+    return f"{year}{seasons[season.lower()]}"
 
 # This list must be kept in ascending order, as other parts of the codebase rely
 # on the ordering.
