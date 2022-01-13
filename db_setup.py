@@ -104,10 +104,11 @@ print("  Moving all historical grades to grades (will take a while)...")
 grades = db.query('SELECT * FROM planetterp.grades_historical')
 for grade in grades:
     db.query(
-        'INSERT INTO planetterp.grades (semester, course_id, section, professor_id, num_students, APLUS, A, AMINUS, BPLUS, B, BMINUS, CPLUS, C, CMINUS, DPLUS, D, DMINUS, F, W, OTHER) VALUES ($semester, $course, $professor, $students, $AP, $A, $AM, $BP, $B, $BM, $CP, $C, $CM, $DP, $D, $DM, $F, $W, $OTHER)',
+        'INSERT INTO planetterp.grades (semester, course_id, section, professor_id, num_students, APLUS, A, AMINUS, BPLUS, B, BMINUS, CPLUS, C, CMINUS, DPLUS, D, DMINUS, F, W, OTHER) VALUES ($semester, $course, $section, $professor, $students, $AP, $A, $AM, $BP, $B, $BM, $CP, $C, $CM, $DP, $D, $DM, $F, $W, $OTHER)',
         vars={
             "semester": grade["semester"],
             "course": grade["course_id"],
+            "section": grade["section"],
             "professor": grade["professor_id"],
             "students": grade["num_students"],
             "AP": grade["APLUS"],
