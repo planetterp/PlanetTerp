@@ -320,7 +320,8 @@ class Review(Model):
     updater = ForeignKey(User, CASCADE, null=True, blank=True, related_name="updater")
     content = TextField()
     rating = IntegerField()
-    grade = CharField(max_length=2, null=True, blank=True)
+    grade = CharField(max_length=2, null=True, blank=True,
+        choices=Grades.choices)
     status = CharField(choices=Status.choices, default=Status.PENDING,
         max_length=50)
     anonymous = BooleanField()
