@@ -399,6 +399,10 @@ body {
 	display: none;
 }
 
+.gpa-disclaimer {
+	font-size: 11px;
+}
+
 /* make sure autocomplete messages show above bootstrap modals (which have z-index 1050) */
 .ui-autocomplete.ui-front {
 	z-index: 1051;
