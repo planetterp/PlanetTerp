@@ -174,6 +174,7 @@ def migrate_reviews(users, courses, professors):
         "status": _status,
         "anonymous": _anonymous,
         "from_ourumd": "from_ourumd",
+        "created_at": "created"
     }
     return _create_table("reviews", Review, mapping)
 
