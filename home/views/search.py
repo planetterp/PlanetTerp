@@ -9,10 +9,14 @@ class Search(View):
     def get(self, request):
         data = request.GET
 
-        if 'query' not in data or data["query"] == "":
+        if 'query' not in data:
             return HttpResponse("Invalid search query.")
 
         query = data["query"]
+
+        if query == "":
+            context = {"results": []}
+            return render(request, "search.html", context)
 
         if any(character.isdigit() for character in query):
             query = query.replace(" ", "")
@@ -33,5 +37,4 @@ class Search(View):
         context = {
             "results": results
         }
-
         return render(request, "search.html", context)
