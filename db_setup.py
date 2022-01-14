@@ -36,6 +36,18 @@ db.query('DELETE FROM planetterp.grades_historical WHERE professor_id < 0')
 db.query('DELETE FROM planetterp.professor_courses WHERE professor_id < 0')
 db.query('DELETE FROM planetterp.professors WHERE id < 0')
 
+print("  Making ourumd reviewer_names unique...")
+to_rename = db.query("""SELECT DISTINCT reviewer_name FROM planetterp.reviews
+            INNER JOIN planetterp.users ON reviews.reviewer_name = users.username
+            WHERE from_ourumd = 1 and reviewer_name != "Anonymous"
+""")
+for row in to_rename:
+    old_name = row["reviewer_name"]
+    new_name = f"{old_name}_ourumd"
+    db.query("UPDATE planetterp.reviews SET reviewer_name = $new_name WHERE reviewer_name = $old_name",
+        vars={"new_name": new_name, "old_name": old_name})
+
+
 # Merge professors with duplicate slugs and delete all duplicate professors.
 # Only keep the professor that was created first
 print("  Removing duplicate professors...")
