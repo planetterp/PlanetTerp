@@ -19,7 +19,7 @@ def semester_name(semester_number):
     if season == "winter":
         year += 1
 
-    return f"{season} {year}"
+    return f"{season.capitalize()} {year}"
 
 def semester_number(semester_name: str):
     seasons = {"spring": "01", "summer": "05", "fall": "08", "winter": "12"}
