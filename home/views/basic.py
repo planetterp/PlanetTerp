@@ -94,7 +94,6 @@ class Grades(View):
             data = professor_form.cleaned_data
             professor = data.get("professor", None)
             context['professor_data'] = GradeData.compose_course_grade_data(professor, pf_semesters)
-            context["professor_form"] = render_crispy_form(professor_form, professor_form.helper, context=ctx)
 
         if course is not None and course_form.is_valid():
             context["course_search_success"] = True
@@ -104,8 +103,9 @@ class Grades(View):
             semester = data.get("semester", None)
             section = data.get("section", None)
             context['course_data'] = GradeData.compose_grade_data(professor, course, semester, section, pf_semesters)
-            context["course_form"] = render_crispy_form(course_form, course_form.helper, context=ctx)
 
+        context["professor_form"] = render_crispy_form(professor_form, professor_form.helper, context=ctx)
+        context["course_form"] = render_crispy_form(course_form, course_form.helper, context=ctx)
         return JsonResponse(context)
 
 class CourseReviews(View):
