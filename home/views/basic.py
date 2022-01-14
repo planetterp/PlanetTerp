@@ -76,7 +76,7 @@ class Grades(View):
     def post(self, request):
         course = request.POST.get('course', None)
         semester = request.POST.get('semester', None)
-        semester = semester if semester not in ['', None] else None
+        semester = semester if semester != '' else None
         pf_semesters = request.POST.get("pf_semesters", False) == "true"
 
         course_form = HistoricCourseGradeForm(course, semester, data=request.POST)
