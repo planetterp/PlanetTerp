@@ -49,7 +49,7 @@
 			{% if courses_taught %}
 				This {{ professor.type }} has taught:
 				{% for course in courses_taught %}
-					<a href="/course/{{ course.department }}{{ course.course_number }}">{{ course.department }}{{ course.course_number }}</a>{% if not forloop.last %},{% endif %}
+					<a href="{{ course.get_absolute_url }}">{{ course.name }}</a>{% if not forloop.last %},{% endif %}
 				{% endfor %}
 			{% endif %}
 			<br />
