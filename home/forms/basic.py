@@ -151,7 +151,7 @@ class HistoricCourseGradeForm(Form):
             return (semester_name(num), semester_name(num))
 
         semester_choices = [_semester_tuple(grade['semester']) for grade in grades]
-        self.fields['semester'].widget.choices = [("", "Select a semester...")] + semester_choices
+        self.fields['semester'].widget.choices = [("", "All semesters")] + semester_choices
 
     def initialize_section(self):
         if self.semester and self.semester != '':
@@ -161,7 +161,7 @@ class HistoricCourseGradeForm(Form):
             ).values('section').distinct()
 
             section_choices = [(grade['section'], grade['section']) for grade in grades]
-            self.fields['section'].widget.choices = [("", "Select a section...")] + section_choices
+            self.fields['section'].widget.choices = [("", "All sections")] + section_choices
 
     def create_field_errors(self):
         field_errors = {}
