@@ -185,6 +185,10 @@ class GenedData(View):
     def get(self, request):
         geneds = request.GET["geneds"].replace("&", "").split("=on")
         geneds = set(gened for gened in geneds if gened in Gened.GENEDS)
+
+        if not geneds:
+            return JsonResponse({"data": []})
+
         geneds = tuple(geneds)
         courses = Course.objects.raw("""
             SELECT GROUP_CONCAT(name) AS geneds, course_id AS id
