@@ -210,6 +210,17 @@
 						legend:  {
 							display: false
 						},
+						hover: {
+							onHover: function(e) {
+								// if we're currently hovering over an element, change to pointer cursor
+								// to indicate that we can click it
+								if (this.getElementAtEvent(e).length > 0) {
+									e.target.style.cursor = "pointer";
+								} else {
+									e.target.style.cursor = "default";
+								}
+							}
+						},
 						pieceLabel: {
 							render: function(args) {
 								if (args['percentage'] > 2) {
