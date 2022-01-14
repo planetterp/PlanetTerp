@@ -13,15 +13,15 @@
 
 <ul class="nav nav-tabs" role="tablist">
 	<li class="nav-item">
-		<a class="nav-link" data-toggle="tab" href="#reviews-noscroll" id="reviews-tab" role="tab" onclick="showReviews()">Unverified Reviews <span id="review-counter" class="badge badge-primary"></span></a>
+		<a class="nav-link active" data-toggle="tab" href="#reviews-noscroll" id="reviews-tab" role="tab" onclick="showReviews()">Unverified Reviews <span id="review-counter" class="badge badge-primary"></span></a>
 	</li>
 	<li class="nav-item">
 		<a class="nav-link" data-toggle="tab" href="#professors-noscroll" id="professors-tab" role="tab" onclick="hideReviews()">Unverified Professors <span id="professor-counter" class="badge badge-primary">{{ professors|length}}</span></a>
 	</li>
 </ul>
 
-<div class="tab-content container admin-panel" id="adminPageContent">
-	<div class="tab-pane fade show" id="reviews-noscroll" role="tabpanel">
+<div class="tab-content container mt-4">
+	<div class="tab-pane fade show active" id="reviews-noscroll" role="tabpanel">
 		{% render_table reviews_table %}
 	</div>
 	<div class="tab-pane fade" id="professors-noscroll" role="tabpanel">
