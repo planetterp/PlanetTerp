@@ -226,7 +226,7 @@
 
 	function fixReviewsTableStyle() {
 		var selectedCourse = $("#course-select").val();
-		if (selectedCourse != "Course") {
+		if (selectedCourse != "All Courses") {
 			$("table.reviews-table").removeClass("table-striped");
 			$("#reviews-table-container tr").filter(":visible").even().css("background-color", "rgba(0,0,0,.05)");
 		} else {
@@ -249,7 +249,7 @@
 		var selectedCourse = $(this).val();
 		var selector = $("#reviews-table-container tr");
 		$(selector).show();
-		if (selectedCourse != "Course") {
+		if (selectedCourse != "All Courses") {
 			$(selector).not(`.${selectedCourse}`).hide();
 		}
 		fixReviewsTableStyle();
@@ -271,7 +271,7 @@
 				$("#reviews-table-container").html(data["reviews_table"]);
 
 				var selectedCourse = $("#course-select").val();
-				if (selectedCourse != "Course") {
+				if (selectedCourse != "All Courses") {
 					$("#reviews-table-container tr").not(`.${selectedCourse}`).hide();
 				}
 				fixReviewsTableStyle();
