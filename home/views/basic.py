@@ -76,7 +76,7 @@ class Grades(View):
     def post(self, request):
         course = request.POST.get('course', None)
         semester = request.POST.get('semester', None)
-        semester = semester if semester != '' else None
+        semester = semester if semester not in ['', None] else None
         pf_semesters = request.POST.get("pf_semesters", False) == "true"
 
         course_form = HistoricCourseGradeForm(course, semester, data=request.POST)
@@ -89,13 +89,14 @@ class Grades(View):
             "professor_search_success": False
         }
 
-        if professor_form.is_valid():
+        if course is None and professor_form.is_valid():
             context["professor_search_success"] = True
             data = professor_form.cleaned_data
             professor = data.get("professor", None)
             context['professor_data'] = GradeData.compose_course_grade_data(professor, pf_semesters)
+            context["professor_form"] = render_crispy_form(professor_form, professor_form.helper, context=ctx)
 
-        if course_form.is_valid():
+        if course is not None and course_form.is_valid():
             context["course_search_success"] = True
             data = course_form.cleaned_data
             professor = data.get("professor", None)
@@ -103,9 +104,7 @@ class Grades(View):
             semester = data.get("semester", None)
             section = data.get("section", None)
             context['course_data'] = GradeData.compose_grade_data(professor, course, semester, section, pf_semesters)
-
-        context["course_form"] = render_crispy_form(course_form, course_form.helper, context=ctx)
-        context["professor_form"] = render_crispy_form(professor_form, professor_form.helper, context=ctx)
+            context["course_form"] = render_crispy_form(course_form, course_form.helper, context=ctx)
 
         return JsonResponse(context)
 
