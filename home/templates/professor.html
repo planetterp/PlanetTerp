@@ -226,7 +226,7 @@
 		var selectedCourse = $("#course-select").val();
 		if (selectedCourse != "All Courses") {
 			$("table.reviews-table").removeClass("table-striped");
-			$("#reviews-table-container tr").filter(":visible").even().css("background-color", "rgba(0,0,0,.05)");
+			$("#reviews-table-container tbody > tr").filter(":visible").even().css("background-color", "rgba(0,0,0,.05)");
 		} else {
 			$("table.reviews-table").addClass("table-striped");
 		}
@@ -245,7 +245,7 @@
 
 	$("#course-select").on('change', function() {
 		var selectedCourse = $(this).val();
-		var selector = $("#reviews-table-container tr");
+		var selector = $("#reviews-table-container tbody > tr");
 		$(selector).show();
 		if (selectedCourse != "All Courses") {
 			$(selector).not(`.${selectedCourse}`).hide();
