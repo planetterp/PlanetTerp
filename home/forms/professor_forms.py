@@ -107,7 +107,7 @@ class ProfessorForm(Form):
         content_errors = self.field_errors["content"]
 
         success_banner = Alert(
-            "Form submitted successfully!",
+            "Review submitted successfully!",
             css_id=f"success-banner-{self.form_type.value}",
             css_class="alert-success text-center w-100 rounded-0 d-none position-absolute"
         )
