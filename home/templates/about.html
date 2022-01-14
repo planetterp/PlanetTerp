@@ -1,33 +1,38 @@
 {% extends "base_main.html" %}
+{% load static %}
 
 {% block title %}About | PlanetTerp{% endblock %}
 
 {% block content %}
 <div class="info-page">
-	<h1>About</h1>
-	<p>PlanetTerp is a website designed to help students at the University of Maryland &mdash; College Park (UMD) make informed decisions. It offers a professor review system, grades for each course and professor, and tools to provide information related to UMD. We hope that you find these features useful!</p>
+	<h2>About</h2>
+	<p>PlanetTerp is a website designed to help students at the University of Maryland &mdash; College Park (UMD) make informed decisions. We provide a professor review system, grade data for courses and professors, and <a href="{% url 'tools' %}">various tools</a> which aggregate data about UMD and the courses theiren. We hope that you find these features useful!</p>
 
-	<h2>Goal &amp; Motivation</h2>
-	<p>Our goal is to provide information that will help all students at UMD make informed decisions.</p>
+	<h3>Review Criteria</h3>
+	<p>While anyone is free to submit a review, anonymously or otherwise, all reviews are manually verified by us before being displayed on the site. Below are some common reasons reviews get rejected:</p>
 
-	<p>One common concern with professor review websites is that they are not accurate, largely because students who dislike a professor are more likely to complain than students who like a professor. This may be true and should be considered when viewing professor reviews on this website.</p>
+	<ul>
+		<li>Vague negative comments with no elaboration. A review only saying "this professor sucks" would be rejected, for instance.</li>
+		<li>Excessive hostility towards a professor. Negativity is fine, insults are not!</li>
+		<li>Excessive use of caps lock. Don't make your review a nuisance for others to read, please!</li>
+	</ul>
 
-	<p>Grade data is provided on this site. We feel it important to note that we believe students should not take a course based on which professor gives the highest grades. A professor who gives out the lowest grades may still be the best professor for you to take. Of course, it is up to you; we do our best to provide the data to help you make an informed decision.</p>
-
-	<h2>Review criteria</h2>
 	<p>PlanetTerp believes in freedom of speech, but maintains standards to ensure the reviews on the website are quality. To prevent low-quality reviews, all reviews are subject to a verification process. The only reviews that are not accepted are personal attacks on professors or teaching assistants that provide no meaningful information, or any reviews that are illegal.</p>
 
+	<h3>Review Accuracy</h3>
+	<p>A common concern with professor review websites is that the reviews aren't necessarily accurate to real life, because students with a negative experience are more likely to leave a review than a student with a positive experience. This may certainly be true, and you should take this into account when considering reviews.</p>
 
-	<a id="credits"></a><h2>Credits</h2>
-	<p>Initial reviews from <a href="http://www.ourumd.com" target="_blank">OurUMD.com</a>. UMD professor &amp; course information from <a href="http://umd.io" target="_blank">umd.io</a>. Grade data from the <a href="https://www.irpa.umd.edu" target="_blank">UMD Office of Institutional Research, Planning &amp; Assessment</a> (IRPA) and obtained through <a href="https://www.umd.edu/administration/public-information-request" target="_blank">a request</a> under <a href="http://www.marylandattorneygeneral.gov/OpenGov%20Documents/PIA_manual_printable.pdf" target="_blank">the state of Maryland's Public Information Act</a> (PIA) (grade data initially from <a href="https://vagrades.com" target="_blank">VAgrades.com</a>).</p>
+	<p>Additionally, be wary of trusting the rating of a professor with a low number of reviews. These ratings are much more likely to be influenced by random chance, and you should be careful not to form an opinion of a professor based just on one or two reviews.</p>
 
-	<h2>Contact us</h2>
-	<p>We can be emailed at <a href="mailto:admin@planetterp.com">admin@planetterp.com</a></p>
+	<h3 id="credits">Credits</h3>
+	<p>Professor and course information comes from a combination of <a href="https://app.testudo.umd.edu/soc/">schedule of classes</a> and <a href="http://umd.io" target="_blank">umdio</a>. Grade data is obtained from the <a href="https://www.irpa.umd.edu" target="_blank">IRPA</a> via a <a href="https://www.umd.edu/administration/public-information-request" target="_blank">PIA request</a>. Initial reviews were imported from OurUMD, and initial grade data was from <a href="https://vagrades.com" target="_blank">VA Grades</a>.</p>
 
-	<a id="organizations"></a><h2>Organizations we support</h2>
-	<p>Want your organization on our homepage and listed below? Please contact us for more information.</p>
+	<h3>Contact us</h3>
+	<p>We can be emailed at <a href="mailto:admin@planetterp.com">admin@planetterp.com</a>.</p>
 
-	<p>PlanetTerp is proud to support the following organizations:</p>
+	<h3 id="organizations">Other Organizations at UMD</h3>
+
+	<p>Check out these other student-run sites at UMD:</p>
 
 	<ul>
 		{% for organization in organizations %}
@@ -35,7 +40,7 @@
 		{% endfor %}
 	</ul>
 
-	<br />
+	<p>If you want your organization on our homepage and listed below, please contact us at the email above!</p>
 
 	<h1 class="text-center">PlanetTerp Team</h1>
 	<div class="member-info">
