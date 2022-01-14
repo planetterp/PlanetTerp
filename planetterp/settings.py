@@ -120,6 +120,9 @@ DATABASES = {
         'PASSWORD': config.PASSWORD,
         'HOST': config.DB_HOST,
         'PORT': "3306",
+        'OPTIONS': {
+            'charset': 'utf8mb4'
+        }
     }
 }
 
