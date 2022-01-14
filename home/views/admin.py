@@ -27,8 +27,12 @@ class Admin(UserPassesTestMixin, View):
         return self.request.user.is_staff
 
     def get(self, request):
-        reviews = Review.objects.pending
-        professors = Professor.objects.pending
+        reviews = (
+            Review.objects.pending
+            .select_related("professor", "course", "user")
+            .all()
+        )
+        professors = Professor.objects.pending.all()
 
         reviews_table = UnverifiedReviewsTable(reviews, request)
         professors_table = ProfessorsTable(professors, request)
