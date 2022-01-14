@@ -105,11 +105,10 @@ class InformationColumn(tables.Column):
         '''
 
         if review.from_ourumd:
-            column_html += ' <i class="fas fa-info-circle" data-toggle="tooltip" data-placement="right" title="This review was automatically imported from OurUMD. It was not verified by our review checkers. It may not follow our review standards."></i>'
-
+            column_html += ' <i class="fas fa-info-circle" data-toggle="tooltip" data-placement="right" title="This review was automatically imported from OurUMD. It was not manually verified and may not follow our review standards."></i>'
 
         if review.created_at.date() >= date(2020, 3, 10) and review.created_at.date() <= date(2021, 8, 30):
-            column_html += ' <i class="fas fa-head-side-mask" data-toggle="tooltip" data-placement="right" title="This review was submitted while most classes were online during the COVID-19 pandemic. The review may not be indicative of a regular semester."></i>'
+            column_html += ' <i class="fas fa-head-side-mask" data-toggle="tooltip" data-placement="right" title="This review was submitted while most classes were online during the COVID-19 pandemic. It may not be indicative of a regular semester."></i>'
 
         kwargs = {
             "professor_slug": review.professor.slug,
