@@ -14,10 +14,6 @@
 <meta property="og:url" content="https://planetterp.com/tools/coursedifficulty">
 
 <style>
-	#header {
-		text-align: center;
-	}
-
 	.dataTables_filter {
 		float: left !important;
 	}
@@ -30,16 +26,13 @@
 {% endblock %}
 
 {% block content %}
-<br />
-
-<h1 id="header">Easiest &amp; Hardest Courses &amp; Departments at UMD</h1>
+<div class="tools-header">Course Difficulty at UMD</div>
 
 <div class="tools-article">
-	<p>This page shows the easiest and hardest courses and departments by GPA at the University of Maryland &mdash; College Park. The data includes all courses taught at UMD in the Fall and Spring from 2012 onwards.</p>
+	<p>This tool shows the average GPA of courses and departments at UMD. The grade data includes all courses taught at UMD in the Fall and Spring from 2012 onwards.</p>
 
-	<p>We feel it important to note that we believe students should not take a course based on which professor gives the highest grades. A professor who gives out the lowest grades may still be the best professor for you to take. Also, a course's difficulty cannot be judged solely by its GPA. Of course, it is up to you; we do our best to provide the data to help you make an informed decision.</p>
+	<p>Please note that average GPA is not a perfect metric for judging a course's difficulty. We provide it here because it is the best standin available to us, but you should note take a course's GPA as absolute indication of difficulty.</p>
 
-	<p>GPA calculations are done according to <a href="https://registrar.umd.edu/current/Policies/acadregs.html#plusminus" target="_blank">UMD's grade to quality points rules</a>. All withdrawals (W) are considered to be 0.0 quality points. Only departments and courses with 100 or more students are included.</p>
 
 	<h2>Difficulty by department</h2>
 
@@ -76,11 +69,13 @@
 <hr>
 
 <div class="tools-article">
-	<p>Courses and departments which can only be taken pass/fail are not included in this list.</p>
 
-	<p>Data is not guaranteed to be correct.</p>
+	<p>GPA calculations are done according to <a href="https://registrar.umd.edu/current/Policies/acadregs.html#plusminus" target="_blank">UMD's grade to quality points rules</a>. All withdrawals (W) are considered to be 0.0 quality points. "Other" grades are not factored into GPA calculation. Only departments and courses with 100 or more students are included. Courses and departments which can only be taken pass/fail are not included in this list.</p>
 
-	<p style="padding-bottom: 10px;"><em>The source of the grade data can be found <a href="/about#credits">here</a>.</em></p>
+	<p></p>
+
+	<p class="pb-3">Data is not guaranteed to be correct. The source of the data can be found <a href="/about#credits">here</a>.</p>
+
 </div>
 
 <script>

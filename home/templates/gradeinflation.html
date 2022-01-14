@@ -13,11 +13,6 @@
 <meta property="og:url" content="https://planetterp.com/tools/geneds">
 
 <style>
-	#header {
-		text-align: center;
-		margin-top: 1%;
-	}
-
 	#distribution-search {
 		width: 200px;
 		margin-left: 15px;
@@ -63,10 +58,10 @@
 </style>
 {% endblock %}
 {% block content %}
-<h1 id="header">Grade Inflation at UMD</h1>
+<div class="tools-header">Grade Inflation at UMD</div>
 
 <div class="tools-article">
-	<p>This tool visualizes how the average GPA has changed over the last 20 years at the University of Maryland &mdash; College Park. You can search for an entire department &mdash; for example, searching for "MATH" shows the GPA changes for the MATH department over time. You can also search for a course to see the average GPA changes in that course over time. Clicking the 'View All Courses' button shows the average GPA of every course over the last 20 years.</p>
+	<p>This tool visualizes how the average GPA has changed over the last 20 years at UMD. You can search for an entire department (eg "MATH" for the math department) or for a specific course ("eg CMSC131"). Clicking the 'View All Courses' button shows the average GPA of all courses combined over the last 20 years.</p>
 
 	<div class="row test">
 		<form method="POST" id="search-form" class="form-inline">
@@ -97,11 +92,7 @@
 
 	<p>GPA calculations are done according to <a href="https://www.testudo.umd.edu/gpa/index.html" target="_blank">UMD's grade to quality points rules</a>. All withdrawals (W) are considered to be 0.0 quality points.</p>
 
-	<p>There is an error in which Fall 2008 and Spring 2008 have identical grade data. We are requesting the correct data and will update this chart when we receive it.</p>
-
-	<p>Data is not guaranteed to be correct.</p>
-
-	<p style="padding-bottom: 10px;"><em>The source of the grade data can be found <a href="/about#credits">here</a>.</em></p>
+	<p class="pb-3">Data is not guaranteed to be correct. The source of the grade data can be found <a href="/about#credits">here</a>.</p>
 </div>
 
 <script>

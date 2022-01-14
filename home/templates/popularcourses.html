@@ -14,10 +14,6 @@
 <meta property="og:url" content="https://planetterp.com/tools/popularcourses">
 
 <style>
-	#header {
-		text-align: center;
-	}
-
 	#popular-search {
 		width: 200px;
 	}
@@ -39,12 +35,12 @@
 {% endblock %}
 {% block content %}
 
-<br />
-
-<h1 id="header">Popular Courses at UMD</h1>
+<div class="tools-header">Popular Courses at UMD</div>
 
 <div class="tools-article">
-	<p>This tool lets you search for the most popular courses at the University of Maryland &mdash; College Park. You can search for an entire department &mdash; for example, searching for "MATH" will let you see the most popular courses that are taken in the math department. You can also search for the most popular xxx-level courses &mdash; for example, searching for "PHYS4" displays the most popular 400-level physics courses. Perhaps less useful, though still interesting, is searching for all courses that contain certain numbers &mdash; for example, searching for "101" shows all courses that have 101 in them. You can click on any course in the chart to see its page, which includes professor reviews and grade distributions.</p>
+	<p>This page lets you search for the most popular courses at UMD. You can search for an entire department (eg "MATH" for all math courses), the most popular xxx-level courses (eg "PHYS4" for all 400-level physics courses), or for a course with a certain number across all departments (eg "101" for all courses with the number 101 in them).
+
+	<p>You can click on any course in the chart to go to its page, which includes professor reviews and grade distributions.</p>
 
 	<form method="POST" id="popular-search-form" class="form-inline">
 		<input type="text" class="form-control" id="popular-search" placeholder="Search..." name="department">
@@ -63,9 +59,8 @@
 <div class="tools-article">
 	<p>Course popularity is determined by the number of students who have received a grade for each course.</p>
 
-	<p>Data is not guaranteed to be correct.</p>
+	<p class="pb-3">Data is not guaranteed to be correct. The source of the grade data can be found <a href="/about#credits">here</a>.</em></p>
 
-	<p style="padding-bottom: 10px;"><em>The source of the grade data can be found <a href="/about#credits">here</a>.</em></p>
 </div>
 
 <script>

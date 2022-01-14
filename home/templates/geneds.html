@@ -1,12 +1,12 @@
 {% extends "base_main.html" %}
 
-{% block title %}Courses By Geneds | PlanetTerp{% endblock %}
+{% block title %}Courses By GenEd | PlanetTerp{% endblock %}
 
 {% block head %}
 <link rel="stylesheet" type="text/css" href="../static/css/datatables.min.css">
 <script type="text/javascript" charset="utf8" src="../static/js/datatables.min.js"></script>
 
-<meta property="og:title" content="Search Courses By General Education Requirements | PlanetTerp">
+<meta property="og:title" content="Courses By GenEd | PlanetTerp">
 <meta property="og:description" name="description" content="Search courses at the University of Maryland &mdash; College Park by general education requirements.">
 <meta property="og:type" content="website">
 <meta property="og:image" content="https://planetterp.com/static/images/geneds.png">
@@ -14,12 +14,8 @@
 <meta property="og:url" content="https://planetterp.com/tools/geneds">
 
 <style>
-	#header {
-		text-align: center;
-	}
-
 	#table-container {
-		width: 85%;
+		width: 90%;
 		margin: 0 auto;
 	}
 
@@ -36,139 +32,136 @@
 </style>
 {% endblock %}
 {% block content %}
-		<br />
+	<div class="tools-header">Search Courses By Geneds</div>
 
-		<h1 id="header">Search Courses By General Education Requirements</h1>
+	<div class="tools-article">
+		<p>This tool allows you to search for courses by General Education requirements. Course data includes all courses taught at UMD in the Fall and Spring from 2012 onwards.</p>
 
-		<div class="tools-article">
-			<p>This tool allows you to search for courses at the University of Maryland &mdash; College Park by General Education requirements. Grade data includes all courses taught at UMD in the Fall and Spring from 2012 onwards.</p>
-		</div>
+		<p>The tool is not totally accurate; some courses fulfill General Education requirements such as DSHU or DSSP, which this tool considers as fulfilling both DSHU and DSSP. Verify which General Education requirements a course fulfills before registering.</p>
+	</div>
 
-		<h2 class="text-center">Categories</h2>
+	<h2 class="text-center">Categories</h2>
 
-		<form id="gened-search-form">
-			<div class="row" style="margin-left: 10px; margin-right: 10px;">
-				<div class="col-md-3">
-					<div class="card">
-						<div class="card-header card-header-gened"><h4>Fundamental Studies</h4></div>
-						<div class="card-body">
-							<div class="form-check">
-								<input class="form-check-input" name="FSAW" type="checkbox" id="FSAW">
-								<label class="form-check-label" for="FSAW">FSAW <small>(Academic Writing)</small></label>
-							  </div>
-							<div class="form-check">
-								<input class="form-check-input" name="FSAR" type="checkbox" id="FSAR">
-								<label class="form-check-label" for="FSAR">FSAR <small>(Analytic Reasoning)</small></label>
+	<form id="gened-search-form">
+		<div class="row" style="margin-left: 10px; margin-right: 10px;">
+			<div class="col-md-3">
+				<div class="card">
+					<div class="card-header card-header-gened"><h4>Fundamental Studies</h4></div>
+					<div class="card-body">
+						<div class="form-check">
+							<input class="form-check-input" name="FSAW" type="checkbox" id="FSAW">
+							<label class="form-check-label" for="FSAW">FSAW <small>(Academic Writing)</small></label>
 							</div>
-							<div class="form-check">
-								<input class="form-check-input" name="FSMA" type="checkbox" id="FSMA">
-								<label class="form-check-label" for="FSMA">FSMA <small>(Math)</small></label>
-							</div>
-							<div class="form-check">
-								<input class="form-check-input" name="FSOC" type="checkbox" id="FSOC">
-								<label class="form-check-label" for="FSOC">FSOC <small>(Oral Communications)</small></label>
-							</div>
-							<div class="form-check">
-								<input class="form-check-input" name="FSPW" type="checkbox" id="FSPW">
-								<label class="form-check-label" for="FSPW">FSPW <small>(Professional Writing)</small></label>
-							</div>
+						<div class="form-check">
+							<input class="form-check-input" name="FSAR" type="checkbox" id="FSAR">
+							<label class="form-check-label" for="FSAR">FSAR <small>(Analytic Reasoning)</small></label>
 						</div>
-					</div>
-				</div>
-				<div class="col-md-3">
-					<div class="card">
-						<div class="card-header card-header-gened"><h4>Distributive Studies</h4></div>
-						<div class="card-body">
-							<div class="form-check">
-								<input class="form-check-input" name="DSHS" type="checkbox" id="DSHS">
-								<label class="form-check-label" for="DSHS">DSHS <small>(History and Social Sciences)</small></label>
-							</div>
-							<div class="form-check">
-								<input class="form-check-input" name="DSHU" type="checkbox" id="DSHU">
-								<label class="form-check-label" for="DSHU">DSHU <small>(Humanities)</small></label>
-							</div>
-							<div class="form-check">
-								<input class="form-check-input" name="DSNS" type="checkbox" id="DSNS">
-								<label class="form-check-label" for="DSNS">DSNS <small>(Natural Sciences)</small></label>
-							</div>
-							<div class="form-check">
-								<input class="form-check-input" name="DSNL" type="checkbox" id="DSNL">
-								<label class="form-check-label" for="DSNL">DSNL <small>(Natural Science Lab)</small></label>
-							</div>
-							<div class="form-check">
-								<input class="form-check-input" name="DSSP" type="checkbox" id="DSSP">
-								<label class="form-check-label" for="DSSP">DSSP <small>(Scholarship in Practice)</small></label>
-							</div>
+						<div class="form-check">
+							<input class="form-check-input" name="FSMA" type="checkbox" id="FSMA">
+							<label class="form-check-label" for="FSMA">FSMA <small>(Math)</small></label>
 						</div>
-					</div>
-				</div>
-				<div class="col-md-3">
-					<div class="card">
-						<div class="card-header card-header-gened"><h4>Diversity</h4></div>
-						<div class="card-body">
-							<div class="form-check">
-								<input class="form-check-input" name="DVCC" type="checkbox" id="DVCC">
-								<label class="form-check-label" for="DVCC">DVCC <small>(Cultural Competency)</small></label>
-							</div>
-							<div class="form-check">
-								<input class="form-check-input" name="DVUP" type="checkbox" id="DVUP">
-								<label class="form-check-label" for="DVUP">DVUP <small>(Understanding Plural Societies)</small></label>
-							</div>
+						<div class="form-check">
+							<input class="form-check-input" name="FSOC" type="checkbox" id="FSOC">
+							<label class="form-check-label" for="FSOC">FSOC <small>(Oral Communications)</small></label>
 						</div>
-					</div>
-				</div>
-				<div class="col-md-3">
-					<div class="card">
-						<div class="card-header card-header-gened"><h4>Signature Courses</h4></div>
-						<div class="card-body">
-							<div class="form-check">
-								<input class="form-check-input" name="SCIS" type="checkbox" id="SCIS">
-								<label class="form-check-label" for="SCIS">SCIS <small>(I-Series)</small></label>
-							</div>
+						<div class="form-check">
+							<input class="form-check-input" name="FSPW" type="checkbox" id="FSPW">
+							<label class="form-check-label" for="FSPW">FSPW <small>(Professional Writing)</small></label>
 						</div>
 					</div>
 				</div>
 			</div>
-
-			<br />
-
-			<div style="text-align: center;">
-				<button type="submit" class="btn btn-primary btn-lg">Search</button>
+			<div class="col-md-3">
+				<div class="card">
+					<div class="card-header card-header-gened"><h4>Distributive Studies</h4></div>
+					<div class="card-body">
+						<div class="form-check">
+							<input class="form-check-input" name="DSHS" type="checkbox" id="DSHS">
+							<label class="form-check-label" for="DSHS">DSHS <small>(History and Social Sciences)</small></label>
+						</div>
+						<div class="form-check">
+							<input class="form-check-input" name="DSHU" type="checkbox" id="DSHU">
+							<label class="form-check-label" for="DSHU">DSHU <small>(Humanities)</small></label>
+						</div>
+						<div class="form-check">
+							<input class="form-check-input" name="DSNS" type="checkbox" id="DSNS">
+							<label class="form-check-label" for="DSNS">DSNS <small>(Natural Sciences)</small></label>
+						</div>
+						<div class="form-check">
+							<input class="form-check-input" name="DSNL" type="checkbox" id="DSNL">
+							<label class="form-check-label" for="DSNL">DSNL <small>(Natural Science Lab)</small></label>
+						</div>
+						<div class="form-check">
+							<input class="form-check-input" name="DSSP" type="checkbox" id="DSSP">
+							<label class="form-check-label" for="DSSP">DSSP <small>(Scholarship in Practice)</small></label>
+						</div>
+					</div>
+				</div>
 			</div>
-		</form>
+			<div class="col-md-3">
+				<div class="card">
+					<div class="card-header card-header-gened"><h4>Diversity</h4></div>
+					<div class="card-body">
+						<div class="form-check">
+							<input class="form-check-input" name="DVCC" type="checkbox" id="DVCC">
+							<label class="form-check-label" for="DVCC">DVCC <small>(Cultural Competency)</small></label>
+						</div>
+						<div class="form-check">
+							<input class="form-check-input" name="DVUP" type="checkbox" id="DVUP">
+							<label class="form-check-label" for="DVUP">DVUP <small>(Understanding Plural Societies)</small></label>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-3">
+				<div class="card">
+					<div class="card-header card-header-gened"><h4>Signature Courses</h4></div>
+					<div class="card-body">
+						<div class="form-check">
+							<input class="form-check-input" name="SCIS" type="checkbox" id="SCIS">
+							<label class="form-check-label" for="SCIS">SCIS <small>(I-Series)</small></label>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
 
 		<br />
 
-		<div id="table-container">
-			<table id="geneds-table" class=	"table table-bordered">
-				<thead>
-					<tr>
-						<th id="header-name">Course</th>
-						<th id="header-title">Title</th>
-						<th id="header-credits"># Credits</th>
-						<th id="header-gpa">Average GPA</th>
-						<th id="header-geneds">Geneds</th>
-					</tr>
-				</thead>
-			</table>
+		<div style="text-align: center;">
+			<button type="submit" class="btn btn-primary btn-lg">Search</button>
 		</div>
+	</form>
+
+	<br />
+
+	<div id="table-container">
+		<table id="geneds-table" class=	"table table-bordered">
+			<thead>
+				<tr>
+					<th id="header-name">Course</th>
+					<th id="header-title">Title</th>
+					<th id="header-credits"># Credits</th>
+					<th id="header-gpa">Average GPA</th>
+					<th id="header-geneds">Geneds</th>
+				</tr>
+			</thead>
+		</table>
+	</div>
 
 
-		<br />
+	<br />
 
-		<hr>
+	<hr>
 
-		<div class="tools-article">
-			<p>We feel it important to note that we believe students should not take a course based on which professor gives the highest grades. A professor who gives out the lowest grades may still be the best professor for you to take. Of course, it is up to you; we do our best to provide the data to help you make an informed decision. Also, a course's difficulty cannot be judged solely by its GPA.</p>
+	<div class="tools-article">
+		<p>Please note that a course's difficulty cannot be judged solely by its GPA; we provide it here because it serves as a useful, but not 100% accurate, standin.</p>
 
-			<p>GPA calculations are done according to <a href="https://registrar.umd.edu/current/Policies/acadregs.html#plusminus" target="_blank">UMD's grade to quality points rules</a>. All withdrawals (W) are considered to be 0.0 quality points.</p>
+		<p>GPA calculations are done according to <a href="https://registrar.umd.edu/current/Policies/acadregs.html#plusminus" target="_blank">UMD's grade to quality points rules</a>. All withdrawals (W) are considered to be 0.0 quality points. "Other" grades are not factored into GPA calculation.</p>
 
-			<p>The tool is not totally accurate. Some courses fulfill General Education requirements such as <em>DSHU or DSSP</em>, which this tool considers as fulfilling <em>DSHU and DSSP</em>. Verify which General Education requirements a course fulfills before registering.</p>
+		<p class="pb-3">Data is not guaranteed to be correct. The source of the grade and course data can be found <a href="/about#credits">here</a>.</p>
+	</div>
 
-			<p>Data is not guaranteed to be correct.</p>
-
-			<p style="padding-bottom: 10px;"><em>The source of the grade data can be found <a href="/about#credits">here</a>.</em></p>
-		</div>
 	<script>
 		var DataTable = $.fn.dataTable;
 		$.extend(true, DataTable.defaults, {
