@@ -82,6 +82,8 @@ class InformationColumn(tables.Column):
         if review.grade:
             column_html += self.grade_to_element(review.grade)
 
+        # wrap long usernames to avoid increasing the information column width
+        column_html += '<span style="white-space: normal; word-break: break-all;">'
         if is_staff and review.user:
             if review.anonymous:
                 column_html += '''
@@ -97,7 +99,7 @@ class InformationColumn(tables.Column):
                 '''
 
         column_html += '''
-            {anonymous}
+            {anonymous}</span>
             <br />
             {created_at}
         '''
