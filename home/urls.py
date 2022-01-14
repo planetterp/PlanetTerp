@@ -67,7 +67,9 @@ urlpatterns = [
     path('autocomplete', Autocomplete.as_view(), name='autocomplete'),
 
     # standalone
-    path('professor/<slug:slug>', Professor.as_view(), name='professor'),
+    # this can't be <slug:slug> because django slugs don't allow quotes, and
+    # some professors have quotes in their name (o'brien)
+    path('professor/<str:slug>', Professor.as_view(), name='professor'),
     path('search', Search.as_view(), name='search'),
     path('course/<course:name>', Course.as_view(), name='course'),
     path('course/<course:name>/reviews', CourseReviews.as_view(), name='course-reviews'),
