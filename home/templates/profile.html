@@ -10,53 +10,32 @@
 
 <ul class="nav nav-tabs" role="tablist">
 	<li class="nav-item">
-		{% if args|length_is:"1" %}
-			<a class="nav-link" data-toggle="tab" href="#reviews-noscroll" id="your-reviews-tab" role="tab" aria-controls="reviews-noscroll" aria-selected="false">Your Reviews</a>
-		{% else %}
-			<a class="nav-link active" data-toggle="tab" href="#reviews-noscroll" id="your-reviews-tab" role="tab" aria-controls="reviews-noscroll" aria-selected="true">Your Reviews</a>
-		{% endif %}
+		<a class="nav-link active" data-toggle="tab" href="#reviews-noscroll" id="your-reviews-tab" role="tab" aria-controls="reviews-noscroll" aria-selected="true">Your Reviews</a>
 	</li>
 	<li class="nav-item">
-		{% if args|length_is:"1" %}
-			<a class="nav-link active" data-toggle="tab" href="#settings-noscroll" id="settings-tab" role="tab" aria-controls="settings-noscroll" aria-selected="true">Settings</a>
-		{% else %}
-			<a class="nav-link" data-toggle="tab" href="#settings-noscroll" id="settings-tab" role="tab" aria-controls="settings-noscroll" aria-selected="false">Settings</a>
-		{% endif %}
+		<a class="nav-link" data-toggle="tab" href="#settings-noscroll" id="settings-tab" role="tab" aria-controls="settings-noscroll" aria-selected="false">Settings</a>
 	</li>
 </ul>
 
 <div class="tab-content" id="profilePageContent">
-	{% if args|length_is:"1" %}
-		<div class="tab-pane fade" id="reviews-noscroll" role="tabpanel" aria-labelledby="your-reviews-tab">
-	{% else %}
-		<div class="tab-pane fade show active" id="reviews-noscroll" role="tabpanel" aria-labelledby="your-reviews-tab">
-	{% endif %}
-		<br />
-		<h1 class="text-center">Your Reviews</h1>
-		<br />
+	<div class="tab-pane fade show active" id="reviews-noscroll" role="tabpanel" aria-labelledby="your-reviews-tab">
+	<h1 class="text-center my-4">Your Reviews</h1>
+	<div id="reviews-table-container" style="width: 80%; margin-left: auto; margin-right: auto; min-width: 600px; overflow-x: auto;">
+		{% render_table reviews_table %}
+	</div>
+</div>
 
-		<div id="reviews-table-container" style="width: 80%; margin-left: auto; margin-right: auto; min-width: 600px; overflow-x: auto;">
-			{% render_table reviews_table %}
+<div class="tab-pane fade" id="settings-noscroll" role="tabpanel" aria-labelledby="settings-tab">
+	<h1 class="text-center my-4">Settings</h1>
+	<div class="container">
+		<div class="row">
+			<div class="col"></div>
+			<div id="profile-form-container" class="col-5">
+				{% crispy form %}
+			</div>
+			<div class="col"></div>
 		</div>
 	</div>
-
-	{% if args|length_is:"1" %}
-	<div class="tab-pane fade show active" id="settings-noscroll" role="tabpanel" aria-labelledby="settings-tab">
-	{% else %}
-	<div class="tab-pane fade" id="settings-noscroll" role="tabpanel" aria-labelledby="settings-tab">
-	{% endif %}
-		<br />
-		<h1 class="text-center">Settings</h1>
-		<br />
-		<div class="container">
-			<div class="row">
-				<div class="col"></div>
-				<div id="profile-form-container" class="col-5">
-					{% crispy form %}
-				</div>
-				<div class="col"></div>
-			</div>
-		</div>
 </div>
 
 <script>
