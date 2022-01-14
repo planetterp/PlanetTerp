@@ -14,7 +14,6 @@ from home.views.profile import Profile, ResetPassword
 from home.views.search import Search
 from home.views.tools import (Tools, ToolDemographics, ToolPopularCourses,
     ToolGradeInflation, ToolGeneds, ToolCourseDifficulty)
-#from home.views.schedule import groupmeauth, groups, newschedule, schedule
 
 
 class CourseConverter:
