@@ -85,9 +85,7 @@
 		sendResponse($(form).serialize(), "professor_verify", args);
 	}
 
-	{% comment %}
 	// when a user changes tabs, change url hash as well
-	{% endcomment %}
 	$('.nav-tabs a').on('shown.bs.tab', function (e) {
 		window.location.hash = e.target.hash.replace("-noscroll", "");
 	});

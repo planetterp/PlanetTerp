@@ -30,7 +30,7 @@
             <script type="text/javascript" src="{% static 'js/admin-action.js' %}"></script>
         {% endif %}
 
-        {% comment %} <!-- must come at the end so we override other css files when specificity is equal --> {% endcomment %}
+        <!-- must come at the end so we override other css files when specificity is equal -->
         <link rel="stylesheet" href="{% static 'css/stylesheet.css' %}">
 
         {% if request.session.color_scheme == "dark" %}
