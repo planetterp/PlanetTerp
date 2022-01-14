@@ -4,21 +4,23 @@
 
 {% block content %}
 <div class="text-center">
-	<h2>Search results</h2>
-
-	{% for result in results %}
-		<h3>
-			<a href="{{ result.source }}/{{ result.slug }}">{{ result.name }}</a>
-		</h3>
-	{% endfor %}
-
 	{% if not results %}
-		<h4><strong>Error:</strong> No results found.</h4>
+		<h2 class="mt-4">No results found.</h2>
+	{% else %}
+		<h2 class="mt-3">Search results</h2>
+
+		{% for result in results %}
+			<h3>
+				<a href="{{ result.source }}/{{ result.slug }}">{{ result.name }}</a>
+			</h3>
+		{% endfor %}
 	{% endif %}
 
-	<span style="font-size: 22px; font-weight: bold; vertical-align: middle;">Professor/TA not found?</span> <button class="btn btn-primary btn-lg" data-toggle="modal" data-target="#add-professor-modal">Add a new Professor/TA</button> {% comment %}<!-- todo: on same line --> {% endcomment %}
+	<span style="font-size: 22px;" class="align-middle">Professor/TA not found?</span>
+	<button class="btn btn-primary btn-lg" data-toggle="modal" data-target="#add-professor-modal">Add a new Professor/TA</button>
+
 	{% if results|length_is:"30" %}
-		<h4>Want to see more results? Search with a more specific query.</h4>
+		<div style="font-size: 22px;" class="pb-3">For more results, try a more specific query.</div>
 	{% endif %}
 </div>
 {% endblock %}
