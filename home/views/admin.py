@@ -1,11 +1,12 @@
 from typing import Optional
 
-from django.shortcuts import redirect, render
+from django.shortcuts import render
 from django.views import View
 from django.db.models import Q
 from django.http import JsonResponse
 from django.template.context_processors import csrf
 from django.contrib.admin.views.decorators import staff_member_required
+from django.contrib.auth.mixins import UserPassesTestMixin
 
 from crispy_forms.utils import render_crispy_form
 
@@ -20,9 +21,11 @@ from home.tables.basic import ProfessorsTable
 from home.forms.admin_forms import ProfessorMergeForm, ProfessorSlugForm, ProfessorUpdateForm
 from planetterp import config
 
-class Admin(View):
+class Admin(UserPassesTestMixin, View):
 
-    @staff_member_required
+    def test_func(self):
+        return self.request.user.is_staff
+
     def get(self, request):
         reviews = Review.objects.pending
         professors = Professor.objects.pending
@@ -39,7 +42,6 @@ class Admin(View):
 
         return render(request, "admin.html", context)
 
-    @staff_member_required
     def post(self, request):
         data = request.POST
         action_type = AdminAction(data["action_type"])
