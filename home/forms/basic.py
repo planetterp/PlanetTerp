@@ -44,7 +44,7 @@ class ProfileForm(ModelForm):
         if self.user.email:
             email.disabled = True
             self.fields['send_review_email'].label = (
-                "Email me updates pertaining to the status of my reviews"
+                "Email me when one of my reviews is accepted or rejected"
             )
         else:
             self.fields.pop("send_review_email")
