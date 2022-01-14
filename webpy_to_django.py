@@ -134,17 +134,16 @@ def migrate_reviews(users, courses, professors):
     print("  Migrating reviews...")
 
     ourumd_users = {}
-    for row in db.select("reviews"):
-        if row["from_ourumd"]:
-            # from ourumd, create new user
-            username = row["reviewer_name"]
+    for row in db.select("reviews", where="reviewer_id = -1 AND from_ourumd = 1"):
+        # from ourumd, create new user
+        username = row["reviewer_name"]
 
-            # ...unless a user by that name already exists
-            if username in ourumd_users:
-                continue
+        # ...unless a user by that name already exists
+        if username in ourumd_users:
+            continue
 
-            user = User.objects.create_ourumd_user(username)
-            ourumd_users[username] = user
+        user = User.objects.create_ourumd_user(username)
+        ourumd_users[username] = user
 
     def _user(row):
         if row["reviewer_id"] == 0:

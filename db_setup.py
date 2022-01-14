@@ -44,7 +44,7 @@ to_rename = db.query("""SELECT DISTINCT reviewer_name FROM planetterp.reviews
 for row in to_rename:
     old_name = row["reviewer_name"]
     new_name = f"{old_name}_ourumd"
-    db.query("UPDATE planetterp.reviews SET reviewer_name = $new_name WHERE reviewer_name = $old_name",
+    db.query("UPDATE planetterp.reviews SET reviewer_name = $new_name WHERE reviewer_name = $old_name AND from_ourumd = 1",
         vars={"new_name": new_name, "old_name": old_name})
 
 
