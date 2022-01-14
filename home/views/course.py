@@ -34,10 +34,12 @@ class Course(View):
             professor_course = ProfessorCourse.objects.get(
                 professor_id=professor.id, course_id=course.id)
             professor.recent_semester = professor_course.recent_semester
+
             if professor.recent_semester in utils.RECENT_SEMESTERS:
-                grouped_professors[professor.recent_semester].append(professor)
+                semester = utils.semester_name(professor.recent_semester)
             else:
-                grouped_professors["Past Semesters"].append(professor)
+                semester = "Past Semesters"
+            grouped_professors[semester].append(professor)
 
         course_description = course.description
         courses_replaced = []
