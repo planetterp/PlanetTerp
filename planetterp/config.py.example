@@ -5,8 +5,8 @@ USER = 'root'
 PASSWORD = ''
 SECRET_KEY = 'django-insecure-zt7yxn++)bh)j#wzb)ofgd0^scu9rwr85%=3l%6g1zt(cx!t)_'
 
-WEBHOOK_HELP_URL = None
-WEBHOOK_UPDATE_URL = None
+WEBHOOK_URL_HELP = None
+WEBHOOK_URL_UPDATE = None
 
 ** FOR DEVELOPMENT ONLY **
 EMAIL_HOST_USER = "planetterp.test@gmail.com"
