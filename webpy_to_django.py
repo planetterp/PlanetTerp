@@ -126,7 +126,8 @@ def migrate_users():
         "username": "username",
         "password": "password",
         "email": _email,
-        "is_staff": "is_admin"
+        "is_staff": "is_admin",
+        "created_at": "created"
     }
     return _create_table("users", User, mapping)
 
@@ -210,7 +211,8 @@ def migrate_geneds(courses):
 
     mapping = {
         "name": "gened",
-        "course": lambda row: _foreign_key(courses, row, "course_id")
+        "course": lambda row: _foreign_key(courses, row, "course_id"),
+        "created_at": "created"
     }
 
     return _create_table("geneds", Gened, mapping)
