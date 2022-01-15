@@ -186,7 +186,7 @@ class ProfessorForm(Form):
         return cleaned_data
 
     def send_webhook(self):
-        channel_url = config.discord_webhook_updates_url
+        channel_url = config.WEBHOOK_URL_UPDATE
 
         if channel_url is None:
             return

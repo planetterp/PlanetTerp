@@ -6,7 +6,7 @@ from discord_webhook import DiscordWebhook
 from discord_webhook.webhook import DiscordEmbed
 
 from home.models import Course, Professor, Review, Grade
-from planetterp.config import discord_webhook_updates_url
+from planetterp.config import WEBHOOK_URL_UPDATE
 
 def semester_name(semester_number):
     seasons = {"01": "spring", "05": "summer", "08": "fall", "12": "winter"}
@@ -88,7 +88,7 @@ def ttl_cache(max_age, maxsize=128, typed=False):
     return decorator
 
 def send_updates_webhook(*, include_professors=True, include_reviews=True):
-    if not discord_webhook_updates_url:
+    if not WEBHOOK_URL_UPDATE:
         return
 
     title = ""
@@ -101,7 +101,7 @@ def send_updates_webhook(*, include_professors=True, include_reviews=True):
         num_reviews = Review.objects.filter(status=Review.Status.PENDING).count()
         title += f"{num_reviews} unverified review(s)"
 
-    webhook = DiscordWebhook(url=discord_webhook_updates_url)
+    webhook = DiscordWebhook(url=WEBHOOK_URL_UPDATE)
     embed = DiscordEmbed(title=title, description="\n", url="https://planetterp.com/admin")
 
     webhook.add_embed(embed)

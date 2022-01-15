@@ -57,7 +57,7 @@ class Admin(UserPassesTestMixin, View):
             return self.verify_review(review_id, verified_status, user)
 
         if action_type is AdminAction.REVIEW_HELP:
-            channel_url = config.discord_webhook_help_url
+            channel_url = config.WEBHOOK_URL_HELP
             review = Review.objects.select_related().get(pk=int(data["review_id"]))
             professor = review.professor
             professor_id = professor.id
