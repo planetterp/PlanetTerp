@@ -6,12 +6,11 @@ from django.core.exceptions import ValidationError
 from django.db.models import QuerySet
 from django.urls import reverse
 from django.forms import Form
+from django.utils.html import format_html
 
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Fieldset, Layout, Div, Field, HTML, Button
 from crispy_forms.bootstrap import FormActions, Alert, InlineRadios
-from django.utils.html import format_html
-
 from discord_webhook import DiscordWebhook
 from discord_webhook.webhook import DiscordEmbed
 
