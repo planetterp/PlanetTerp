@@ -69,8 +69,9 @@ class Admin(UserPassesTestMixin, View):
                 embed = DiscordEmbed(title=professor.name, description="\n", url="https://planetterp.com/admin")
                 course = review.course.name if review.course else "N/A"
                 review_text = review_text if len(review_text) <= 1000 else review_text[:1000] + "..."
+                username = "Anonymous" if review.anonymous else review.user.username
 
-                embed.add_embed_field(name="Reviewer", value=review.user.username, inline=True)
+                embed.add_embed_field(name="Reviewer", value=username, inline=True)
                 embed.add_embed_field(name="Course", value=course, inline=True)
                 embed.add_embed_field(name="Grade", value=grade, inline=True)
                 embed.add_embed_field(name="Review", value=review_text, inline=False)
