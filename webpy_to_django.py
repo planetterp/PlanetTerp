@@ -127,7 +127,7 @@ def migrate_users():
         "password": "password",
         "email": _email,
         "is_staff": "is_admin",
-        "created_at": "created"
+        "date_joined": "created"
     }
     return _create_table("users", User, mapping)
 
