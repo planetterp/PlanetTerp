@@ -48,7 +48,7 @@ class ProfileForm(ModelForm):
             )
         else:
             self.fields.pop("send_review_email")
-            email.error_messages['unique'] = User.error_message_unique("email", include_anchor=False)
+            email.error_messages['unique'] = "A user with that email already exists."
 
         self.field_errors = self.create_field_errors()
         self.helper = FormHelper()

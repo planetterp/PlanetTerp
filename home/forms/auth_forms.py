@@ -110,9 +110,6 @@ class RegisterForm(ModelForm):
         labels = {
             'email': "Email"
         }
-        help_text = {
-            "username": User._meta.get_field("username").help_text
-        }
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)

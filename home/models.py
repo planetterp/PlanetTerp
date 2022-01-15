@@ -4,9 +4,9 @@ from django.contrib.auth.models import (AbstractUser,
     UserManager as DjangoUserManager)
 from django.utils.safestring import mark_safe
 from django.db.models.functions import Concat
-from django.utils.html import format_html
 from django.urls import reverse
 from django.core import validators
+from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.db.models import (Model, CharField, DateTimeField, TextField,
     IntegerField, BooleanField, ForeignKey, PositiveIntegerField, EmailField,
     CASCADE, ManyToManyField, SlugField, TextChoices, FloatField, Manager,
@@ -193,6 +193,21 @@ class User(AbstractUser):
     # can log in to the accounts
     from_ourumd = BooleanField(default=False)
 
+    username = CharField(
+        max_length=20,
+        unique=True,
+        help_text="Once a username is set, it cannot be changed.",
+        validators=[
+            UnicodeUsernameValidator(),
+            validators.MaxLengthValidator(20, "Username must be less than 20 characters"),
+            validators.MinLengthValidator(2, "Username must be at least 2 characters")
+        ],
+        error_messages={
+            "required": "You must enter a username",
+            "unique": "A user with that username already exists."
+        }
+    )
+
     email = EmailField(
         unique=True,
         null=True,
@@ -209,43 +224,26 @@ class User(AbstractUser):
             'PlantTerp handles your data, please email '
             '<a href="mailto:admin@planetterp.com">admin@planetterp.com</a>'
             '</span>'
-        )
+        ),
+        error_messages={
+            "unique": mark_safe(
+                'A user with that email already exists. If you forgot your <br /> '
+                'password, please <a href="" data-toggle="modal" '
+                'data-target="#password-reset-modal" style="color: red;"> '
+                '<strong>reset your password</strong></a> or login on the left.'
+                )
+        }
     )
 
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        email = self._meta.get_field('email')
-        username = self._meta.get_field('username')
-        password = self._meta.get_field('password')
-
-        email.error_messages['unique'] = self.error_message_unique("email")
-
-        username.help_text = "Once a username is set, it cannot be changed."
-        username.error_messages.update({"required":"You must enter a username"})
-        username.error_messages['unique'] = self.error_message_unique("username")
-        username.validators += [
-            validators.MaxLengthValidator(20, "Username must be less than 20 characters"),
-            validators.MinLengthValidator(2, "Username must be at least 2 characters")
-        ]
-
-        password.error_messages.update({"required":"You must enter a password"})
-        password.validators += [
+    password = CharField(
+        max_length=128,
+        validators=[
             validators.MinLengthValidator(8, "Password must be at least 8 characters")
-        ]
-
-    @staticmethod
-    def error_message_unique(value, include_anchor=True):
-        error_message = 'A user with that {} already exists. '
-
-        if include_anchor:
-            error_message += (
-                'If you forgot your <br /> password, please '
-                '<a href="" data-toggle="modal" data-target="#password-reset-modal" style="color: red;"> '
-                '<strong>reset your password</strong></a> or login on the left.'
-            )
-
-        return format_html(error_message, value)
+        ],
+        error_messages={
+            "required": "You must enter a password"
+        }
+    )
 
     # Workaround to force CharField to store empty values as NULL instead of ''
     # https://stackoverflow.com/a/38621160
