@@ -185,7 +185,14 @@ class Section(Model):
 
 
 class User(AbstractUser):
+    objects = UserManager()
+
     send_review_email = BooleanField(default=True)
+
+    # accounts which are from ourumd are given an unusable password so nobody
+    # can log in to the accounts
+    from_ourumd = BooleanField(default=False)
+
     email = EmailField(
         unique=True,
         null=True,
@@ -205,11 +212,6 @@ class User(AbstractUser):
         )
     )
 
-    # accounts which are from ourumd are given an unusable password so nobody
-    # can log in to the accounts
-    from_ourumd = BooleanField(default=False)
-
-    objects = UserManager()
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
