@@ -17,7 +17,8 @@ from home.views.tools import (Tools, ToolDemographics, ToolPopularCourses,
 
 
 class CourseConverter:
-    regex = "[A-Za-z]{4}[\dA-Za-z]{3,6}"
+    # yes, unfortunately there are courses with `+` in the name, eg `BIOL105+`
+    regex = "[A-Za-z]{4}[\dA-Za-z+]{3,6}"
 
     def to_python(self, value):
         return value
