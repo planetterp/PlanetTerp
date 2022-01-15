@@ -21,11 +21,18 @@ LOGIN_URL = 'login'
 AUTH_USER_MODEL = "home.User"
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
-    'home.backend.BcryptBackend'
 ]
-# https://docs.djangoproject.com/en/3.2/topics/auth/passwords/#using-bcrypt-with-django
+
 PASSWORD_HASHERS = [
-    'django.contrib.auth.hashers.BCryptSHA256PasswordHasher'
+    'django.contrib.auth.hashers.PBKDF2PasswordHasher',
+    'django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher',
+    'django.contrib.auth.hashers.Argon2PasswordHasher',
+    # we can't use the default `BCryptSHA256PasswordHasher` because the old
+    # webpy implementation of planetterp didn't hash the password through sha256
+    # before actually hashing it (why would we), so we need this hasher instead.
+    # see also https://code.djangoproject.com/ticket/20138 for why
+    # `BCryptSHA256PasswordHasher` exists
+    'django.contrib.auth.hashers.BCryptPasswordHasher'
 ]
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.

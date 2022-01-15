@@ -121,10 +121,13 @@ def migrate_users():
     def _email(row):
         return None if str(row["email"]).isspace() else row['email']
 
+    def _password(row):
+        return f"bcrypt${row['password']}"
+
     mapping = {
         "send_review_email": _send_review_email,
         "username": "username",
-        "password": "password",
+        "password": _password,
         "email": _email,
         "is_staff": "is_admin",
         "date_joined": "created"
