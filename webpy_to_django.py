@@ -286,6 +286,14 @@ def migrate_organizations():
     return _create_table("organizations", Organization, mapping)
 
 
+# disable all auto_now_add fields, if we don't they won't respect our values,
+# even if we pass it as a param
+# https://stackoverflow.com/q/7499767/12164878
+for model in [User, Course, Professor, Section, Gened, ProfessorCourse, SectionMeeting]:
+    for field in model._meta.local_fields:
+        if field.name == "created_at":
+            field.auto_now_add = False
+
 courses = migrate_courses()
 professors = migrate_professors()
 link_courses_and_professors(courses, professors)
