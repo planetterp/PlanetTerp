@@ -1,7 +1,7 @@
 from django.views import View
 from django.shortcuts import render
 from django.db.models import Sum, Count
-from django.http import HttpResponse, JsonResponse
+from django.http import Http404, JsonResponse
 from django.template.context_processors import csrf
 
 from crispy_forms.utils import render_crispy_form
@@ -19,7 +19,7 @@ class Professor(View):
     def get(self, request, slug):
         professor = ProfessorModel.objects.verified.filter(slug=slug).first()
         if not professor:
-            return HttpResponse("Professor not found.")
+            raise Http404()
 
         user = request.user
 

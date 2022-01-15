@@ -3,7 +3,7 @@ from django.http.response import JsonResponse
 from django.shortcuts import redirect, render
 from django.views import View
 from django.views.generic import TemplateView, RedirectView, ListView
-from django.http import HttpResponse
+from django.http import HttpResponse, Http404
 
 from crispy_forms.utils import render_crispy_form
 
@@ -115,7 +115,7 @@ class CourseReviews(View):
         course = Course.objects.filter(name=name).first()
 
         if course is None:
-            return HttpResponse("Error: Course not found.")
+            raise Http404()
 
         reviews = course.review_set.verified.order_by("-created_at")
 

@@ -2,7 +2,7 @@ import re
 from collections import defaultdict
 
 from django.shortcuts import render, redirect
-from django.http import HttpResponse
+from django.http import Http404
 from django.views import View
 
 from home import utils
@@ -18,7 +18,7 @@ class Course(View):
         course = CourseModel.objects.filter(name=name).first()
 
         if not course:
-            return HttpResponse("Error: Course not found.")
+            raise Http404()
 
         sister_courses = (
             CourseModel.objects
