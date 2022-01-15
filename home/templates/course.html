@@ -1,7 +1,7 @@
 {% extends "base_main.html" %}
 
 {% block title %}{{ course.name }} | PlanetTerp{% endblock %}
-{% block description %}View professor reviews and grade data for {{course.department}}{{ course.course_number }} at the University of Maryland &mdash; College Park{% endblock %}
+{% block description %}View professor reviews and grade data for {{ course.name }}.\nProfessors teaching {{ course.name }} this semester: {% for professor in grouped_professors.values.0 %}{{ professor.name }}{% if not forloop.last %},{% endif %}{% endfor %}{% endblock %}
 
 {% block head %}
 <script type="text/javascript" src="../static/js/chart.min.js"></script>
