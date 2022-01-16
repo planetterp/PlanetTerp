@@ -62,6 +62,7 @@ Now simply run the following to start the server:
 python manage.py runserver
 ```
 
+You'll probably want to create an admin user so that you can see the admin panel and other admin-only items. To do so, run `python manage.py createsuperuser`. You'll be able to log in using that user to your local planetterp site, and it will have admin permissions.
 
 #### Advanced Setup
 
