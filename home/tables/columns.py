@@ -11,9 +11,9 @@ import django_tables2 as tables
 
 from planetterp.settings import DATE_FORMAT
 from home.models import Review, Grade
-from home.forms.admin_forms import (ReviewUnverifyForm, ReviewVerifyForm,
-ProfessorVerifyForm, ReviewRejectForm, ReviewHelpForm, ProfessorRejectForm,
-ProfessorDeleteForm, ProfessorMergeForm)
+from home.forms.admin_forms import (ReviewUnverifyForm, ProfessorMergeForm,
+ProfessorVerifyForm, ProfessorRejectForm,
+ProfessorDeleteForm)
 
 class InformationColumn(tables.Column):
     def __init__(self, *args, **kwargs):
@@ -198,26 +198,24 @@ class UnverifiedReviewsActionColumn(ActionColumn):
         ctx = {}
         ctx.update(csrf(request))
 
-        verify_form = ReviewVerifyForm(model_obj.pk)
-        reject_form = ReviewRejectForm(model_obj.pk)
-        help_form = ReviewHelpForm(model_obj.pk)
-
         column_html = '''
-            <div class="unverified_review_{professor_id}" style="white-space: nowrap;">
-                <div class="btn-group">
-                    {verify_form}
-                    {reject_form}
+            <div class="unverified_review_{professor_id} container" style="white-space: nowrap;">
+                <div class="row">
+                    <div class="col">
+                        <button class="btn btn-success w-100" onClick="verifyReview('{review_id}', 'verified')" style="border-bottom-left-radius: 0; border-bottom-right-radius: 0;">Verify</button>
+                    </div>
                 </div>
-                <div class="btn-group">
-                    {help_form}
+                <div class="row">
+                    <div class="col btn-group">
+                        <button class="btn btn-danger" onClick="verifyReview('{review_id}', 'rejected')" style="border-top-left-radius: 0;">Reject</button>
+                        <button class="btn btn-warning" onClick="verifyReview('{review_id}', 'review_help')" style="border-top-right-radius: 0;">Help</button>
+                    </div>
                 </div>
             </div>
         '''
         kwargs = {
             "professor_id": model_obj.professor_id,
-            "verify_form": render_crispy_form(verify_form, verify_form.helper, context=ctx),
-            "reject_form": render_crispy_form(reject_form, reject_form.helper, context=ctx),
-            "help_form": render_crispy_form(help_form, help_form.helper, context=ctx)
+            "review_id": model_obj.pk
         }
         return format_html(column_html, **kwargs)
 

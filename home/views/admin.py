@@ -19,7 +19,8 @@ from home.models import Review, Professor, ProfessorCourse, Grade, User
 from home.utils import AdminAction
 from home.tables.reviews_table import UnverifiedReviewsTable
 from home.tables.basic import ProfessorsTable
-from home.forms.admin_forms import ProfessorMergeForm, ProfessorSlugForm, ProfessorUpdateForm
+from home.forms.admin_forms import (ProfessorMergeForm, ProfessorSlugForm,
+ProfessorUpdateForm, ReviewActionForm)
 from planetterp import config
 
 class Admin(UserPassesTestMixin, View):
@@ -35,15 +36,20 @@ class Admin(UserPassesTestMixin, View):
         )
         professors = Professor.objects.pending.all()
 
+
         reviews_table = UnverifiedReviewsTable(reviews, request)
         professors_table = ProfessorsTable(professors, request)
+        review_action_form = ReviewActionForm()
 
         context = {
             "reviews": reviews,
             "professors": professors,
             "reviews_table": reviews_table,
-            "professors_table": professors_table
+            "professors_table": professors_table,
+            "review_action_form": review_action_form
         }
+
+        context.update(csrf(request))
 
         return render(request, "admin.html", context)
 

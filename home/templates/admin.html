@@ -22,6 +22,7 @@
 
 <div class="tab-content container mt-4">
 	<div class="tab-pane fade show active" id="reviews-noscroll" role="tabpanel">
+		{% crispy review_action_form %}
 		{% render_table reviews_table %}
 	</div>
 	<div class="tab-pane fade" id="professors-noscroll" role="tabpanel">
@@ -63,9 +64,19 @@
 		$("#unverified-professor-form").show();
 	}
 
-	function verifyReview(form) {
-		var review_counter = (num_reviews > 0 ? --num_reviews : 0)
-		sendResponse($(form).serialize(), "review_verify", {"count" : review_counter});
+	function verifyReview(review_id, action) {
+		var args = null;
+		var action_type = action;
+
+		if (action != "review_help") {
+			$('#review_verified').val(action);
+			args = {"count" : (num_reviews > 0 ? --num_reviews : 0)};
+			action_type = "review_verify";
+		}
+
+		$('#review_id').val(review_id);
+		$('#review_action_type').val(action_type);
+		sendResponse($('#review_action_form').serialize(), action_type, args);
 	}
 
 	function verifyProfessor(form) {

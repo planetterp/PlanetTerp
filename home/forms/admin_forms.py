@@ -13,6 +13,27 @@ from home.utils import AdminAction, slug_in_use_err
 from home.models import Review, Professor
 from planetterp.settings import DATE_FORMAT
 
+class ReviewActionForm(Form):
+    review_id = IntegerField(required=True, widget=HiddenInput)
+    verified = CharField(required=True, widget=HiddenInput)
+    action_type = CharField(required=True, widget=HiddenInput)
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+        self.helper = FormHelper()
+        self.helper.form_id = "review_action_form"
+        self.helper.form_show_errors = False
+        self.helper.layout = self.generate_layout()
+
+    def generate_layout(self):
+        return Layout(
+            Field('review_id', id="review_id"),
+            Field('verified', id="review_verified"),
+            Field('action_type', id="review_action_type")
+        )
+
+
 # For verifying unverified reviews in admin panel
 class ReviewVerifyForm(Form):
     review_id = IntegerField(required=True, widget=HiddenInput)
