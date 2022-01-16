@@ -32,3 +32,9 @@ Now simply run the following to start the server:
 ```bash
 python manage.py runserver
 ```
+
+### Contributing
+
+All contributions are welcome!
+
+If you're submitting a PR, see [STYLE.md](./STYLE.md) for a style guide, but you'll be safe if you follow existing conventions in the codebase.
