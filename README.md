@@ -44,7 +44,7 @@ EMAIL_HOST_PASSWORD = None
 
 If you named your database something other than `planetterp`, you'll need to edit `DB_NAME`. If you would like to use a different user than `root` to acces mysql, you'll need to edit `USER`, and if your password for your user is not the empty string, you'll need to edit `PASSWORD`.
 
-The other fields can be left along for now. We'll discuss the `WEBHOOK_*` and `EMAIL_*` settings in a bit, but they aren't necessary for an initial setup and can be left `None`.
+The other fields can be left alone for now. We'll discuss the `WEBHOOK_*` and `EMAIL_*` settings in a bit, but they aren't necessary for an initial setup and can be left as `None`.
 
 Once you're satisfied with your config, continue with your setup:
 
