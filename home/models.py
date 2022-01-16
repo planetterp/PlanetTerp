@@ -194,7 +194,7 @@ class User(AbstractUser):
     from_ourumd = BooleanField(default=False)
 
     username = CharField(
-        max_length=20,
+        max_length=22,
         unique=True,
         help_text="Once a username is set, it cannot be changed.",
         validators=[
