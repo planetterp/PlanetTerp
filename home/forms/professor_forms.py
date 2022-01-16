@@ -202,8 +202,7 @@ class ProfessorForm(Form):
 
         title = f"{num} new {'review' if num == 1 else 'reviews'}"
         embed = DiscordEmbed(title=title,
-            # TODO Replace all hard-coded urls with django's reverse()
-            url="https://planetterp.com/admin")
+            url=self.request.build_absolute_uri(reverse("admin")))
         webhook.add_embed(embed)
         webhook.execute()
 

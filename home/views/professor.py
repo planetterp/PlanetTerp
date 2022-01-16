@@ -97,7 +97,7 @@ class Professor(View):
             new_review = Review(**review_data)
             new_review.save()
 
-            send_updates_webhook(include_professors=False)
+            send_updates_webhook(request, include_professors=False)
 
             ctx = {}
             ctx.update(csrf(request))

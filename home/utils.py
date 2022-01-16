@@ -2,6 +2,8 @@ from enum import Enum, auto
 from functools import lru_cache, wraps
 import time
 
+from django.urls import reverse
+
 from discord_webhook import DiscordWebhook
 from discord_webhook.webhook import DiscordEmbed
 
@@ -87,7 +89,7 @@ def ttl_cache(max_age, maxsize=128, typed=False):
         return wrapper
     return decorator
 
-def send_updates_webhook(*, include_professors=True, include_reviews=True):
+def send_updates_webhook(request, *, include_professors=True, include_reviews=True):
     if not WEBHOOK_URL_UPDATE:
         return
 
@@ -102,7 +104,8 @@ def send_updates_webhook(*, include_professors=True, include_reviews=True):
         title += f"{num_reviews} unverified review(s)"
 
     webhook = DiscordWebhook(url=WEBHOOK_URL_UPDATE)
-    embed = DiscordEmbed(title=title, description="\n", url="https://planetterp.com/admin")
+    embed = DiscordEmbed(title=title, description="\n",
+        url=request.build_absolute_uri(reverse("admin")))
 
     webhook.add_embed(embed)
     webhook.execute()

@@ -39,7 +39,7 @@ class AddProfessor(View):
             )
             new_review.save()
 
-            send_updates_webhook()
+            send_updates_webhook(request)
 
             form = ProfessorFormAdd(user)
             form_html = render_crispy_form(form, form.helper, context=ctx)
