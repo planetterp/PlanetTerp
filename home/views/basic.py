@@ -51,18 +51,6 @@ class Robots(TemplateView):
     content_type = "text/plain"
     template_name = "robots.html"
 
-class Sitemap(View):
-    def get(self, request):
-        courses = Course.objects.all()
-        professors = Professor.objects.verified
-
-        context = {
-            "courses": courses,
-            "professors": professors
-        }
-        return render(request, "sitemap.xml", context,
-            content_type="application/xml")
-
 class Grades(View):
     template_name = "grades.html"
 

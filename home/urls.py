@@ -1,11 +1,13 @@
-from django.urls import path, register_converter
+from django.urls import path, register_converter, reverse
+from django.contrib.sitemaps import Sitemap
+from django.contrib.sitemaps.views import sitemap
 
 from home.views.add_professor import AddProfessor
 from home.views.admin import Admin
 from home.views.authentication import Login, Logout, ForgotPassword, Register
 from home.views.basic import (About, Contact, PrivacyPolicy, TermsOfUse, Courses,
-    Professors, Documents, SetColorScheme, Robots, Sitemap, Grades,
-    CourseReviews, Index, SortReviewsTable)
+    Professors, Documents, SetColorScheme, Robots, Grades, CourseReviews, Index,
+    SortReviewsTable)
 from home.views.course import Course
 from home.views.data_sources import GradeData, CourseDifficultyData, GenedData
 from home.views.endpoints import Autocomplete
@@ -14,6 +16,7 @@ from home.views.profile import Profile, ResetPassword
 from home.views.search import Search
 from home.views.tools import (Tools, ToolDemographics, ToolPopularCourses,
     ToolGradeInflation, ToolGeneds, ToolCourseDifficulty)
+from home.models import Course as CourseModel, Professor as ProfessorModel
 
 
 class CourseConverter:
@@ -36,6 +39,55 @@ class ResetCodeConverter:
 register_converter(CourseConverter, "course")
 register_converter(ResetCodeConverter, "reset_code")
 
+class CourseSitemap(Sitemap):
+    changefreq = "weekly"
+    priority = 0.5
+
+    def items(self):
+        return CourseModel.objects.all().order_by("pk")
+
+class ProfessorSitemap(Sitemap):
+    changefreq = "daily"
+    priority = 0.5
+
+    def items(self):
+        return ProfessorModel.objects.all().order_by("pk")
+
+class StaticSitemap(Sitemap):
+    def location(self, item):
+        return reverse(item)
+
+# short for "high priority"
+class HighStaticSitemap(StaticSitemap):
+    changefreq = "daily"
+    priority = 1
+
+    def items(self):
+        return ["index"]
+
+class MediumStaticSitemap(StaticSitemap):
+    changefreq = "weekly"
+    priority = 0.5
+
+    def items(self):
+        return ["login", "grades", "tools", "tools-demographics",
+            "tools-popular-courses", "tools-course-difficulty",
+            "tools-geneds", "tools-grade-inflation", "api-docs"]
+
+class LowStaticSitemap(StaticSitemap):
+    changefreq = "weekly"
+    priority = 0.2
+
+    def items(self):
+        return ["about"]
+
+sitemaps = {
+    "courses": CourseSitemap,
+    "professors": ProfessorSitemap,
+    "high_static": HighStaticSitemap,
+    "medium_static": MediumStaticSitemap,
+    "low_static": LowStaticSitemap,
+}
 
 urlpatterns = [
     # authentication
@@ -56,7 +108,7 @@ urlpatterns = [
     path('courses', Courses.as_view(), name='courses'),
     path('professors', Professors.as_view(), name='professors'),
     path('robots.txt', Robots.as_view(), name="robots"),
-    path('sitemap.xml', Sitemap.as_view(), name="sitemap"),
+    path('sitemap.xml', sitemap, {"sitemaps": sitemaps}, name="sitemap"),
     path('table_sort', SortReviewsTable.as_view(), name="table_sort"),
 
     # data sources

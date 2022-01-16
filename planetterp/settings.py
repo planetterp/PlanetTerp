@@ -53,12 +53,20 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    # only necessary for django.contrib.sitemaps
+    'django.contrib.sites',
+    'django.contrib.sitemaps',
     'home.apps.HomeConfig',
     'crispy_forms',
     'django_tables2',
     "rest_framework",
     "api"
 ]
+
+# used by django.contrib.sites. Needs to be 2 as django sites adds an example
+# site as site 1. Our site is added automatically by a data migration at SITE_ID
+# 2
+SITE_ID = 2
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
