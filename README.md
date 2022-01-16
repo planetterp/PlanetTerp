@@ -62,9 +62,10 @@ Now simply run the following to start the server:
 python manage.py runserver
 ```
 
-#### Optional Setup
 
-If you'd like to test features relating to the webhooks or emails, you'll need to fill in the relevant settings in `planetterp/config.py`.
+#### Advanced Setup
+
+If you'd like to test features relating to the webhooks or emails, you'll need to fill in the relevant settings in `planetterp/config.py`. To be clear, you don't need to set this up if you don't want to. The site will still work fine, but no emails or webhook messages will be sent.
 
 For webhooks, you can create a webhook url by going to a discord server (which you have the "Manage Webhooks" permission in), right clicking a channel, and selecting "integrations". Then click "Create Webhook" and then "Copy Webhook URL". That value is what you'll set the webhook url setting (either `WEBHOOK_URL_HELP` or `WEBHOOK_URL_UPDATE`) to.
 
