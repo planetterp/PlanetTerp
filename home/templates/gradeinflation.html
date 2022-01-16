@@ -1,16 +1,17 @@
 {% extends "base_main.html" %}
+{% load utils %}
+{% load static %}
 
 {% block title %}Grade Inflation | PlanetTerp{% endblock %}
 
 {% block head %}
-<script type="text/javascript" src="../../static/js/chart.min.js"></script>
+<script type="text/javascript" src="{% static 'js/chart.min.js' %}"></script>
 
 <meta property="og:title" content="Grade Inflation at UMD | PlanetTerp">
 <meta property="og:description" name="description" content="Visualize grade inflation at UMD for departments and courses over time.">
-<meta property="og:type" content="website">
-<meta property="og:image" content="https://planetterp.com/static/images/gradeinflation.png">
+<meta property="og:image" content="{% full_static 'images/tools/gradeinflation.png' %}">
 <meta property="og:image:alt" content="A screenshot of a page titled &quot;Grade Inflation at UMD&quot;. The page contains a chart that allows users to input a department or course. After the user searches, a chart appears that shows the average GPA for that department or course from 1998 until 2019.">
-<meta property="og:url" content="https://planetterp.com/tools/geneds">
+<meta property="og:url" content="{% full_url 'tools-grade-inflation' %}">
 
 <style>
 	#distribution-search {

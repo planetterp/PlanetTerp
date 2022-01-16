@@ -34,12 +34,12 @@
         <link rel="stylesheet" href="{% static 'css/stylesheet.css' %}">
 
         {% if request.session.color_scheme == "dark" %}
-            <link rel="stylesheet" type="text/css" href="../static/css/darktheme.css">
+            <link rel="stylesheet" type="text/css" href="{% static 'css/darktheme.css' %}">
         {% endif %}
-
 
         {% block head %}{% endblock %}
 
+        <meta property="og:type" content="website">
         <title>{% block title %}{% endblock %}</title>
 
         <meta name="description" content="{% block description %}PlanetTerp is a website designed to help students at the University of Maryland &mdash; College Park make informed decisions.{% endblock %}"/>
@@ -135,7 +135,7 @@
                                 <a class="nav-link" href="{% url 'tools' %}" title="Tools">Tools</a>
                             </li>
                             <li class="nav-item"  title="API">
-                                <a class="nav-link" href="https://api.planetterp.com">API</a>
+                                <a class="nav-link" href="{% url 'api-docs' %}">API</a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link" href="#" title="Add Professor/TA" data-toggle="modal" data-target="#add-professor-modal" style="color: #9af99a;">Add Professor/TA</a>

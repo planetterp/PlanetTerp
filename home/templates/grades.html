@@ -1,5 +1,7 @@
 {% extends "base_main.html" %}
 {% load crispy_forms_tags %}
+{% load utils %}
+{% load static %}
 
 {% block title %}Grade Lookup | PlanetTerp{% endblock %}
 
@@ -7,10 +9,9 @@
 
 <meta property="og:title" content="Grade Lookup | PlanetTerp">
 <meta name="description" content="Grade data by professor, course, semester, and/or section at the University of Maryland &mdash; College Park." />
-<meta property="og:type" content="website">
-<meta property="og:image" content="https://planetterp.com/static/images/grades.png">
+<meta property="og:image" content="{% full_static 'images/tools/grades.png' %}">
 <meta property="og:image:alt" content="A screenshot of a bar chart entitled &quot;CMSC131 Spring 2017 Section 0101 Grade Distribution&quot;. The average GPA was 2.30 between 32 students. The most common grade was an A.">
-<meta property="og:url" content="https://planetterp.com/grades">
+<meta property="og:url" content="{% full_url 'grades' %}">
 
 <style>
 	.error-alert {
@@ -82,7 +83,7 @@
 	<p><em>The source of the grade data can be found <a href="/about#credits">here</a>.</em></p>
 </div>
 
-<script type="text/javascript" src="../static/js/chart.min.js"></script>
+<script type="text/javascript" src="{% static 'js/chart.min.js' %}"></script>
 <script>
 	const ENTER_KEY = 13;
 	var canvasCount = 0;

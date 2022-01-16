@@ -5,14 +5,13 @@
 {% block title %}Home | PlanetTerp{% endblock %}
 
 {% block head %}
-<script type="text/javascript" src="../static/js/chart.min.js"></script>
+<script type="text/javascript" src="{% static 'js/chart.min.js' %}"></script>
 
 <meta property="og:title" content="PlanetTerp">
 <meta property="og:description" name="description" content="A community for students at the University of Maryland &mdash; College Park containing grade data, professor reviews, tools, and more.">
-<meta property="og:type" content="website">
-<meta property="og:image" content="https://planetterp.com/static/images/homepage.png">
+<meta property="og:image" content="{% full_static 'images/homepage.png' %}">
 <meta property="og:image:alt" content="A screenshot of the homepage of planetterp.com. The page has a header which states &quot;Welcome to PlanetTerp&quot;.">
-<meta property="og:url" content="https://planetterp.com">
+<meta property="og:url" content="{% full_url 'index' %}">
 {% endblock %}
 
 {% block content %}

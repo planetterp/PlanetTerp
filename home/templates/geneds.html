@@ -1,17 +1,18 @@
 {% extends "base_main.html" %}
+{% load utils %}
+{% load static %}
 
 {% block title %}Courses By GenEd | PlanetTerp{% endblock %}
 
 {% block head %}
-<link rel="stylesheet" type="text/css" href="../static/css/datatables.min.css">
-<script type="text/javascript" charset="utf8" src="../static/js/datatables.min.js"></script>
+<link rel="stylesheet" type="text/css" href="{% static 'css/datatables.min.css' %}">
+<script type="text/javascript" charset="utf8" src="{% static 'js/datatables.min.js' %}"></script>
 
 <meta property="og:title" content="Courses By GenEd | PlanetTerp">
-<meta property="og:description" name="description" content="Search courses at the University of Maryland &mdash; College Park by general education requirements.">
-<meta property="og:type" content="website">
-<meta property="og:image" content="https://planetterp.com/static/images/geneds.png">
+<meta property="og:description" name="description" content="Search courses at UMD by general education requirements.">
+<meta property="og:image" content="{% full_static 'images/tools/geneds.png' %}">
 <meta property="og:image:alt" content="A screenshot of a page titled &quot;Search Courses By General Education Requirements&quot;. The page contains checkboxes of a list of general education requirements, such as DSHS (History and Social Sciences). Toward the bottom of the page a table can be seen listing courses, course titles, number of credits, and average GPAs. For example, the title of ANTH265 is Anthropology of Global Health, it is 3 credits, and it has an average GPA of 3.62.">
-<meta property="og:url" content="https://planetterp.com/tools/geneds">
+<meta property="og:url" content="{% full_url 'tools-geneds' %}">
 
 <style>
 	#table-container {

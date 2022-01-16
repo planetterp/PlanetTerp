@@ -1,16 +1,17 @@
 {% extends "base_main.html" %}
+{% load utils %}
+{% load static %}
 
 {% block title %}Demographics | PlanetTerp{% endblock %}
 
 {% block head %}
-<script type="text/javascript" src="../static/js/chart.min.js"></script>
+<script type="text/javascript" src="{% static 'js/chart.min.js' %}"></script>
 
 <meta property="og:title" content="40 Years of Race &amp; Ethnicity at UMD | PlanetTerp">
 <meta property="og:description" name="description" content="The demographic breakdown by race and ethnicity of undergraduates at the University of Maryland &mdash; College Park from 1975 &ndash; 2016.">
-<meta property="og:type" content="website">
-<meta property="og:image" content="https://planetterp.com/static/images/raceandethnicity.png">
+<meta property="og:image" content="{% full_static 'images/tools/raceandethnicity.png' %}">
 <meta property="og:image:alt" content="A screenshot of a graph showing the demographic breakdown by race and ethnicity of undergraduates at the University of Maryland, College Park from 1975 until 2016. Over time, the percentage of white students decreases.">
-<meta property="og:url" content="https://planetterp.com/tools/demographics">
+<meta property="og:url" content="{% full_url 'tools-demographics' %}">
 
 <style>
 	#graph-wrapper {

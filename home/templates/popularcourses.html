@@ -1,17 +1,18 @@
 {% extends "base_main.html" %}
+{% load static %}
+{% load utils %}
 
 {% block title %}Popular Courses | PlanetTerp{% endblock %}
 
 {% block head %}
-<script type="text/javascript" src="../static/js/chart.min.js"></script>
-<script type="text/javascript" src="../static/js/chart.piecelabel.min.js"></script>
+<script type="text/javascript" src="{% static 'js/chart.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/chart.piecelabel.min.js' %}"></script>
 
 <meta property="og:title" content="Popular Courses at UMD | PlanetTerp">
 <meta property="og:description" name="description" content="A tool that lets you search for the most popular courses at the University of Maryland &mdash; College Park.">
-<meta property="og:type" content="website">
-<meta property="og:image" content="https://planetterp.com/static/images/popularcourses.png">
+<meta property="og:image" content="{% full_static 'images/tools/popularcourses.png' %}">
 <meta property="og:image:alt" content="A screenshot of a doughnut chart displaying the most popular 400-level Computer Science courses at the University of Maryland, College Park. The most popular course is CMSC131.">
-<meta property="og:url" content="https://planetterp.com/tools/popularcourses">
+<meta property="og:url" content="{% full_url 'tools-popular-courses' %}">
 
 <style>
 	#popular-search {

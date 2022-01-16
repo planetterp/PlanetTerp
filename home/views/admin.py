@@ -7,6 +7,7 @@ from django.http import JsonResponse
 from django.template.context_processors import csrf
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.mixins import UserPassesTestMixin
+from django.urls import reverse
 
 from crispy_forms.utils import render_crispy_form
 
@@ -66,7 +67,8 @@ class Admin(UserPassesTestMixin, View):
 
             if channel_url:
                 webhook = DiscordWebhook(url=channel_url)
-                embed = DiscordEmbed(title=professor.name, description="\n", url="https://planetterp.com/admin")
+                admin_url = request.build_absolute_uri(reverse("admin"))
+                embed = DiscordEmbed(title=professor.name, description="\n", url=admin_url)
                 course = review.course.name if review.course else "N/A"
                 review_text = review_text if len(review_text) <= 1000 else review_text[:1000] + "..."
                 username = "Anonymous" if review.anonymous else review.user.username
@@ -321,12 +323,14 @@ class Admin(UserPassesTestMixin, View):
     def validate_email(self, verified_status: Review.Status, professor: Professor, user: User):
         if user.email and user.send_review_email:
             status_text = 'Under Review' if verified_status is Review.Status.PENDING else verified_status.value.capitalize()
+            profile_url = self.request.build_absolute_uri(reverse('profile'))
+            professor_url = self.request.build_absolute_uri(professor.get_absolute_url())
             message = (
-                f'Your review for <a href="https://planetterp.com/professor/{professor.slug}">{professor.name}'
+                f'Your review for <a href="{professor_url}">{professor.name}'
                 f"</a> is now {status_text.lower()}.<br />"
                 "<br /> If you would no longer like to receive review"
                 "verification emails, you can disable them on "
-                '<a href="https://planetterp.com/profile#settings">'
+                f'<a href="{profile_url}#settings">'
                 "your profile settings page</a>."
                 )
 

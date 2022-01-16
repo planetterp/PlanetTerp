@@ -1,4 +1,6 @@
 from django.views.generic import TemplateView
+from django.urls import reverse
+
 from rest_framework.views import APIView
 from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
@@ -16,10 +18,10 @@ class Docs(TemplateView):
 
 
 class Meta(APIView):
-    def get(self, _request):
+    def get(self, request):
         data = {
             "version": 1,
-            "documentation": "https://api.planetterp.com"
+            "documentation": request.build_absolute_uri(reverse("api-docs"))
         }
         return Response(data)
 
