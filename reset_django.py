@@ -8,6 +8,13 @@ db = web.database(dbn='mysql', db=db_name, user=USER, pw=PASSWORD, charset='utf8
 
 
 os.system("python3 manage.py makemigrations")
+# django_site needs to be dropped before migrating for the first time or we
+# might try to create it again
+db.query('''
+DROP TABLE IF EXISTS
+`planetterp`.`django_site`
+''')
+
 os.system("python3 manage.py migrate")
 db.query('''
     DROP TABLE IF EXISTS
@@ -18,6 +25,7 @@ db.query('''
     `planetterp`.`django_content_type`,
     `planetterp`.`django_migrations`,
     `planetterp`.`django_session`,
+    `planetterp`.`django_site`,
     `planetterp`.`home_audit_log`,
     `planetterp`.`home_professor_section`,
     `planetterp`.`home_course`,
