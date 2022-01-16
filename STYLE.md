@@ -1,4 +1,4 @@
-A style giude for the PlanetTerp codebase. Unless specified otherwise, assume we
+A style guide for the PlanetTerp codebase. Unless stated otherwise, assume we
 follow [PEP 8](https://www.python.org/dev/peps/pep-0008/) conventions.
 
 ## Python
