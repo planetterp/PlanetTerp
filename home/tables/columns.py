@@ -6,7 +6,6 @@ from django.utils.safestring import mark_safe
 from django.template.context_processors import csrf
 
 from crispy_forms.utils import render_crispy_form
-
 import django_tables2 as tables
 
 from planetterp.settings import DATE_FORMAT

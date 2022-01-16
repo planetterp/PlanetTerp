@@ -1,16 +1,37 @@
+A style giude for the PlanetTerp codebase. Unless specified otherwise, assume we
+follow [PEP 8](https://www.python.org/dev/peps/pep-0008/) conventions.
+
 ## Python
 
 ### Package Imports
 
 Imports should be organized in blocks, according to its type, with a space
-separating each block. The order of blocks should be listed in the following order:
-* Stanard Python Packages
-* Standard Django Packages
-* Crispy Forms
-* Django Tables
-* Discord
-* Other Non-local imports
+between each block. The blocks are as follows, in order:
+
+* Standard python packages
+* Django packages
+* Other non-local imports
 * Local imports
+
+For example:
+
+```python
+# stdlib import block
+from datetime import date
+
+# django import block
+from django.utils.html import format_html
+from django.utils.safestring import mark_safe
+from django.template.context_processors import csrf
+
+# other non-local import block
+from crispy_forms.utils import render_crispy_form
+import django_tables2 as tables
+
+# local import block
+from planetterp.settings import DATE_FORMAT
+from home.models import Review, Grade
+```
 
 If an import line is longer than 80 characters, surround it with parenthesis and
 break up the import across as many lines as neccessary to keep it under 80 characters:
@@ -22,9 +43,15 @@ from home.forms.admin_forms import ReviewUnverifyForm, ReviewVerifyForm, Profess
 
 # GOOD:
 from home.forms.admin_forms import (ReviewUnverifyForm, ReviewVerifyForm,
-ProfessorVerifyForm, ReviewRejectForm, ReviewHelpForm, ProfessorRejectForm,
-ProfessorDeleteForm)
+    ProfessorVerifyForm, ReviewRejectForm, ReviewHelpForm,
+    ProfessorRejectForm, ProfessorDeleteForm)
 ```
+
+### Line Length
+
+Speaking of line length: while PEP 8 recommends a line length of 80 characters, we often work with long class names and
+long strings as a result of using django and html. The 80 character limit should be followed where possible, but
+can be disregarded where reasonable.
 
 ## Django
 
@@ -53,7 +80,7 @@ average_gpa = (
 )
 ```
 
-If any of the subexpressions get too long, the arguments should be put on their own line to save a few characters:
+If any of the subexpressions get too long, the arguments can be put on their own line to save a few characters:
 
 ```python
 # before
@@ -89,6 +116,7 @@ Field(
 ## Django Tables
 
 ### Column HTML Attributes in Python
+
 HTML attributes are defined via nested dictionaries in the column definition. No matter how many ```key, value``` pairs a dictionary has, always expand a nested dictionary onto it own line.
 
 ```python
