@@ -220,7 +220,7 @@ class User(AbstractUser):
             'yours is approved, rejected, or unverified. You can opt out of this '
             'in your account settings at any time. <br /><br /> Your email and '
             'any other personal data on our site is kept confidential and isn\'t '
-            'shared with anyone else. If you have any questions about how '
+            'shared with any other entity. If you have any questions about how '
             'PlantTerp handles your data, please email '
             '<a href="mailto:admin@planetterp.com">admin@planetterp.com</a>'
             '</span>'
