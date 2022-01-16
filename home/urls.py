@@ -51,7 +51,7 @@ class ProfessorSitemap(Sitemap):
     priority = 0.5
 
     def items(self):
-        return ProfessorModel.objects.all().order_by("pk")
+        return ProfessorModel.objects.verified.all().order_by("pk")
 
 class StaticSitemap(Sitemap):
     def location(self, item):
