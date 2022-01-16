@@ -12,6 +12,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('home', '0045_auto_20220116_0234'),
+        ('sites', '0001_initial')
     ]
 
     operations = [
