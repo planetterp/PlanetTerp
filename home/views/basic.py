@@ -10,7 +10,7 @@ from crispy_forms.utils import render_crispy_form
 from home.models import Organization, Professor, Course, Review, Grade
 from home.tables.reviews_table import VerifiedReviewsTable
 from home.forms.basic import HistoricCourseGradeForm, HistoricProfessorGradeForm
-from home.utils import GradeData
+from home.views.data_sources import GradeData
 
 class About(View):
     def get(self, request):

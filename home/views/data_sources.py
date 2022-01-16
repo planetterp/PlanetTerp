@@ -2,7 +2,7 @@ from django.http import JsonResponse
 from django.db.models import Sum, Q
 from django.views import View
 
-from home.models import Professor, Grade, Course, Gened
+from home.models import Professor, Grade, Course, Gened, GradeQuerySet
 from home.utils import ttl_cache
 
 SPRING_2020 = 202001
@@ -132,6 +132,32 @@ class GradeData(View):
         grades = grades.grade_totals_aggregate()
 
         return (average_gpa, num_students, grades)
+
+    @staticmethod
+    def compose_grade_data(professor, course, semester, section, pf_semesters):
+        (average_gpa, num_students, grades) = GradeData._grade_data(professor,
+        course, semester, section, pf_semesters)
+
+        return GradeData._get_data(average_gpa, num_students, grades)
+
+    @staticmethod
+    def compose_course_grade_data(professor, pf_semesters):
+        grade_data = GradeData._course_grade_data(professor, pf_semesters)
+        data = {
+            "professor_slug": grade_data.pop("professor_slug"),
+            "average_gpa": grade_data.pop("average_gpa"),
+            "num_students": grade_data.pop("num_students"),
+            "data": {}
+        }
+
+        for course_name, course_data in grade_data.items():
+            (course_average_gpa, course_num_students, course_grades) = course_data
+
+            if course_num_students and course_average_gpa:
+                data['data'][course_name] = GradeData._get_data(
+                    course_average_gpa, course_num_students, course_grades)
+        return data
+
 
 
 class CourseDifficultyData(View):
