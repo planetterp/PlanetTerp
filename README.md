@@ -10,7 +10,7 @@ All contributions are welcome, whether that be opening an issue with a bug or fe
 
 ### Setup
 
-PlanetTerp is developed against python 3.9. It's likely that 3.7+ will work, but we only officially support 3.9+.
+PlanetTerp is developed against python 3.9. It's likely that 3.7+ will work as well, but we only officially support 3.9+.
 
 To set up locally:
 
