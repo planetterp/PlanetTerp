@@ -136,11 +136,10 @@ def migrate_users():
 
 def migrate_reviews(users, courses, professors):
     print("  Migrating reviews...")
-
     ourumd_users = {}
     for row in db.select("reviews", where="reviewer_id = -1 AND from_ourumd = 1"):
         # from ourumd, create new user
-        username = row["reviewer_name"]
+        username = row["reviewer_name"].strip()
 
         # ...unless a user by that name already exists
         if username in ourumd_users:
