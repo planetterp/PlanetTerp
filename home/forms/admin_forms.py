@@ -13,6 +13,7 @@ from home.utils import AdminAction, slug_in_use_err
 from home.models import Review, Professor
 from planetterp.settings import DATE_FORMAT
 
+# used for verifying, rejecting, and asking for help on unverified reviews
 class ReviewActionForm(Form):
     review_id = IntegerField(required=True, widget=HiddenInput)
     verified = CharField(required=True, widget=HiddenInput)
