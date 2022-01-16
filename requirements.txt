@@ -1,14 +1,16 @@
-requests
-bcrypt
-# https://github.com/planetterp/PlanetTerp/pull/43#discussion_r559918111
-pymysql >= 1.0.2
-web.py
+django==3.2.4
+# required for django, not used explicitly by us
+mysqlclient==2.1.0
+django-tables2==2.4.0
+django-crispy-forms==1.12.0
+# for the api
+djangorestframework==3.12.4
+
+requests==2.26.0
+bcrypt==3.2.0
+discord-webhook==0.12.0
 google-api-python-client
 google-auth-httplib2
-django
-mysqlclient
-discord-webhook
-django-tables2
-django-crispy-forms
-# for the api
-djangorestframework
+
+# can be removed after migration scripts are removed
+web.py
