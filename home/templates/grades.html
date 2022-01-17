@@ -378,7 +378,7 @@
 				$("#professor-lookup-form-container").html(data.professor_form);
 				initalizeKeypressEvent("#course-search");
 				initalizeKeypressEvent("#professor-search");
-				initializeCourseSearchAutoComplete();
+				initializeProfessorSearchAutoComplete();
 
 				if (data['professor_search_success'] && Object.keys(data.professor_data.data).length > 0) {
 					$(".lookup-error").hide();
