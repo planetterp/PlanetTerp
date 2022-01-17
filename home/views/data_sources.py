@@ -188,7 +188,8 @@ class CourseDifficultyData(View):
                 continue
 
             average_gpa = round(average_gpa, 2)
-            entry = [course.name, average_gpa, num_students]
+            course_html = f"<a href='{course.get_absolute_url()}' target='_blank'>{course.name}</a>"
+            entry = [course_html, average_gpa, num_students]
             data.append(entry)
 
         return data
