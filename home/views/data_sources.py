@@ -187,9 +187,9 @@ class CourseDifficultyData(View):
             if average_gpa is None or average_gpa == 0:
                 continue
 
-            average_gpa = round(average_gpa, 2)
-            course_html = f"<a href='{course.get_absolute_url()}' target='_blank'>{course.name}</a>"
-            entry = [course_html, average_gpa, num_students]
+            average_gpa = f"{average_gpa:.2f}"
+            course_name = f"<a href='{course.get_absolute_url()}' target='_blank'>{course.name}</a>"
+            entry = [course_name, average_gpa, num_students]
             data.append(entry)
 
         return data
