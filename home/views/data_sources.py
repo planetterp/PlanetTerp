@@ -174,11 +174,20 @@ class CourseDifficultyData(View):
     def _course_data():
         data = []
         for course in Course.objects.all():
-            num_students = course.grade_set.all().num_students() or 0
-            if num_students < 100:
+            num_students = course.grade_set.all().num_students()
+            if num_students is None or num_students < 100:
                 continue
 
-            average_gpa = round(course.average_gpa(), 2)
+            average_gpa = course.average_gpa()
+            # some courses with entirely "other" graded students have a gpa of
+            # 0. Other courses with weirder circumstances (citation needed)
+            # return an undefined gpa. Skip both of these; 0 gpa courses are
+            # of no interest to users, and a gpa of `None` will error when we
+            # try to round it.
+            if average_gpa is None or average_gpa == 0:
+                continue
+
+            average_gpa = round(average_gpa, 2)
             entry = [course.name, average_gpa, num_students]
             data.append(entry)
 
