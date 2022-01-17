@@ -140,7 +140,6 @@
 				e.preventDefault();
 			}
 		});
-
 	}
 
 	function initializeCourseSearchAutoComplete() {
@@ -200,7 +199,8 @@
 		var grades_text = `Showing data for <a href="/course/${course}" target="_blank">${course}</a>`
 
 		if ($("#semester-search").is(':visible')) {
-			grades_text += ` ${semester}`
+			let el = document.getElementById("semester-search");
+			grades_text += ` ${el.options[el.selectedIndex].text}`
 		}
 		if ($("#section-search").is(':visible') && $("#section-search").val()) {
 			grades_text += ` (Section ${section})`

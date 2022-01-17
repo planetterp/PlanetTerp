@@ -145,10 +145,10 @@ class HistoricCourseGradeForm(Form):
             grades = Grade.objects.filter(course=course_obj).values('semester').distinct()
         else:
             # Otherwise, only display semesters we have data for
-            grades = Grade.objects.values('semester').distinct()
+            grades = Grade.objects.all().values('semester').distinct()
 
         def _semester_tuple(num):
-            return (semester_name(num), semester_name(num))
+            return (num, semester_name(num))
 
         semester_choices = [_semester_tuple(grade['semester']) for grade in grades]
         self.fields['semester'].widget.choices = [("", "All semesters")] + semester_choices
@@ -157,7 +157,7 @@ class HistoricCourseGradeForm(Form):
         if self.semester and self.semester != '':
             course = Course.objects.filter(name=self.course_name).first()
             grades = Grade.objects.filter(
-                course=course, semester=semester_number(self.semester)
+                course=course, semester=self.semester
             ).values('section').distinct()
 
             section_choices = [(grade['section'], grade['section']) for grade in grades]
