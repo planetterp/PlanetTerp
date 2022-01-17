@@ -2,7 +2,7 @@ from django.http import JsonResponse
 from django.db.models import Sum, Q
 from django.views import View
 
-from home.models import Professor, Grade, Course, Gened, GradeQuerySet
+from home.models import Professor, Grade, Course, Gened
 from home.utils import ttl_cache
 
 SPRING_2020 = 202001
