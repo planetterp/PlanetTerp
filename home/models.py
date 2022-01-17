@@ -21,7 +21,7 @@ class GradeQuerySet(QuerySet):
                 Sum("c_plus") * 2.3 + Sum("c") * 2 + Sum("c_minus") * 1.7 +
                 Sum("d_plus") * 1.3 + Sum("d") * 1 + Sum("d_minus") * 0.7)
                 /
-                Sum("num_students")
+                self.num_graded_students()
             )
         )["average_gpa"]
 
@@ -29,6 +29,19 @@ class GradeQuerySet(QuerySet):
         return self.aggregate(
             num_students=Sum("num_students")
         )["num_students"]
+
+    def num_graded_students(self):
+        # returns the number of students which factor into gpa calculation, ie
+        # num_students - other
+        return self.aggregate(
+            num_graded_students=(
+                Sum("a_plus") + Sum("a") + Sum("a_minus") +
+                Sum("b_plus") + Sum("b") + Sum("b_minus") +
+                Sum("c_plus") + Sum("c") + Sum("c_minus") +
+                Sum("d_plus") + Sum("d") + Sum("d_minus") +
+                Sum("f") + Sum("w")
+            )
+        )["num_graded_students"]
 
     def grade_totals_aggregate(self):
         return (
