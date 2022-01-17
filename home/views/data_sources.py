@@ -20,7 +20,7 @@ class GradeData(View):
         pf_semesters = data.get("pf_semesters", False) == "true"
 
         if professor_courses:
-            grade_data = self._course_grade_data(professor, pf_semesters)
+            grade_data = GradeData._course_grade_data(professor, pf_semesters)
             data = {
                 "professor_slug": grade_data.pop("professor_slug"),
                 "average_gpa": grade_data.pop("average_gpa"),
@@ -32,13 +32,13 @@ class GradeData(View):
                 (course_average_gpa, course_num_students, course_grades) = course_data
 
                 if course_num_students and course_average_gpa:
-                    data['data'][course_name] = self._get_data(
+                    data['data'][course_name] = GradeData._get_data(
                         course_average_gpa, course_num_students, course_grades)
         else:
-            (average_gpa, num_students, grades) = self._grade_data(professor,
+            (average_gpa, num_students, grades) = GradeData._grade_data(professor,
                 course, semester, section, pf_semesters)
 
-            data = self._get_data(average_gpa, num_students, grades)
+            data = GradeData._get_data(average_gpa, num_students, grades)
 
         return JsonResponse(data)
 
