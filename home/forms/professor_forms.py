@@ -270,8 +270,7 @@ class ProfessorFormReview(ProfessorForm):
         else:
             clean_course = course
 
-        course_obj = Course.objects.filter(name=clean_course.replace(" ", ""))
-        if clean_course and not course_obj.exists():
+        if clean_course and not Course.objects.filter(name=clean_course.replace(" ", "")).exists():
             error_msg = '''The course you specified is not in our database.
                 If you think it should be, please email us at admin@planetterp.com.'''
             error = ValidationError(error_msg, code='Not Found')
