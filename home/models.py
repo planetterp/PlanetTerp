@@ -10,7 +10,7 @@ from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.db.models import (Model, CharField, DateTimeField, TextField,
     IntegerField, BooleanField, ForeignKey, PositiveIntegerField, EmailField,
     CASCADE, ManyToManyField, SlugField, TextChoices, FloatField, Manager,
-    QuerySet, Sum, UniqueConstraint)
+    QuerySet, Sum, UniqueConstraint, Index)
 
 class GradeQuerySet(QuerySet):
     def average_gpa(self):
@@ -373,6 +373,12 @@ class Grade(Model):
     other   = PositiveIntegerField(db_column="OTHER")
 
     objects = GradeQuerySet.as_manager()
+
+    class Meta:
+        indexes = [
+            Index(fields=["semester"]),
+            Index(fields=["section"]),
+        ]
 
     def __str__(self):
         return (
