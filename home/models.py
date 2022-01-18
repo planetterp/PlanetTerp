@@ -10,7 +10,7 @@ from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.db.models import (Model, CharField, DateTimeField, TextField,
     IntegerField, BooleanField, ForeignKey, PositiveIntegerField, EmailField,
     CASCADE, ManyToManyField, SlugField, TextChoices, FloatField, Manager,
-    QuerySet, Sum)
+    QuerySet, Sum, UniqueConstraint)
 
 class GradeQuerySet(QuerySet):
     def average_gpa(self):
@@ -102,8 +102,6 @@ class ProfessorManager(Manager):
         return self.filter(status=Professor.Status.REJECTED)
 
 
-# The db_table Meta option changes the name of the table in the db viewer. It's
-# purely for aesthetics.
 class Course(Model):
     department = CharField(max_length=4)
     course_number = CharField(max_length=6)
@@ -116,6 +114,12 @@ class Course(Model):
         through="ProfessorCourse")
 
     objects = CourseManager()
+
+    class Meta:
+        constraints = [
+            UniqueConstraint(fields=["department", "course_number"],
+                name="unique_course_name")
+        ]
 
     def average_gpa(self):
         return self.grade_set.all().average_gpa()
