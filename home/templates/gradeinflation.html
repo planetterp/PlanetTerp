@@ -98,22 +98,11 @@
 
 <script>
 	var semesters = [];
-	var fullSemesters = [];
 
-	for (var i = 1998; i <= 2018; i++) {
-		for (var j = 0; j <= 1; j++) {
-			if (j == 0) {
-				semesters.push(i + " S");
-				fullSemesters.push("Spring " + i);
-			}
-			else {
-				semesters.push(i + " F");
-				fullSemesters.push("Fall " + i);
-			}
-		}
+	for (var i = 1998; i <= 2020; i++) {
+		semesters.push(i + " S");
+		semesters.push(i + " F");
 	}
-
-	semesters.push("2019 S");
 
 	var options = {
 		scales: {
@@ -129,8 +118,8 @@
 					labelString: 'Average GPA'
 				},
 				ticks: {
-					// beginAtZero: true,
-					// max: 4
+					suggestedMin: 2.4,
+					suggestedMax: 3.8
 				}
 			}]
 		}

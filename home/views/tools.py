@@ -4,7 +4,7 @@ from django.db.models.functions import Concat
 from django.db.models import Sum
 
 from home.models import Grade
-from home import model
+
 
 class Tools(TemplateView):
     template_name = "tools.html"
@@ -52,39 +52,46 @@ class ToolPopularCourses(TemplateView):
 
 class ToolGradeInflation(TemplateView):
     template_name = "gradeinflation.html"
+    SEMESTERS = ['199801', '199808', '199901', '199908', '200001', '200008',
+        '200101', '200108', '200201', '200208', '200301', '200308', '200401',
+        '200408', '200501', '200508', '200601', '200608', '200701', '200708',
+        '200801', '200808', '200901', '200908', '201001', '201008', '201101',
+        '201108', '201201', '201208', '201301', '201308', '201401', '201408',
+        '201501', '201508', '201601', '201608', '201701', '201708', '201801',
+        '201808', '201901', '201908', '202001', '202008', '202101'
+    ]
 
     def post(self, request):
         data = request.POST
-
         if 'search' not in data:
             return HttpResponseBadRequest("Invalid search.")
 
-        # TODO rewrite this
+        search = data["search"]
 
-        if len(data["search"]) != 0 and len(data["search"]) != 4 and len(data["search"]) != 7 and len(data["search"]) != 8:
+        if len(search) not in [0, 4, 5, 6, 7, 8]:
             return HttpResponseBadRequest("Invalid department or course.")
 
-        distribution = list(model.get_distribution(data["search"]))
+        dist = []
+        for semester in self.SEMESTERS:
+            grades = Grade.objects.filter(semester=semester)
+            if len(search) == 4:
+                grades = grades.filter(course__department=search)
+            if len(search) > 4:
+                grades.annotate(
 
-        if len(distribution) == 0:
-            return HttpResponseBadRequest("No results.")
+                )
+                grades = (
+                    grades.annotate(
+                        course_name=Concat("course__department", "course__course_number")
+                    )
+                    .filter(course_name=search)
+                )
 
-        new_distribution = []
-        semesters = ['199801', '199808', '199901', '199908', '200001', '200008', '200101', '200108', '200201', '200208',
-            '200301', '200308', '200401', '200408', '200501', '200508', '200601', '200608', '200701', '200708', '200801',
-            '200808', '200901', '200908', '201001', '201008', '201101', '201108', '201201', '201208', '201301', '201308',
-            '201401', '201408', '201501', '201508', '201601', '201608', '201701', '201708', '201801', '201808',
-            '201901', '201908', '202001', '202008']
+            gpa = grades.average_gpa()
+            print(gpa, semester)
+            dist.append(f"{gpa:.2f}" if gpa else None)
 
-        for semester in semesters:
-            if not any(semester in s.semester for s in distribution):
-                new_distribution.append('null')
-            else:
-                for s in distribution:
-                    if s.semester == semester:
-                        new_distribution.append("{0:.2f}".format(s.avg_gpa))
-
-        return JsonResponse(new_distribution, safe=False)
+        return JsonResponse(dist, safe=False)
 
 
 class ToolGeneds(TemplateView):
