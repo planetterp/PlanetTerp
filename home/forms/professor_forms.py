@@ -21,7 +21,7 @@ from planetterp import config
 # Base form that contains common form fields
 class ProfessorForm(Form):
     grade = ChoiceField(
-        choices=[('grade', 'Expected Grade')] + [(tup[0],tup[0]) for tup in Review.Grades.choices],
+        choices=[('', 'Expected Grade')] + [(tup[0],tup[0]) for tup in Review.Grades.choices],
         error_messages={
             "invalid_choice": """Invalid grade entered.
                 Please copy your review, refresh the page, and try again. If the error persists,
@@ -164,17 +164,15 @@ class ProfessorForm(Form):
         field_errors = {}
 
         for field in self.fields:
-            if_condition = f'{{% if form.{field}.errors %}} '
-            error_html = f'<div id="{{{{ form.{field}.name }}}}_errors" class="invalid-feedback text-center" style="font-size: 15px">{{{{ form.{field}.errors|striptags }}}}</div>'
-            endif = ' {% endif %}'
-            field_errors[field] = HTML(if_condition + error_html + endif)
+            error_html = f'<div id="{{{{ form.{field}.name }}}}_errors" class="invalid-feedback text-center mb-3" style="font-size: 15px"></div>'
+            field_errors[field] = HTML(error_html)
 
         return field_errors
 
     def clean(self):
         cleaned_data = super().clean()
         grade = cleaned_data.get('grade')
-        if grade == 'grade':
+        if grade == '':
             self.cleaned_data['grade'] = None
 
         content = cleaned_data.get('content')
@@ -228,7 +226,7 @@ class ProfessorFormReview(ProfessorForm):
         super().__init__(user, Review.ReviewType.REVIEW, **kwargs)
 
         choices = [(course.name, course.name) for course in Course.objects.filter(professors__pk=professor.id)]
-        choices.insert(0, ('course', "Course"))
+        choices.insert(0, ('', "Course"))
         choices.append(("other", "Other"))
         self.fields['course'].choices = choices
         self.fields['slug'].initial = professor.slug
@@ -267,7 +265,7 @@ class ProfessorFormReview(ProfessorForm):
                 self.add_error("other_course", error)
             else:
                 clean_course = other_course
-        elif course == 'course':
+        elif course == '':
             clean_course = None
         else:
             clean_course = course
@@ -327,7 +325,7 @@ class ProfessorFormAdd(ProfessorForm):
         course = Field(
             'course',
             placeholder="Course",
-            id=f"div_course_{self.form_type.value}"
+            id=f"id_course_{self.form_type.value}"
         )
         crispy_course_errors = self.field_errors["course"]
 

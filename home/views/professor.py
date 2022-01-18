@@ -2,9 +2,6 @@ from django.views import View
 from django.shortcuts import render
 from django.db.models import Sum, Count
 from django.http import Http404, JsonResponse
-from django.template.context_processors import csrf
-
-from crispy_forms.utils import render_crispy_form
 
 from home.utils import send_updates_webhook
 from home.forms.professor_forms import ProfessorFormReview
@@ -99,23 +96,14 @@ class Professor(View):
 
             send_updates_webhook(request, include_professors=False)
 
-            ctx = {}
-            ctx.update(csrf(request))
             form = ProfessorFormReview(user, professor)
-            form_html = render_crispy_form(form, form.helper, context=ctx)
-
             context = {
-                "success": True,
-                "form": form_html
+                "success": True
             }
         else:
-            ctx = {}
-            ctx.update(csrf(request))
-            form_html = render_crispy_form(form, form.helper, context=ctx)
-
             context = {
                 "success": False,
-                "form": form_html
+                "errors": form.errors.as_json()
             }
 
         return JsonResponse(context)

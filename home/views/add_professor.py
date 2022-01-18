@@ -1,8 +1,5 @@
 from django.views import View
 from django.http import JsonResponse
-from django.template.context_processors import csrf
-
-from crispy_forms.utils import render_crispy_form
 
 from home.forms.professor_forms import ProfessorFormAdd
 from home.models import Professor, Review, Course
@@ -11,10 +8,7 @@ from home.utils import send_updates_webhook
 class AddProfessor(View):
     def post(self, request):
         user = request.user
-
         form = ProfessorFormAdd(user, data=request.POST)
-        ctx = {}
-        ctx.update(csrf(request))
 
         if form.is_valid():
             cleaned_data = form.cleaned_data
@@ -42,18 +36,14 @@ class AddProfessor(View):
             send_updates_webhook(request)
 
             form = ProfessorFormAdd(user)
-            form_html = render_crispy_form(form, form.helper, context=ctx)
 
             context = {
-                "success": True,
-                "form": form_html
+                "success": True
             }
         else:
-            form_html = render_crispy_form(form, form.helper, context=ctx)
-
             context = {
                 "success": False,
-                "form": form_html
+                "errors": form.errors.as_json()
             }
 
         return JsonResponse(context)
