@@ -76,13 +76,13 @@ function submitProfessorForm(form_id) {
                 $("div.invalid-feedback").hide();
                 $("div.form-group .is-invalid").removeClass("is-invalid");
 
-                $(`#success-banner-${form_type}`).removeClass("d-none").css({"z-index": "1"});
+                $(`#success-banner-${form_type}`).removeClass("d-none");
 
                 if (form_type == "add") {
                     $("#success-banner-add").removeClass("w-100").css({"width": "69rem"});
                 }
 
-                $(':input', form_id).not(':button, :submit, :reset').val('').prop('checked', false);
+                $(':input', form_id).not(':button, :submit, :reset, :hidden').val('').prop('checked', false);
                 $(`#rateYo_${form_type}`).rateYo("option", "rating", 0);
             }
         },

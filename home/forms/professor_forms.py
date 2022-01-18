@@ -105,11 +105,13 @@ class ProfessorForm(Form):
         )
         content_errors = self.field_errors["content"]
 
-        success_banner = Alert(
-            "Review submitted successfully!",
+        success_banner = Div(
+            HTML('Review submitted successfully! <button type="button" class="close">&times;</button>'),
             css_id=f"success-banner-{self.form_type.value}",
-            css_class="alert-success text-center w-100 rounded-0 d-none position-absolute"
+            css_class="alert alert-dismissable alert-success text-center w-100 rounded-0 d-none position-absolute",
+            style="z-index: 1;"
         )
+
         login_banner = None
         anonymous = None
 

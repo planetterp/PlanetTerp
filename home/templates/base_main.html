@@ -213,6 +213,10 @@
 
         <script type="text/javascript">
             $(function() {
+                $('.alert .close').click(function(){
+                    $(this).parent().addClass("d-none");
+                 });
+
                 $("#header-search").autocomplete({
                     minLength: 3,
                     source: function(request, response) {
