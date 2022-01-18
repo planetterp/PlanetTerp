@@ -3,6 +3,7 @@
 import os
 import web
 from django.core.wsgi import get_wsgi_application
+from django.db import IntegrityError
 from planetterp.config import USER, PASSWORD
 
 # https://stackoverflow.com/a/43391786
@@ -36,8 +37,6 @@ def _create_table(table, model, mapping):
     for row in db.select(table):
         id_ = row["id"]
 
-        # because of bad design decisions in the original database, we have a
-        # dummy user with a pk of 0 that we need to ignore
         # because of bad design decisions in the original database, we have
         # dummy users with pk of 0 and -1 that we need to ignore
         if table == "users" and id_ <= 0:
@@ -71,7 +70,26 @@ def migrate_courses():
     }
 
     courses = _create_table("courses", Course, mapping)
-    return courses
+
+    # manually create the historical courses (instead of calling
+    # `_create_table`) to deal with some edge cases
+    historical_courses = {}
+    for row in db.select("courses_historical"):
+        id_ = row["id"]
+        obj = _instantiate(Course, row, mapping)
+        historical_courses[id_] = obj
+
+    for id_, course in historical_courses.copy().items():
+        try:
+            course.save()
+        except IntegrityError:
+            # if there's an existing course we're conflicting with, find it and
+            # set our old historical course id to point to that course instead
+            # of a new one
+            new_course = Course.objects.filter(name=course.name).get()
+            historical_courses[id_] = new_course
+
+    return (courses, historical_courses)
 
 def migrate_professors():
     print("  Migrating professors...")
@@ -181,7 +199,7 @@ def migrate_reviews(users, courses, professors):
     }
     return _create_table("reviews", Review, mapping)
 
-def migrate_grades(courses, professors):
+def migrate_grades(courses, historical_courses, professors):
     print("  Migrating grades...")
 
     mapping = {
@@ -206,7 +224,19 @@ def migrate_grades(courses, professors):
         "w": "W",
         "other": "OTHER"
     }
-    return _create_table("grades", Grade, mapping)
+
+    grades = _create_table("grades", Grade, mapping)
+
+    # use historical_courses for the course fk in grades_historical instead
+    mapping["course"] = lambda row: _foreign_key(historical_courses, row, "course_id")
+    # no historical grades have a professor. the fk is declared nullable above,
+    # but since the db uses a placeholder id of 0 instead of None, we would get
+    # a keyerror above if we didn't modify this.
+    mapping["professor"] = lambda row: None
+
+    historical_grades = _create_table("grades_historical", Grade, mapping)
+
+    return (grades, historical_grades)
 
 def migrate_geneds(courses):
     print("  Migrating geneds...")
@@ -298,15 +328,17 @@ for model in [User, Course, Professor, Section, Gened, SectionMeeting, Review]:
         if field.name == "created_at":
             field.auto_now_add = False
 
-courses = migrate_courses()
+(courses, historical_courses) = migrate_courses()
 professors = migrate_professors()
 link_courses_and_professors(courses, professors)
+(grades, historical_grades) = migrate_grades(courses, historical_courses, professors)
 
 users = migrate_users()
 reviews = migrate_reviews(users, courses, professors)
-grades = migrate_grades(courses, professors)
-geneds = migrate_geneds(courses)
+
 sections = migrate_sections(courses)
 link_sections_and_professors(professors, sections)
 migrate_section_meetings(sections)
+
+geneds = migrate_geneds(courses)
 migrate_organizations()
