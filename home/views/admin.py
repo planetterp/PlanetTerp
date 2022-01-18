@@ -21,6 +21,7 @@ from home.tables.reviews_table import UnverifiedReviewsTable
 from home.tables.basic import ProfessorsTable
 from home.forms.admin_forms import (ProfessorMergeForm, ProfessorSlugForm,
 ProfessorUpdateForm, ReviewActionForm)
+from home.utils import send_email
 from planetterp import config
 
 class Admin(UserPassesTestMixin, View):
@@ -254,13 +255,13 @@ class Admin(UserPassesTestMixin, View):
 
         if professor_status is Professor.Status.PENDING:
             response['success_msg'] = (
-                " however the review is associated with"
+                ". However, this review is associated with "
                 f"an unverified {professor.type}. Please verify {professor.type}"
                 f" {professor.name} ({professor.pk}) as soon as possible."
             )
 
         if reviewer:
-            self.validate_email(verified_status, professor, reviewer)
+            self.email_user(verified_status, professor, reviewer)
 
         return JsonResponse(response)
 
@@ -326,22 +327,20 @@ class Admin(UserPassesTestMixin, View):
 
         return JsonResponse(response)
 
-    def validate_email(self, verified_status: Review.Status, professor: Professor, user: User):
-        if user.email and user.send_review_email:
-            status_text = 'Under Review' if verified_status is Review.Status.PENDING else verified_status.value.capitalize()
-            profile_url = self.request.build_absolute_uri(reverse('profile'))
-            professor_url = self.request.build_absolute_uri(professor.get_absolute_url())
-            message = (
-                f'Your review for <a href="{professor_url}">{professor.name}'
-                f"</a> is now {status_text.lower()}.<br />"
-                "<br /> If you would no longer like to receive review"
-                "verification emails, you can disable them on "
-                f'<a href="{profile_url}#settings">'
-                "your profile settings page</a>."
-                )
+    def email_user(self, verified_status: Review.Status, professor: Professor, user: User):
+        if not user.send_review_email:
+            return
 
-            user.email_user(
-                f"PlanetTerp Review {status_text}",
-                message,
-                html_message=message
-            )
+        status_text = 'Under Review' if verified_status is Review.Status.PENDING else verified_status.value.capitalize()
+        profile_url = self.request.build_absolute_uri(reverse('profile'))
+        professor_url = self.request.build_absolute_uri(professor.get_absolute_url())
+        message = (
+            f'Your review for <a href="{professor_url}">{professor.name}'
+            f"</a> has been {status_text.lower()}.<br />"
+            "<br /> If you would no longer like to receive review "
+            "verification emails, you can disable them on "
+            f'<a href="{profile_url}#settings">'
+            "your profile settings page</a>."
+        )
+
+        send_email(user, f"PlanetTerp Review {status_text}", message)

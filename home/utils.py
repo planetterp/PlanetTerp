@@ -1,14 +1,21 @@
 from enum import Enum, auto
 from functools import lru_cache, wraps
 import time
+import base64
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+from threading import Thread
 
 from django.urls import reverse
 
 from discord_webhook import DiscordWebhook
 from discord_webhook.webhook import DiscordEmbed
+from google.oauth2 import service_account
+from googleapiclient.discovery import build
 
 from home.models import Professor, Review
-from planetterp.config import WEBHOOK_URL_UPDATE
+from planetterp.config import (WEBHOOK_URL_UPDATE, EMAIL_HOST_USER,
+    EMAIL_SERVICE_ACCOUNT_CREDENTIALS)
 
 def semester_name(semester_number):
     seasons = {"01": "spring", "05": "summer", "08": "fall", "12": "winter"}
@@ -109,3 +116,57 @@ def send_updates_webhook(request, *, include_professors=True, include_reviews=Tr
 
     webhook.add_embed(embed)
     webhook.execute()
+
+
+
+EMAIL_SCOPES = ["https://www.googleapis.com/auth/gmail.send"]
+
+gmail_service_account = None
+if EMAIL_SERVICE_ACCOUNT_CREDENTIALS:
+    credentials = service_account.Credentials.from_service_account_info(
+        EMAIL_SERVICE_ACCOUNT_CREDENTIALS, scopes=EMAIL_SCOPES,
+        subject=EMAIL_HOST_USER)
+
+    gmail_service_account = build("gmail", "v1", credentials=credentials)
+
+def send_email(user, subject, message_text):
+    # sending email can be a highly expensive operation, so we do it in a
+    # separate thread by default. If you require a blocking operation, see
+    # `send_mail_sync.`
+    thread = Thread(target=lambda: send_mail_sync(user, subject, message_text))
+    thread.start()
+
+def send_mail_sync(user, subject, message_text):
+    if not user.email:
+        return
+    # prefer sending using the service account if it's set up
+    if gmail_service_account:
+        # alternative means we're sending both html and plaintext
+        # https://stackoverflow.com/q/3902455
+        message = MIMEMultipart("alternative")
+        message["to"] = user.email
+        message["from"] = "admin@planetterp.com"
+        message["subject"] = subject
+
+        # plaintext is provided as a fallback if the client doesn't support html.
+        # important: we have to add the html part last so it is the first one the
+        # client attempts to display.
+        # # https://realpython.com/python-send-email/#including-html-content
+        text_part = MIMEText(message_text, "plain")
+        html_part = MIMEText(message_text, "html")
+        message.attach(text_part)
+        message.attach(html_part)
+
+        # https://stackoverflow.com/a/46668827
+        message_b64 = base64.urlsafe_b64encode(message.as_bytes()).decode()
+        message = {'raw': message_b64}
+
+        # pylint: disable=no-member
+        gmail_service_account.users().messages().send(userId="me", body=message).execute()
+    # otherwise, fall back to django's email setup
+    elif EMAIL_HOST_USER:
+        user.email_user(
+            subject,
+            message_text,
+            html_message=message_text
+        )
