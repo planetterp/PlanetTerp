@@ -172,6 +172,7 @@ class CourseDifficultyData(View):
         return JsonResponse({"data": data})
 
     @staticmethod
+    @ttl_cache(24 * 60 * 60)
     def _course_data():
         data = []
 
@@ -183,7 +184,6 @@ class CourseDifficultyData(View):
             .values("course_name", total_students=Sum("num_students"))
             .filter(total_students__gte=100)
             .average_gpa_annotate()
-            .order_by("-average_gpa")
         )
 
         data = []
@@ -214,6 +214,7 @@ class CourseDifficultyData(View):
         return data
 
     @staticmethod
+    @ttl_cache(24 * 60 * 60)
     def _departments_data():
         departments = (
             Grade.objects
