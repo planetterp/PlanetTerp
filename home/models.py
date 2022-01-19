@@ -14,16 +14,30 @@ from django.db.models import (Model, CharField, DateTimeField, TextField,
 
 class GradeQuerySet(QuerySet):
     def average_gpa(self):
-        return self.aggregate(
+        return self._apply_average_gpa(self.aggregate)["average_gpa"]
+
+    def average_gpa_annotate(self):
+        """
+        Exposed primarily for queries which require performance and need the
+        average_gpa annotated, not returned directly.
+        """
+        return self._apply_average_gpa(self.annotate)
+
+    def _apply_average_gpa(self, func):
+        """
+        A generic way to calculate average_gpa, either as an aggregate or as an
+        annotation. Not intended for external use.
+        """
+        return func(
             average_gpa=(
                 (Sum("a_plus") * 4  + Sum("a") * 4 + Sum("a_minus") * 3.7 +
                 Sum("b_plus") * 3.3 + Sum("b") * 3 + Sum("b_minus") * 2.7 +
                 Sum("c_plus") * 2.3 + Sum("c") * 2 + Sum("c_minus") * 1.7 +
                 Sum("d_plus") * 1.3 + Sum("d") * 1 + Sum("d_minus") * 0.7)
                 /
-                self.num_graded_students()
+                (Sum("num_students") - Sum("other"))
             )
-        )["average_gpa"]
+        )
 
     def num_students(self):
         return self.aggregate(
@@ -34,13 +48,7 @@ class GradeQuerySet(QuerySet):
         # returns the number of students which factor into gpa calculation, ie
         # num_students - other
         return self.aggregate(
-            num_graded_students=(
-                Sum("a_plus") + Sum("a") + Sum("a_minus") +
-                Sum("b_plus") + Sum("b") + Sum("b_minus") +
-                Sum("c_plus") + Sum("c") + Sum("c_minus") +
-                Sum("d_plus") + Sum("d") + Sum("d_minus") +
-                Sum("f") + Sum("w")
-            )
+            num_graded_students=Sum("num_students") - Sum("other")
         )["num_graded_students"]
 
     def grade_totals_aggregate(self):

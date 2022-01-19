@@ -1,9 +1,9 @@
 from django.http import HttpResponseBadRequest, JsonResponse
 from django.views.generic import TemplateView
 from django.db.models.functions import Concat
-from django.db.models import Sum
+from django.db.models import Sum, Q
 
-from home.models import Grade
+from home.models import Grade, Course
 
 
 class Tools(TemplateView):
@@ -71,26 +71,31 @@ class ToolGradeInflation(TemplateView):
         if len(search) not in [0, 4, 5, 6, 7, 8]:
             return HttpResponseBadRequest("Invalid department or course.")
 
-        dist = []
-        for semester in self.SEMESTERS:
-            grades = Grade.objects.filter(semester=semester)
-            if len(search) == 4:
-                grades = grades.filter(course__department=search)
-            if len(search) > 4:
-                grades.annotate(
+        grades = Grade.objects.all()
+        if len(search) == 4:
+            grades = grades.filter(course__department=search)
+        if len(search) > 4:
+            if not Course.objects.filter(name__istartswith=search).exists():
+                return HttpResponseBadRequest("Course does not exist.")
 
+            department = search[0:4]
+            course_number = search[4:]
+
+            grades = (
+                grades
+                .filter(
+                    Q(course__department=department) &
+                    Q(course__course_number__startswith=course_number)
                 )
-                grades = (
-                    grades.annotate(
-                        course_name=Concat("course__department", "course__course_number")
-                    )
-                    .filter(course_name=search)
-                )
+            )
 
-            gpa = grades.average_gpa()
-            print(gpa, semester)
-            dist.append(f"{gpa:.2f}" if gpa else None)
-
+        values = (
+            grades
+            .values("semester")
+            .average_gpa_annotate()
+            .order_by("semester")
+        )
+        dist = [value["average_gpa"] for value in values]
         return JsonResponse(dist, safe=False)
 
 

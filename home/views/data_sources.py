@@ -1,6 +1,8 @@
 from django.http import JsonResponse
 from django.db.models import Sum, Q
+from django.db.models.functions import Concat
 from django.views import View
+from django.urls import reverse
 
 from home.models import Professor, Grade, Course, Gened
 from home.utils import ttl_cache
@@ -170,15 +172,23 @@ class CourseDifficultyData(View):
         return JsonResponse({"data": data})
 
     @staticmethod
-    @ttl_cache(24 * 60 * 60)
     def _course_data():
         data = []
-        for course in Course.objects.all():
-            num_students = course.grade_set.all().num_students()
-            if num_students is None or num_students < 100:
-                continue
 
-            average_gpa = course.average_gpa()
+        values = (
+            Grade.objects
+            .annotate(
+                course_name=Concat("course__department", "course__course_number")
+            )
+            .values("course_name", total_students=Sum("num_students"))
+            .filter(total_students__gte=100)
+            .average_gpa_annotate()
+            .order_by("-average_gpa")
+        )
+
+        data = []
+        for value in values:
+            average_gpa = value["average_gpa"]
             # some courses with entirely "other" graded students have a gpa of
             # 0. Other courses with weirder circumstances (citation needed)
             # return an undefined gpa. Skip both of these; 0 gpa courses are
@@ -188,14 +198,22 @@ class CourseDifficultyData(View):
                 continue
 
             average_gpa = f"{average_gpa:.2f}"
-            course_name = f"<a href='{course.get_absolute_url()}' target='_blank'>{course.name}</a>"
+            course_name = value["course_name"]
+            # We're sacrificing access to the `course` object
+            # itself for the sake of performance in the above query, so we have
+            # to construct its location manually instead of with
+            # `Course#get_absolute_url`. An acceptable, although unfortunate,
+            # tradeoff.
+            href = reverse("course", kwargs={"name": course_name})
+            course_name = f"<a href='{href}' target='_blank'>{course_name}</a>"
+            num_students = value["total_students"]
+
             entry = [course_name, average_gpa, num_students]
             data.append(entry)
 
         return data
 
     @staticmethod
-    @ttl_cache(24 * 60 * 60)
     def _departments_data():
         departments = (
             Grade.objects
