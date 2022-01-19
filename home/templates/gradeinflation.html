@@ -125,29 +125,13 @@
 		}
 	}
 
-	var data = {
-		labels: semesters,
-		datasets: [
-			{
-				label: "All courses",
-				data: ["2.81", "2.81", "2.84", "2.85", "2.89", "2.90", "2.95", "2.89", "2.95", "2.94", "3.01", "2.98", "3.02", "3.00", "3.05", "3.01", "3.06", "3.03", "3.06", "3.05", "3.08", "3.07", "3.10", "3.07", "3.11", "3.05", "3.13", "3.13", "3.08", "3.08", "3.11", "3.12", "3.14", "3.12", "3.13", "3.12", "3.15", "3.15", "3.18", "3.17", "3.20", "3.18", "3.21"],
-				fill: false,
-				backgroundColor: '#008D94',
-				borderColor: '#0DB537'
-			}
-		]
-	};
-
 	var distributionGraph;
 
 	$(document).ready(function() {
 		var distributionCanvas = document.getElementById("distribution");
 		var ctx = distributionCanvas.getContext("2d");
-		distributionGraph = new Chart(ctx, {
-			type: 'line',
-			data: data,
-			options: options
-		});
+
+		createChart("");
 
 		$('#all-courses').on('click', function(e) {
 			createChart("");
@@ -204,9 +188,6 @@
 					data: data,
 					options: options
 				});
-
-				var location = $("a[id=\"distribution-search\"]");
-				$('html, body').animate({scrollTop: location.offset().top}, 'slow');
 			},
 			error: function(response) {
 				$('#chart-loading').hide();
