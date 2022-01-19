@@ -17,7 +17,7 @@ from home.models import Professor, Review
 from planetterp.config import (WEBHOOK_URL_UPDATE, EMAIL_HOST_USER,
     EMAIL_SERVICE_ACCOUNT_CREDENTIALS)
 
-def semester_name(semester_number):
+def semester_name(semester_number, *, year_first=False, short=False):
     seasons = {"01": "spring", "05": "summer", "08": "fall", "12": "winter"}
     season = seasons[semester_number[4:6]]
 
@@ -28,7 +28,13 @@ def semester_name(semester_number):
     if season == "winter":
         year += 1
 
-    return f"{season.capitalize()} {year}"
+    season = season.capitalize()
+    if short:
+        # use first letter as acronym
+        season = season[0]
+    if year_first:
+        return f"{year} {season}"
+    return f"{season} {year}"
 
 def semester_number(semester_name: str):
     seasons = {"spring": "01", "summer": "05", "fall": "08", "winter": "12"}

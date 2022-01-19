@@ -97,19 +97,15 @@
 </div>
 
 <script>
-	var semesters = [];
-
-	for (var i = 1998; i <= 2020; i++) {
-		semesters.push(i + " S");
-		semesters.push(i + " F");
-	}
-
 	var options = {
 		scales: {
 			xAxes: [{
 				scaleLabel: {
 					display: true,
 					labelString: 'Semester'
+				},
+				ticks: {
+					autoSkip: false
 				}
 			}],
 			yAxes: [{
@@ -119,7 +115,7 @@
 				},
 				ticks: {
 					suggestedMin: 2.4,
-					suggestedMax: 3.8
+					suggestedMax: 3.8,
 				}
 			}]
 		}
@@ -171,11 +167,11 @@
 				}
 
 				var data = {
-					labels: semesters,
+					labels: response[0],
 					datasets: [
 						{
 							label: label,
-							data: response,
+							data: response[1],
 							fill: false,
 							backgroundColor: '#008D94',
 							borderColor: '#0DB537'
