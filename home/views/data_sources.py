@@ -178,10 +178,7 @@ class CourseDifficultyData(View):
 
         values = (
             Grade.objects
-            .annotate(
-                course_name=Concat("course__department", "course__course_number")
-            )
-            .values("course_name", total_students=Sum("num_students"))
+            .values("course__name", total_students=Sum("num_students"))
             .filter(total_students__gte=100)
             .average_gpa_annotate()
         )
@@ -198,7 +195,7 @@ class CourseDifficultyData(View):
                 continue
 
             average_gpa = f"{average_gpa:.2f}"
-            course_name = value["course_name"]
+            course_name = value["course__name"]
             # We're sacrificing access to the `course` object
             # itself for the sake of performance in the above query, so we have
             # to construct its location manually instead of with

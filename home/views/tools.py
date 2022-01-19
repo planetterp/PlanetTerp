@@ -23,30 +23,24 @@ class ToolPopularCourses(TemplateView):
 
         query = data["department"]
         if len(query) < 3:
-            return HttpResponseBadRequest("Your search must be 3 or more "
+            return HttpResponseBadRequest("Your search must be at least 3 "
                 "characters.")
 
-        grades = (
+        values = (
             Grade.objects
-            .annotate(
-                course_name=Concat("course__department", "course__course_number")
-            )
-            .filter(course_name__icontains=query)
-        )
-
-        if not grades:
-            return HttpResponseBadRequest("No results.")
-
-        courses = (
-            grades
-            .values("course_name")
+            .filter(course__name__icontains=query)
+            .values("course__name")
             .annotate(num_students=Sum("num_students"))
             .order_by("-num_students")
         )
+
+        if not values:
+            return HttpResponseBadRequest("No results.")
+
         data = [[], []]
-        for course in courses:
-            data[0].append(course["num_students"])
-            data[1].append(course["course_name"])
+        for value in values:
+            data[0].append(value["num_students"])
+            data[1].append(value["course__name"])
 
         return JsonResponse(data, safe=False)
 
@@ -75,19 +69,10 @@ class ToolGradeInflation(TemplateView):
         if len(search) == 4:
             grades = grades.filter(course__department=search)
         if len(search) > 4:
-            if not Course.objects.filter(name__istartswith=search).exists():
+            if not Course.objects.filter(name=search).exists():
                 return HttpResponseBadRequest("Course does not exist.")
 
-            department = search[0:4]
-            course_number = search[4:]
-
-            grades = (
-                grades
-                .filter(
-                    Q(course__department=department) &
-                    Q(course__course_number__startswith=course_number)
-                )
-            )
+            grades = grades.filter(course__name__istartswith=search)
 
         values = (
             grades

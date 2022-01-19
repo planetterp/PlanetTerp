@@ -3,7 +3,6 @@ from enum import Enum
 from django.contrib.auth.models import (AbstractUser,
     UserManager as DjangoUserManager)
 from django.utils.safestring import mark_safe
-from django.db.models.functions import Concat
 from django.urls import reverse
 from django.core import validators
 from django.contrib.auth.validators import UnicodeUsernameValidator
@@ -66,15 +65,6 @@ class GradeQuerySet(QuerySet):
     num_students.queryset_only = True
 
 
-class CourseManager(Manager):
-    def get_queryset(self):
-        # annotate all queries with a name field so we can filter on it
-        return (
-            super().get_queryset().annotate(
-                name=Concat("department", "course_number")
-            )
-        )
-
 class UserManager(DjangoUserManager):
     def create_ourumd_user(self, username, email=None, **kwargs):
         # password=None is equivalent to calling user#set_unusable_password()
@@ -113,6 +103,13 @@ class ProfessorManager(Manager):
 class Course(Model):
     department = CharField(max_length=4)
     course_number = CharField(max_length=6)
+    # I fought against adding this as a column for a long time, but django wins;
+    # it's simply easier if the course name is a first-class citizen, instead of
+    # having to be explicitly promoted with
+    # `.annotate(name=Concat("department", "course_number"))`. This also allows
+    # us to apply an index to this field, something which is not possible with
+    # the concatenated version.
+    name = CharField(max_length=10)
     title = TextField(null=True)
     credits = IntegerField(null=True)
     description = TextField(null=True)
@@ -121,26 +118,23 @@ class Course(Model):
     professors = ManyToManyField("Professor", blank=True,
         through="ProfessorCourse")
 
-    objects = CourseManager()
+    def save(self, *args, **kwargs):
+        # `name` is essentially a computed field, and will never have a value
+        # other than CONCAT("department", "course_number"). Ensure that this
+        # invariant holds here.
+        self.name = f"{self.department}{self.course_number}"
+        super().save(*args, **kwargs)
 
     class Meta:
         constraints = [
-            UniqueConstraint(fields=["department", "course_number"],
-                name="unique_course_name")
+            UniqueConstraint(fields=["name"], name="unique_name")
+        ]
+        indexes = [
+            Index(fields=["name"])
         ]
 
     def average_gpa(self):
         return self.grade_set.all().average_gpa()
-
-    @property
-    def name(self):
-        return f"{self.department}{self.course_number}"
-
-    # necessary for django admin interface to be able to create courses
-    # https://stackoverflow.com/a/51189035
-    @name.setter
-    def name(self, _value):
-        pass
 
     def get_absolute_url(self):
         return reverse("course", kwargs={"name": self.name})
