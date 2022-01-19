@@ -32,7 +32,6 @@ class BaseReviewsTable(tables.Table):
         self.columns = columns
         self.reviews = reviews
         self.request = request
-        self.is_staff = ReviewsTableColumn.ACTION in columns
         self.data = self.get_data(self.reviews)
 
         kwargs = {
@@ -58,7 +57,7 @@ class BaseReviewsTable(tables.Table):
             if ReviewsTableColumn.INFORMATION in self.columns:
                 formatted_data['information'] = {
                     "review": review,
-                    "is_staff": self.is_staff
+                    "is_staff": self.request.user.is_staff
                 }
             if ReviewsTableColumn.REVIEW in self.columns:
                 formatted_data['review'] = {"review": review}
