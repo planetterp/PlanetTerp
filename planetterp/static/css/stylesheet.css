@@ -465,14 +465,17 @@ div#toggle-btn button {
 @media (max-width: 800px) {
 	/* Begin homepage */
 
-	#homepage-stats {
+	.homepage-stats {
 		order: 1;
 	}
 
-	#recent-reviews {
+	.homepage-recent-reviews {
 		text-align: center;
 	}
 
+	.homepage-organizations {
+		order: 2;
+	}
 	/* End homepage*/
 
 	.card {
