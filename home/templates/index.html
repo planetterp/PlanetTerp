@@ -57,9 +57,15 @@
 		<div class="col homepage-recent-reviews">
 			<h4>Recent reviews</h4>
 			{% for review in recent_reviews %}
-			<strong><a href="/professor/{{ review.professor.slug }}">{{ review.professor.name }}</a></strong>
+			<strong>
+				<a href="{{ review.professor.get_absolute_url }}">
+					{{ review.professor.name }}
+				</a>
+			</strong>
 			{% if review.course %}
-			<small>({{ review.course.department }}{{ review.course.course_number }})</small>
+			<small>
+				(<a href="{{ review.course.get_absolute_url }}">{{ review.course.name }}</a>)
+			</small>
 			{% endif %}
 			<br />
 
