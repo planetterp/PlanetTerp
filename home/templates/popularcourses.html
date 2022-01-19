@@ -28,8 +28,8 @@
 	}
 
 	#courses-wrapper {
-		height: 100vh;
-		width: 100vw;
+		height: 85vh;
+		width: 85vw;
 		display: none;
 	}
 </style>
@@ -51,7 +51,7 @@
 	<div id="popular-search-form-error"></div>
 </div>
 
-<div id="courses-wrapper">
+<div id="courses-wrapper" class="mx-auto">
 	<canvas id="courses" alt="A doughnut chart that displays the most popular courses at the University of Maryland, College Park. A user can enter a search term to see the most popular courses containing that term."></canvas>
 </div>
 
@@ -226,13 +226,10 @@
 					}
 
 					coursesGraph = new Chart(graph, {
-						type: 'doughnut',
+						type: 'pie',
 						data: data,
 						options: options
 					});
-
-					var location = $("a[id=\"popular-search\"]");
-					$('html, body').animate({scrollTop: location.offset().top}, 'slow');
 
 					coursesCanvas.onclick = function(e) {
 						var activePoint = coursesGraph.getElementAtEvent(e);
