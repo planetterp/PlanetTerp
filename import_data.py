@@ -110,11 +110,7 @@ print(f"Done (added {len(num_created)})")
 
 if any(rejects):
     print("Exporting rejected data...")
-    try:
-        rejects_file = open("rejected_imports.csv", "w")
-    except:
-        os.system("touch rejected_imports.csv")
-        rejects_file = open("rejected_imports.csv", "w")
+    rejects_file = open("rejected_imports.csv", "w+")
 
     writer = csv.writer(rejects_file)
     for key in rejects.keys():
