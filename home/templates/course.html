@@ -19,7 +19,7 @@
 				<h2 class="text-center">{{ course.title }}</h2>
 			{% endif %}
 			<div class="d-flex justify-content-center">
-				<a href="/course/{{ course.name }}/reviews" class="btn btn-primary">
+				<a href="{{ course.get_absolute_url }}/reviews" class="btn btn-primary">
 					Reviews for this course
 				</a>
 				<a target="_blank" class="ml-2 btn btn-primary text-center" href="https://app.testudo.umd.edu/soc/search?courseId={{ course.name }}&sectionId=&termId=202101&_openSectionsOnly=on&creditCompare=&credits=&courseLevelFilter=ALL&instructor=&_facetoface=on&_blended=on&_online=on&courseStartCompare=&courseStartHour=&courseStartMin=&courseStartAM=&courseEndHour=&courseEndMin=&courseEndAM=&teachingCenter=ALL&_classDay1=on&_classDay2=on&_classDay3=on&_classDay4=on&_classDay5=on">
@@ -62,7 +62,7 @@
 						<div class="col px-2 pb-3">
 							<div class="professor-card card h-100">
 								<div class="card-header text-center px-1 pb-0 pt-1">
-									<h4><a href="/professor/{{ professor.slug }}">{{ professor.name }}</a></h4>
+									<h4><a href="{{ professor.get_absolute_url }}">{{ professor.name }}</a></h4>
 								</div>
 								<div class="card-body">
 									<p class="card-text">
