@@ -154,7 +154,7 @@ class RegisterForm(ModelForm):
                 css_class="username-container mb-1"
             ),
             Div(
-                Field('email', placeholder="Email", wrapper_class='mb-0'),
+                Field('email', placeholder="Email (optional)", wrapper_class='mb-0'),
                 self.field_errors['email'],
                 css_class="email-container mb-1"
             ),
