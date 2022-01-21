@@ -3,7 +3,6 @@ from django.views.generic import TemplateView
 from django.db.models import Sum
 
 from home.models import Grade, Course
-from home.utils import Semester
 
 
 class Tools(TemplateView):
