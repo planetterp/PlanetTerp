@@ -29,10 +29,6 @@
 </div>
 
 <script>
-	$(function(){
-		bindEvents();
-	});
-
 	function submitLoginForm() {
 		$.ajax({
 			type: "POST",
@@ -60,7 +56,6 @@
 				} else {
 					$("#register-form-container").html(data['register_form']);
 					$("div.register-error").show();
-					bindEvents();
 				}
 			}
 		});

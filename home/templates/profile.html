@@ -40,7 +40,6 @@
 
 <script>
 	$(function() {
-		bindEvents();
 		var hash = window.location.hash;
 		// when we change `window.location.hash`, if there is an element with id equal to that hash,
 		// the browser will scroll to it automatically. We don't want this so we need to have our
@@ -74,7 +73,6 @@
 				} else {
 					$("#profile-form").html(data['form']);
 					$("#profile-form div.invalid-feedback").show();
-					bindEvents();
 				}
 			}
 		});
