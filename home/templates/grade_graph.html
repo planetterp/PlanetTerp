@@ -140,7 +140,7 @@
             var average_gpa = grade_data.average_gpa ?? 0;
             var num_students = grade_data.num_students ?? 0;
 
-            $("#average-gpa-text").html(`Average GPA^ of ${average_gpa.toFixed(2)} between ${num_students.toLocaleString()} students*`);
+            $("#average-gpa-text").html(`Average GPA of ${average_gpa.toFixed(2)} between ${num_students.toLocaleString()} students*`);
             chart.data.datasets[0].data = grade_data.data_minus
             chart.data.datasets[1].data = grade_data.data_flat
             chart.data.datasets[2].data = grade_data.data_plus

@@ -57,16 +57,6 @@
 		window.location.hash = e.target.hash.replace("-noscroll", "");
 	});
 
-	function bindEvents() {
-		$("#email-field-info").parent().on('click', function() {
-			$("#email_hint_text").toggle();
-		});
-
-		$("#email-field-info").parent().hover(function() {
-			$(this).toggleClass('email-field-info-bg');
-		});
-	}
-
 	function updateProfile() {
 		$.ajax({
 			type: "POST",

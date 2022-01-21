@@ -20,7 +20,7 @@
 			</div>
 		</div>
 		<div class="col">
-			<h2 class="d-inline">Register</h2> <i class="fas fa-info-circle" data-toggle="tooltip" data-placement="right" title="Registering will allow you to keep track of the reviews you post and give you a choice of displaying your name next to your reviews."></i>
+			<h2 class="d-inline">Register</h2> <i class="fas fa-info-circle" data-toggle="tooltip" data-placement="right" title="Registering will allow you to keep track of the reviews you post and give you a choice of displaying your name next to your reviews"></i>
 			<div id="register-form-container">
 				{% crispy register_form %}
 			</div>
@@ -32,17 +32,6 @@
 	$(function(){
 		bindEvents();
 	});
-
-	function bindEvents() {
-		$("#email-field-info").parent().on('click', function() {
-			$("#email_hint_text").toggle();
-		});
-
-		$("#email-field-info").parent().hover(function() {
-			$(this).toggleClass('email-field-info-bg');
-		});
-	}
-
 
 	function submitLoginForm() {
 		$.ajax({

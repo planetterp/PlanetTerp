@@ -10,7 +10,7 @@
 <meta property="og:title" content="Grade Inflation at UMD | PlanetTerp">
 <meta property="og:description" name="description" content="Visualize grade inflation at UMD for departments and courses over time.">
 <meta property="og:image" content="{% full_static 'images/tools/gradeinflation.png' %}">
-<meta property="og:image:alt" content="A screenshot of a page titled &quot;Grade Inflation at UMD&quot;. The page contains a chart that allows users to input a department or course. After the user searches, a chart appears that shows the average GPA for that department or course from 1998 until 2019.">
+<meta property="og:image:alt" content="A screenshot of a page titled &quot;Grade Inflation&quot;. The page contains a chart that allows users to input a department or course. After the user searches, a chart appears that shows the average GPA at the University of Maryland for that department or course from 1998 until 2021.">
 <meta property="og:url" content="{% full_url 'tools-grade-inflation' %}">
 
 <style>
@@ -62,7 +62,7 @@
 <div class="tools-header">Grade Inflation</div>
 
 <div class="tools-article">
-	<p>This tool visualizes how the average GPA has changed over the last 20 years at UMD. You can search for an entire department (eg "MATH" for the math department) or for a specific course (eg "CMSC131"). Clicking the 'View All Courses' button shows the average GPA of all courses combined over the last 20 years.</p>
+	<p>This tool visualizes how the average GPA has changed over the last 20 years at the University of Maryland &mdash; College Park. You can search for an entire department (e.g. "MATH" for the math department) or for a specific course (e.g. "CMSC131"). Clicking the 'View All Courses' button shows the average GPA of all courses combined since Spring 1998.</p>
 
 	<div class="row test">
 		<form method="POST" id="search-form" class="form-inline">
@@ -92,6 +92,8 @@
 	<p>"1998 S" means "1998 Spring"; "1998 F" means "1998 Fall".</p>
 
 	<p>GPA calculations are done according to <a href="https://www.testudo.umd.edu/gpa/index.html" target="_blank">UMD's grade to quality points rules</a>. All withdrawals (W) are considered to be 0.0 quality points.</p>
+
+	<p>There is an error in which Fall 2008 and Fall 2009 have identical grade data. We are requesting the correct data and will update this chart when we receive it.</p>
 
 	<p class="pb-3">Data is not guaranteed to be correct. The source of the grade data can be found <a href="/about#credits">here</a>.</p>
 </div>

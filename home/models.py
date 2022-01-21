@@ -230,18 +230,6 @@ class User(AbstractUser):
         null=True,
         blank=True,
         validators=[validators.validate_email],
-        help_text=mark_safe(
-            'Once an email is set, it cannot be changed. '
-            '<span id="email_hint_text" style="display: none;">'
-            '<br /><br /> PlantTerp will only send you emails when a review of '
-            'yours is approved, rejected, or unverified. You can opt out of this '
-            'in your account settings at any time. <br /><br /> Your email and '
-            'any other personal data on our site is kept confidential and isn\'t '
-            'shared with any other entity. If you have any questions about how '
-            'PlantTerp handles your data, please email '
-            '<a href="mailto:admin@planetterp.com">admin@planetterp.com</a>'
-            '</span>'
-        ),
         error_messages={
             "unique": mark_safe(
                 'A user with that email already exists. If you forgot your <br /> '

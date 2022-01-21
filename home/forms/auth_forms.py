@@ -154,12 +154,7 @@ class RegisterForm(ModelForm):
                 css_class="username-container mb-1"
             ),
             Div(
-                PrependedText(
-                    'email',
-                    mark_safe('<i id="email-field-info" class="fas fa-info-circle"></i>'),
-                    placeholder="Email (optional)",
-                    wrapper_class='mb-0'
-                ),
+                Field('email', placeholder="Email", wrapper_class='mb-0'),
                 self.field_errors['email'],
                 css_class="email-container mb-1"
             ),
