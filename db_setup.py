@@ -46,24 +46,3 @@ for row in to_rename:
     new_name = f"{old_name}_ourumd"
     db.query("UPDATE planetterp.reviews SET reviewer_name = $new_name WHERE reviewer_name = $old_name AND from_ourumd = 1",
         vars={"new_name": new_name, "old_name": old_name})
-
-
-# Merge professors with duplicate slugs and delete all duplicate professors.
-# Only keep the professor that was created first
-print("  Removing duplicate professors...")
-professors = db.query('SELECT * FROM planetterp.professors WHERE slug IS NOT NULL ORDER BY created DESC')
-for professor in professors:
-    query = db.query('SELECT id FROM planetterp.professors WHERE slug = $slug ORDER BY created DESC', vars={"slug": professor["slug"]})
-    p_ids = [record["id"] for record in query]
-
-    if len(p_ids) > 1:
-        kwargs = {
-            "new_id": p_ids[-1],
-            "curr_id": professor["id"]
-        }
-
-        db.query('UPDATE planetterp.reviews SET professor_id = $new_id WHERE professor_id = $curr_id', vars=kwargs)
-        db.query('UPDATE planetterp.grades SET professor_id = $new_id WHERE professor_id = $curr_id', vars=kwargs)
-        db.query('UPDATE planetterp.grades_historical SET professor_id = $new_id WHERE professor_id = $curr_id', vars=kwargs)
-        db.query('UPDATE planetterp.professor_courses SET professor_id = $new_id WHERE professor_id = $curr_id', vars=kwargs)
-        db.query('DELETE FROM planetterp.professors WHERE id = $id', vars={"id": professor["id"]})
