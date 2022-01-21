@@ -23,17 +23,13 @@ class Professor(View):
         review_form = ProfessorFormReview(user, professor)
 
         reviews = (
-            Review.objects
+            professor.review_set
             .verified
-            .filter(professor=professor)
-            .select_related("professor", "course")
+            .select_related("course")
             .order_by("-created_at")
         )
 
         reviews_table = VerifiedReviewsTable(reviews, request)
-
-        sum, num = reviews.aggregate(sum=Sum("rating"), num=Count("rating")).values()
-        average_rating = 0 if not (sum or num) else float(sum)/num
 
         courses_taught = (
             Course.objects
@@ -42,21 +38,31 @@ class Professor(View):
         )
 
         courses_reviewed = []
-        for review in reviews:
-            if review.course:
-                courses_reviewed.append(review.course.name)
-        courses_reviewed = set(courses_reviewed)
+        values = (
+            reviews
+            .order_by("course__name")
+            .values("course__name")
+            .distinct()
+        )
+        for value in values:
+            # filter out None values
+            if not value["course__name"]:
+                continue
+            courses_reviewed.append(value["course__name"])
 
-        grades = Grade.objects.filter(professor=professor)
-
-        courses_graded = [grade.course.name for grade in grades]
-        courses_graded = set(courses_graded)
+        values = (
+            professor.grade_set
+            .order_by("course__name")
+            .values("course__name")
+            .distinct()
+        )
+        courses_graded = [value["course__name"] for value in values]
 
         context = {
             "user": user,
             "professor": professor,
             "form": review_form,
-            "average_rating": average_rating,
+            "average_rating": professor.average_rating(),
             "courses_taught": courses_taught,
             "courses_reviewed": courses_reviewed,
             "courses_graded": courses_graded,
