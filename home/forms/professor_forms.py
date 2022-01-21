@@ -83,8 +83,8 @@ class ProfessorForm(Form):
         # Ordering the fields/elements and assigning css styles
         # https://django-crispy-forms.readthedocs.io/en/latest/layouts.html#universal-layout-objects
         submit_button = Button(
-            "Submit",
             "submit",
+            "Submit",
             id=f"submit-{self.form_type.value}-form",
             css_class="btn-warning w-100 mt-3",
             onClick=f'submitProfessorForm("#{self.form_html_id}")'
