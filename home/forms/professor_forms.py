@@ -85,7 +85,7 @@ class ProfessorForm(Form):
         submit_button = Button(
             "submit",
             "Submit",
-            id=f"submit-{self.form_type.value}-form",
+            css_id=f"submit-{self.form_type.value}-form",
             css_class="btn-warning w-100 mt-3",
             onClick=f'submitProfessorForm("#{self.form_html_id}")'
         )
