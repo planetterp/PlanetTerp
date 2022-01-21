@@ -119,28 +119,27 @@ class Admin(UserPassesTestMixin, View):
                 "type": None
             }
 
-            if form.has_changed():
-                if form.is_valid():
-                    if 'name' in form.changed_data:
-                        context['name'] = professor.name = form.cleaned_data['name']
-                    if 'slug' in form.changed_data:
-                        context['slug'] = professor.slug = form.cleaned_data['slug']
-                    if 'type' in form.changed_data:
-                        context['type'] = professor.type = form.cleaned_data['type']
+            if form.is_valid():
+                if 'name' in form.changed_data:
+                    context['name'] = professor.name = form.cleaned_data['name']
+                if 'slug' in form.changed_data:
+                    context['slug'] = professor.slug = form.cleaned_data['slug']
+                if 'type' in form.changed_data:
+                    context['type'] = professor.type = form.cleaned_data['type']
 
-                    professor.save()
+                professor.save()
 
-                    context["success"] = True
-                    form = ProfessorUpdateForm(professor)
-                else:
-                    context["success"] = False
+                context["success"] = True
+                form = ProfessorUpdateForm(professor)
+            else:
+                context["success"] = False
 
-                    if 'name' in form.changed_data:
-                        context['name'] = form.errors.pop("name", "valid")
-                    if 'slug' in form.changed_data:
-                        context['slug'] = form.errors.pop("slug", "valid")
-                    if 'type' in form.changed_data:
-                        context['type'] = form.errors.pop("type", "valid")
+                if 'name' in form.changed_data:
+                    context['name'] = form.errors.pop("name", "valid")
+                if 'slug' in form.changed_data:
+                    context['slug'] = form.errors.pop("slug", "valid")
+                if 'type' in form.changed_data:
+                    context['type'] = form.errors.pop("type", "valid")
 
             return JsonResponse(context)
 

@@ -377,7 +377,7 @@ class ProfessorUpdateForm(ModelForm):
         return layout
 
     def clean(self):
-        cleaned_data = super().clean()
+        cleaned_data = self.cleaned_data
         professor_id = int(cleaned_data.get("hidden_professor_id"))
         name = str(cleaned_data.get("name"))
         slug = str(cleaned_data.get("slug"))
