@@ -5,7 +5,6 @@ from django.contrib.auth.models import (AbstractUser,
 from django.utils.safestring import mark_safe
 from django.urls import reverse
 from django.core import validators
-from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.db.models import (Model, CharField, DateTimeField, TextField,
     IntegerField, BooleanField, ForeignKey, PositiveIntegerField, EmailField,
     CASCADE, ManyToManyField, SlugField, TextChoices, FloatField, Manager,
