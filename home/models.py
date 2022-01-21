@@ -145,7 +145,7 @@ class Course(Model):
 
 class Professor(Model):
     class Type(TextChoices):
-        PROFESSOR = "professor"
+        PROFESSOR = "Professor"
         TA = "TA"
 
     class Status(TextChoices):
