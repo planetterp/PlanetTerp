@@ -87,13 +87,6 @@ class Semester:
     def number(self):
         return int(f"{self.year}{self.season_number:02}")
 
-# This list must be kept in ascending order, as other parts of the codebase rely
-# on the ordering.
-RECENT_SEMESTERS = [
-    Semester("202008"), Semester("202012"), Semester("202101"),
-    Semester("202105"), Semester("202108")
-]
-
 class AdminAction(Enum):
     # Review actions
     REVIEW_VERIFY = "review_verify"
