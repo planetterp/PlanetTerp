@@ -26,8 +26,10 @@ function initializeRateYo(multiplier, form_type, show_error_styles) {
 }
 
 function setRateYoSize(wrapper_id, rateYo_instance_id) {
-	var starWidth =  $(wrapper_id).width() / 5;
-	starWidth = (starWidth >= 20 ? starWidth : 20) // minimum starWidth is 20px
+	const NUM_STARS = 5;
+	const MIN_STAR_WIDTH = 20;
+	var starWidth =  $(wrapper_id).width() / NUM_STARS;
+	starWidth = (starWidth >= MIN_STAR_WIDTH ? starWidth : MIN_STAR_WIDTH)
 	$(rateYo_instance_id).rateYo("option", "starWidth", starWidth + "px");
 }
 
