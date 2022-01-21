@@ -308,26 +308,26 @@ class Review(Model):
         REVIEW = "review"
 
     class Grades(TextChoices):
-        A_PLUS = "A+"
-        A = "A"
-        A_MINUS = "A-"
+        A_PLUS = ("A+", "A+")
+        A = ("A", "A")
+        A_MINUS = ("A-", "A-")
 
-        B_PLUS = "B+"
-        B = "B"
-        B_MINUS = "B-"
+        B_PLUS = ("B+", "B+")
+        B = ("B", "B")
+        B_MINUS = ("B-", "B-")
 
-        C_PLUS = "C+"
-        C = "C"
-        C_MINUS = "C-"
+        C_PLUS = ("C+", "C+")
+        C = ("C", "C")
+        C_MINUS = ("C-", "C-")
 
-        D_PLUS = "D+"
-        D = "D"
-        D_MINUS = "D-"
+        D_PLUS = ("D+", "D+")
+        D = ("D", "D")
+        D_MINUS = ("D-", "D-")
 
-        F = "F"
-        P = "P"
-        W = "W"
-        XF = "XF"
+        F = ("F", "F")
+        P = ("P", "P")
+        W = ("W", "W")
+        XF = ("XF", "XF")
 
     objects = ReviewManager()
 

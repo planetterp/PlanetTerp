@@ -21,7 +21,7 @@ from planetterp import config
 # Base form that contains common form fields
 class ProfessorForm(Form):
     grade = ChoiceField(
-        choices=[('', 'Expected Grade')] + [(tup[0],tup[0]) for tup in Review.Grades.choices],
+        choices=[('', 'Expected Grade')] + Review.Grades.choices,
         error_messages={
             "invalid_choice": """Invalid grade entered.
                 Please copy your review, refresh the page, and try again. If the error persists,
