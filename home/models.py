@@ -213,6 +213,7 @@ class User(AbstractUser):
     username = CharField(
         max_length=22,
         unique=True,
+        help_text="Once a username is set, it cannot be changed.",
         validators=[
             validators.RegexValidator("^[\w\d]+$", "Username can only contain "
                 "alphanumeric characters and underscores"),
