@@ -6,7 +6,7 @@ from django.forms import Form, ModelForm
 
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Div, Field, Layout, Button, HTML
-from crispy_forms.bootstrap import FormActions, StrictButton, UneditableField
+from crispy_forms.bootstrap import FormActions, StrictButton
 
 from .layout_objects.bootstrap_modal import BootstrapModal
 from home.utils import AdminAction, slug_in_use_err
@@ -279,9 +279,6 @@ class ProfessorUpdateForm(ModelForm):
         initial=AdminAction.PROFESSOR_EDIT.value
     )
 
-    # Using the 'disabled' option removes the field from
-    # the POST data. This work-around is neccessary as long
-    # as the slug isn't unique.
     hidden_professor_id = IntegerField(
         required=True,
         widget=HiddenInput
@@ -338,11 +335,11 @@ class ProfessorUpdateForm(ModelForm):
                         css_class="form-group col-md-4"
                     ),
                     Div(
-                        UneditableField('created_at'),
+                        'created_at',
                         css_class="form-group col-md-4"
                     ),
                     Div(
-                        UneditableField('professor_id'),
+                        'professor_id',
                         css_class="form-group col-md-4"
                     ),
                     css_class="form-row"
