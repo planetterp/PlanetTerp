@@ -215,7 +215,8 @@ class User(AbstractUser):
         unique=True,
         help_text="Once a username is set, it cannot be changed.",
         validators=[
-            UnicodeUsernameValidator(),
+            validators.RegexValidator("^[\w\d]+$", "Username can only contain "
+                "alphanumeric characters"),
             validators.MaxLengthValidator(22, "Username must be less than 20 characters"),
             validators.MinLengthValidator(2, "Username must be at least 2 characters")
         ],
