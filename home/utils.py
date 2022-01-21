@@ -87,6 +87,10 @@ class Semester:
     def number(self):
         return int(f"{self.year}{self.season_number:02}")
 
+# If you add additional semesters here, you will also need to add additional
+# semesters to grades.html in the submitCourseSearch method.
+PF_SEMESTERS = [Semester(202001), Semester(202012), Semester(202101)]
+
 class AdminAction(Enum):
     # Review actions
     REVIEW_VERIFY = "review_verify"

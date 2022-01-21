@@ -4,14 +4,8 @@ from django.views import View
 from django.urls import reverse
 
 from home.models import Professor, Grade, Course, Gened
-from home.utils import ttl_cache, Semester
+from home.utils import ttl_cache, Semester, PF_SEMESTERS
 
-# These are the pass/fail semesters that will need to be updated if
-# future semesters are p/f. If you modify the semesters here, you'll need to
-# modify them in grades.html in the submitCourseSearch() method.
-SPRING_2020 = Semester(202001)
-FALL_2020 = Semester(202012)
-SPRING_2021 = Semester(202101)
 
 class GradeData(View):
     def get(self, request):
@@ -86,11 +80,8 @@ class GradeData(View):
         grades = professor.grade_set.all()
 
         if not pf_semesters:
-            grades = grades.exclude(
-                Q(semester=SPRING_2020) |
-                Q(semester=FALL_2020) |
-                Q(semester=SPRING_2021)
-            )
+            for sem in PF_SEMESTERS:
+                grades = grades.exclude(semester=sem)
 
         grade_data = {
             "professor_slug": professor.slug,
@@ -125,11 +116,8 @@ class GradeData(View):
         if section:
             grades = grades.filter(section=section)
         if not pf_semesters:
-            grades = grades.exclude(
-                Q(semester=SPRING_2020) |
-                Q(semester=FALL_2020) |
-                Q(semester=SPRING_2021)
-            )
+            for sem in PF_SEMESTERS:
+                grades = grades.exclude(semester=sem)
 
         average_gpa = grades.average_gpa()
         num_students = grades.num_students()
