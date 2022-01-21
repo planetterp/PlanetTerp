@@ -66,10 +66,10 @@
 								</div>
 								<div class="card-body">
 									<p class="card-text">
-										{% if professor.review_set.count == 1 %}
-											{{ professor.review_set.count }} review
+										{% if professor.review_set.verified.count == 1 %}
+											{{ professor.review_set.verified.count }} review
 										{% else %}
-											{{ professor.review_set.count }} reviews
+											{{ professor.review_set.verified.count }} reviews
 										{% endif %}
 										<br />
 										Average rating: {{ professor.average_rating }}
