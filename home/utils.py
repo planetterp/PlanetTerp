@@ -89,7 +89,7 @@ class Semester:
 
 # If you add additional semesters here, you will also need to add additional
 # semesters to grades.html in the submitCourseSearch method.
-PF_SEMESTERS = [Semester(202001), Semester(202012), Semester(202101)]
+PF_SEMESTERS = [Semester(202001), Semester(202101)]
 
 class AdminAction(Enum):
     # Review actions
