@@ -1,5 +1,6 @@
 {% extends "base_main.html" %}
 {% load static %}
+{% load utils %}
 
 {% block title %}{{ course.name }} | PlanetTerp{% endblock %}
 {% block description %}View professor reviews and grade data for {{ course.name }}.\nProfessors teaching {{ course.name }} this semester: {% for professor in grouped_professors.values.0 %}{{ professor.name }}{% if not forloop.last %},{% endif %}{% endfor %}{% endblock %}
@@ -22,7 +23,7 @@
 				<a href="{{ course.get_absolute_url }}/reviews" class="btn btn-primary">
 					Reviews for this course
 				</a>
-				<a target="_blank" class="ml-2 btn btn-primary text-center" href="https://app.testudo.umd.edu/soc/search?courseId={{ course.name }}&sectionId=&termId=202101&_openSectionsOnly=on&creditCompare=&credits=&courseLevelFilter=ALL&instructor=&_facetoface=on&_blended=on&_online=on&courseStartCompare=&courseStartHour=&courseStartMin=&courseStartAM=&courseEndHour=&courseEndMin=&courseEndAM=&teachingCenter=ALL&_classDay1=on&_classDay2=on&_classDay3=on&_classDay4=on&_classDay5=on">
+				<a target="_blank" class="ml-2 btn btn-primary text-center" href="https://app.testudo.umd.edu/soc/search?courseId={{ course.name }}&sectionId=&termId={% current_semester %}&_openSectionsOnly=on&creditCompare=&credits=&courseLevelFilter=ALL&instructor=&_facetoface=on&_blended=on&_online=on&courseStartCompare=&courseStartHour=&courseStartMin=&courseStartAM=&courseEndHour=&courseEndMin=&courseEndAM=&teachingCenter=ALL&_classDay1=on&_classDay2=on&_classDay3=on&_classDay4=on&_classDay5=on">
 					Testudo
 				</a>
 			</div>

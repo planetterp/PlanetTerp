@@ -5,6 +5,7 @@ import base64
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from threading import Thread
+from datetime import datetime
 
 from django.urls import reverse
 
@@ -44,6 +45,18 @@ def semester_number(semester_name: str):
         year = int(year) + 1
 
     return f"{year}{seasons[season.lower()]}"
+
+def current_semester():
+    now = datetime.now()
+    # fall
+    if 3 >= now.month >= 9:
+        semester = "08"
+    # spring
+    else:
+        semester = "01"
+
+    return f"{now.year}{semester}"
+
 
 # This list must be kept in ascending order, as other parts of the codebase rely
 # on the ordering.

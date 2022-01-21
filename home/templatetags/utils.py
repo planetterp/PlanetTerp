@@ -2,6 +2,9 @@ from django import template
 from django.urls import reverse
 from django.templatetags.static import static
 
+from home import utils
+
+
 register = template.Library()
 
 @register.filter(name='range')
@@ -19,3 +22,7 @@ def full_url(context, name):
 @register.simple_tag(takes_context=True)
 def full_static(context, name):
     return context.request.build_absolute_uri(static(name))
+
+@register.simple_tag
+def current_semester():
+    return utils.current_semester()
