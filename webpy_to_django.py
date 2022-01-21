@@ -11,6 +11,7 @@ os.environ['DJANGO_SETTINGS_MODULE'] = 'planetterp.settings'
 application = get_wsgi_application()
 
 from home.models import *
+from home.utils import Semester
 
 web.config.debug = False
 db_name = os.environ.get("PLANETTERP_MYSQL_DB_NAME", "planetterp")
@@ -125,7 +126,7 @@ def link_courses_and_professors(courses, professors):
         course = courses[row["course_id"]]
         recent_semester = row["recent_semester"]
         through = {
-            "recent_semester": recent_semester
+            "recent_semester": Semester(recent_semester)
         }
         course.professors.add(professor, through_defaults=through)
 
@@ -202,10 +203,13 @@ def migrate_reviews(users, courses, professors):
 def migrate_grades(courses, historical_courses, professors):
     print("  Migrating grades...")
 
+    def _semester(row):
+        return Semester(row["semester"])
+
     mapping = {
         "course": lambda row: _foreign_key(courses, row, "course_id"),
         "professor": lambda row: _foreign_key(professors, row, "professor_id", True),
-        "semester": "semester",
+        "semester": _semester,
         "section": "section",
         "num_students": "num_students",
         "a_plus": "APLUS",
@@ -255,10 +259,12 @@ def migrate_sections(courses):
     def _active(row):
         val = row['active']
         return bool(val)
+    def _semester(row):
+        return Semester(row["semester"])
 
     mapping = {
         "id": "id",
-        "semester": "semester",
+        "semester": _semester,
         "section_number": "section_number",
         "seats": "seats",
         "available_seats": "available_seats",
