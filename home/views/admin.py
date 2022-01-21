@@ -5,7 +5,6 @@ from django.views import View
 from django.db.models import Q
 from django.http import JsonResponse
 from django.template.context_processors import csrf
-from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.urls import reverse
 
