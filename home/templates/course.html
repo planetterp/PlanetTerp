@@ -72,7 +72,7 @@
 											{{ professor.review_set.verified.count }} reviews
 										{% endif %}
 										<br />
-										Average rating: {{ professor.average_rating }}
+										Average rating: {{ professor.average_rating|floatformat:2 }}
 									</p>
 								</div>
 							</div>
