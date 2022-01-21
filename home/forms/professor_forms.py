@@ -306,7 +306,7 @@ class ProfessorFormAdd(ProfessorForm):
     def __init__(self, user, **kwargs):
         super().__init__(user, Review.ReviewType.ADD, **kwargs)
 
-        choices = [(tup[0],tup[0]) for tup in Professor.Type.choices]
+        choices = [(tup[0], tup[0].capitalize() if tup[0] == 'professor' else tup[0]) for tup in Professor.Type.choices]
         self.fields['type_'].choices = choices
 
     def error_message(self, field_name):
