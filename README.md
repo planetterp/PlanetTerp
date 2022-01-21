@@ -50,10 +50,13 @@ Once you're satisfied with your config, continue with your setup:
 
 ```bash
 python manage.py migrate
-# we provide some initial data (reviews, courses, professors,
-# grades, users, etc) for developers. If you prefer to start from
-# a completely blank database, skip this step.
-python manage.py loaddata initial
+# for testing, we provide some initial data, including all grades,
+# professors, courses, and reviews on the live site (as of 01/20/2022).
+# If you'd prefer to start from scratch with a fresh database, you can
+# safely skip this step, but we recommend it for anyone looking to develop
+# planetterp.
+# This command will take a while (about 15 minutes) to run.
+python manage.py loaddata home/initial.json.gz
 ```
 
 Now simply run the following to start the server:
@@ -62,7 +65,7 @@ Now simply run the following to start the server:
 python manage.py runserver
 ```
 
-You'll probably want to create an admin user so that you can see the admin panel and other admin-only items. To do so, run `python manage.py createsuperuser`. You'll be able to log in using that user to your local planetterp site, and it will have admin permissions. Make sure you chose a password that's longer than 8 characters, or our client-side validation will reject it on the login page!
+You'll probably want to create an admin user so that you can see the admin panel and other admin-only items. To do so, run `python manage.py createsuperuser`. You'll be able to log in using that user to your local planetterp site, and it will have admin permissions. Make sure you chose a password that's at least 8 characters long, or our client-side validation will reject it on the login page!
 
 #### Advanced Setup
 
