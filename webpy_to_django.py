@@ -126,7 +126,7 @@ def link_courses_and_professors(courses, professors):
         course = courses[row["course_id"]]
         recent_semester = row["recent_semester"]
         through = {
-            "recent_semester": Semester(recent_semester)
+            "recent_semester": Semester(recent_semester) if recent_semester else recent_semester
         }
         course.professors.add(professor, through_defaults=through)
 
