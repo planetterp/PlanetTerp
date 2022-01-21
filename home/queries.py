@@ -10,10 +10,12 @@ def search(search, num_results, *, offset=0, professors=False, courses=False):
         Professor.objects
         .verified
         .filter(name__icontains=search)
+        .order_by("name")
     )
     courses_q = (
         Course.objects
         .filter(Q(name__icontains=search) | Q(title__icontains=search))
+        .order_by("name")
     )
     iterables = []
     # professors before courses if both are passed
