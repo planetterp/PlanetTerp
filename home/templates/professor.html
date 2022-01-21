@@ -133,7 +133,7 @@
 	var is_admin = {{ user.is_staff|yesno:"true,false" }};
 
 	$(function() {
-		initializeRateYo(3.1, "review");
+		initializeRateYo(3, "review");
 
 		$("#review-counter").html(`${num_reviews} review${num_reviews == 1 ? '' : 's'}`);
 
