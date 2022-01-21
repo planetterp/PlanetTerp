@@ -63,10 +63,8 @@ INSTALLED_APPS = [
     "api"
 ]
 
-# used by django.contrib.sites. Needs to be 2 as django sites adds an example
-# site as site 1. Our site is added automatically by a data migration at SITE_ID
-# 2
-SITE_ID = 2
+# used by django.contrib.sites
+SITE_ID = 1
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
