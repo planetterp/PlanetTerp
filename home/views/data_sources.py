@@ -79,8 +79,8 @@ class GradeData(View):
     @staticmethod
     def _course_grade_data(professor, pf_semesters):
         professor = Professor.objects.verified.filter(name=professor).first()
-        courses = Course.objects.filter(professors=professor)
-        grades = Grade.objects.filter(professor=professor)
+        courses = professor.course_set.all().order_by("name")
+        grades = professor.grade_set.all()
 
         if not pf_semesters:
             grades = grades.exclude(
