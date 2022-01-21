@@ -1,15 +1,14 @@
 from django.http import JsonResponse
 from django.db.models import Sum, Q
-from django.db.models.functions import Concat
 from django.views import View
 from django.urls import reverse
 
 from home.models import Professor, Grade, Course, Gened
-from home.utils import ttl_cache
+from home.utils import ttl_cache, Semester
 
-SPRING_2020 = 202001
-FALL_2020 = 202012
-SPRING_2021 = 202101
+SPRING_2020 = Semester(202001)
+FALL_2020 = Semester(202012)
+SPRING_2021 = Semester(202101)
 
 class GradeData(View):
     def get(self, request):
@@ -119,7 +118,7 @@ class GradeData(View):
             course = Course.objects.filter(name=course).first()
             grades = grades.filter(course=course)
         if semester:
-            grades = grades.filter(semester=semester)
+            grades = grades.filter(semester=Semester(semester))
         if section:
             grades = grades.filter(section=section)
         if not pf_semesters:

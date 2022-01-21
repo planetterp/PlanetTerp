@@ -104,6 +104,11 @@ class SemesterField(CharField):
         kwargs["max_length"] = 6
         super().__init__(*args, **kwargs)
 
+    def deconstruct(self):
+        name, path, args, kwargs = super().deconstruct()
+        del kwargs["max_length"]
+        return name, path, args, kwargs
+
     def from_db_value(self, value, _expression, _connection):
         # avoid circular import
         from home.utils import Semester
@@ -112,8 +117,14 @@ class SemesterField(CharField):
             return value
         return Semester(value)
 
+    def get_prep_value(self, value):
+        from home.utils import Semester
+        if not isinstance(value, Semester):
+            raise ValueError(f"Expected a Semester object; found {type(value)} "
+                "instead.")
+        return str(value.number())
+
     def to_python(self, value):
-        # avoid circular import
         from home.utils import Semester
 
         if isinstance(value, Semester):
