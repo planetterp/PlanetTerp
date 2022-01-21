@@ -218,7 +218,9 @@ class CourseDifficultyData(View):
                 .filter(course__department=department_name)
                 .average_gpa()
             )
-            entry = [department_name, round(average_gpa, 2), department["num_students"]]
+            href = reverse("search") + f"?query={department_name}"
+            dep_link = f"<a href='{href}' target='_blank'>{department_name}</a>"
+            entry = [dep_link, f"{average_gpa:.2f}", department["num_students"]]
             data.append(entry)
         return data
 
