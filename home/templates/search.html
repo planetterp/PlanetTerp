@@ -11,7 +11,7 @@
 
 		{% for result in results %}
 			<h3>
-				<a href="{{ result.source }}/{{ result.slug }}">{{ result.name }}</a>
+				<a href="{{ result.get_absolute_url }}">{{ result.name }}</a>
 			</h3>
 		{% endfor %}
 	{% endif %}
