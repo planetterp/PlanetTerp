@@ -76,9 +76,9 @@ class ForgotPassword(View):
             reset_code = secrets.token_hex(int(self.RESET_LINK_LENGTH / 2))
             email_url = request.build_absolute_uri(reverse('reset-password', args=[reset_code]))
             message = (
-                f"Dear {user.username},\nA request has been made to reset your password. To do "
+                f"Dear {user.username},\n\nA request has been made to reset your password. To do "
                 f"so, please follow this link: \n{email_url}\n\n If you did not "
-                "request a password reset, you may safely disregard this email."
+                "request a password reset, you can safely disregard this email."
             )
             html_message = mark_safe(
                 f"Dear {user.username},<br />A request has been made to reset your password. To do "
