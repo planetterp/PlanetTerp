@@ -145,8 +145,8 @@ class Course(Model):
 
 class Professor(Model):
     class Type(TextChoices):
-        PROFESSOR = "professor"
-        TA = "TA"
+        PROFESSOR = ("professor", "Professor")
+        TA = ("TA", "TA")
 
     class Status(TextChoices):
         VERIFIED = "verified"
