@@ -1,5 +1,5 @@
 from django.http import JsonResponse
-from django.db.models import Sum, Q
+from django.db.models import Sum
 from django.views import View
 from django.urls import reverse
 
