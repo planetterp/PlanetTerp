@@ -28,17 +28,17 @@ class Course(View):
 
         professors = course.professors.all()
         grouped_professors = defaultdict(list)
-
+        past_professors = []
         for professor in professors:
             professor_course = ProfessorCourse.objects.get(
                 professor_id=professor.id, course_id=course.id)
             recent_semester = professor_course.recent_semester
 
             if recent_semester and recent_semester.recent:
-                semester = recent_semester.name()
+                grouped_professors[recent_semester].append(professor)
             else:
-                semester = "Past Semesters"
-            grouped_professors[semester].append(professor)
+                past_professors.append(professor)
+
 
         course_description = course.description
         courses_replaced = []
@@ -52,8 +52,15 @@ class Course(View):
                     courses_replaced.append(word)
         course.description = course_description
 
-        # https://code.djangoproject.com/ticket/16335
-        grouped_professors = dict(grouped_professors)
+        def key(item):
+            return item[0].number()
+
+        # order by semester taught
+        grouped_professors = {
+            k.name(): v for k, v in sorted(grouped_professors.items(), key=key, reverse=True)
+        }
+        # then add "past semesters" at the end
+        grouped_professors["Past Semesters"] = past_professors
 
         context = {
             "course": course,

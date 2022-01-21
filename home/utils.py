@@ -42,6 +42,12 @@ class Semester:
         # TODO more accurate measure
         self.recent = datetime.now().year - self.year <= 1
 
+    def __hash__(self):
+        return hash((self.year, self.season_number))
+
+    def __eq__(self, other):
+        return (self.year == other.year and
+            self.season_number == other.season_number)
 
     @classmethod
     def from_name(cls, name):
@@ -79,7 +85,7 @@ class Semester:
         return f"{season} {year}"
 
     def number(self):
-        return f"{self.year}{self.season_number:02}"
+        return int(f"{self.year}{self.season_number:02}")
 
 # This list must be kept in ascending order, as other parts of the codebase rely
 # on the ordering.
