@@ -56,7 +56,7 @@ python manage.py migrate
 # safely skip this step, but we recommend it for anyone looking to develop
 # planetterp.
 # This command will take a while (about 15 minutes) to run.
-python manage.py loaddata home/initial.json.gz
+python manage.py loaddata home/fixtures/initial
 ```
 
 Now simply run the following to start the server:
