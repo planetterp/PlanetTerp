@@ -4,7 +4,7 @@ from django.views import View
 from django.urls import reverse
 
 from home.models import Professor, Grade, Course, Gened
-from home.utils import ttl_cache, Semester, PF_SEMESTERS
+from home.utils import ttl_cache, Semester
 
 
 class GradeData(View):
@@ -80,8 +80,7 @@ class GradeData(View):
         grades = professor.grade_set.all()
 
         if not pf_semesters:
-            for sem in PF_SEMESTERS:
-                grades = grades.exclude(semester=sem)
+            grades = grades.exclude_pf()
 
         grade_data = {
             "professor_slug": professor.slug,
@@ -116,8 +115,7 @@ class GradeData(View):
         if section:
             grades = grades.filter(section=section)
         if not pf_semesters:
-            for sem in PF_SEMESTERS:
-                grades = grades.exclude(semester=sem)
+            grades = grades.exclude_pf()
 
         average_gpa = grades.average_gpa()
         num_students = grades.num_students()

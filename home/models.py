@@ -11,6 +11,14 @@ from django.db.models import (Model, CharField, DateTimeField, TextField,
     QuerySet, Sum, UniqueConstraint, Index, Count)
 
 class GradeQuerySet(QuerySet):
+
+    def exclude_pf(self):
+        from home.utils import PF_SEMESTERS
+        ret = self
+        for semester in PF_SEMESTERS:
+            ret = ret.exclude(semester=semester)
+        return ret
+
     def average_gpa(self):
         return self._apply_average_gpa(self.aggregate)["average_gpa"]
 
