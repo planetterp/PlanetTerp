@@ -6,3 +6,4 @@ static/documents/
 .vscode
 .env
 config.py
+rejected_imports.csv
