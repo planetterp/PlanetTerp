@@ -114,11 +114,13 @@ class SemesterField(CharField):
         from home.utils import Semester
 
         if value is None:
-            return value
+            return None
         return Semester(value)
 
     def get_prep_value(self, value):
         from home.utils import Semester
+        if value is None:
+            return None
         if not isinstance(value, Semester):
             raise ValueError(f"Expected a Semester object; found {type(value)} "
                 "instead.")
@@ -130,7 +132,7 @@ class SemesterField(CharField):
         if isinstance(value, Semester):
             return value
         if value is None:
-            return value
+            return None
         return Semester(value)
 
 class Course(Model):
