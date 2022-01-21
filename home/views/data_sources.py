@@ -166,6 +166,7 @@ class CourseDifficultyData(View):
 
         values = (
             Grade.objects
+            .exclude_pf()
             .values("course__name", total_students=Sum("num_students"))
             .filter(total_students__gte=100)
             .average_gpa_annotate()
@@ -203,6 +204,7 @@ class CourseDifficultyData(View):
     def _departments_data():
         departments = (
             Grade.objects
+            .exclude_pf()
             .values("course__department").distinct()
             .annotate(num_students=Sum("num_students"))
             .filter(num_students__gte=100)
@@ -214,6 +216,7 @@ class CourseDifficultyData(View):
             average_gpa = (
                 Grade.objects
                 .filter(course__department=department_name)
+                .exclude_pf()
                 .average_gpa()
             )
             href = reverse("search") + f"?query={department_name}"
