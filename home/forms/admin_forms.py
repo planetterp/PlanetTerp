@@ -255,7 +255,7 @@ class ProfessorUpdateForm(ModelForm):
     type = ChoiceField(
         required=False,
         label_suffix=None,
-        choices=[(tup[0],tup[0]) for tup in Professor.Type.choices]
+        choices=Professor.Type.choices
     )
 
     created_at = DateField(
