@@ -6,6 +6,9 @@ from django.urls import reverse
 from home.models import Professor, Grade, Course, Gened
 from home.utils import ttl_cache, Semester
 
+# These are the pass/fail semesters that will need to be updated if
+# future semesters are p/f. If you modify the semesters here, you'll need to
+# modify them in grades.html in the submitCourseSearch() method.
 SPRING_2020 = Semester(202001)
 FALL_2020 = Semester(202012)
 SPRING_2021 = Semester(202101)
