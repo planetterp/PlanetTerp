@@ -9,7 +9,7 @@ from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.db.models import (Model, CharField, DateTimeField, TextField,
     IntegerField, BooleanField, ForeignKey, PositiveIntegerField, EmailField,
     CASCADE, ManyToManyField, SlugField, TextChoices, FloatField, Manager,
-    QuerySet, Sum, UniqueConstraint, Index)
+    QuerySet, Sum, UniqueConstraint, Index, Count)
 
 class GradeQuerySet(QuerySet):
     def average_gpa(self):
@@ -163,13 +163,11 @@ class Professor(Model):
     created_at = DateTimeField(auto_now_add=True)
 
     def average_rating(self):
-        num_reviews = self.review_set.count()
-        if num_reviews == 0:
-            return None
         return (
             self.review_set
+            .verified
             .aggregate(
-                average_rating=Sum("rating") / num_reviews
+                average_rating=Sum("rating", output_field=FloatField()) / Count("*")
             )
         )["average_rating"]
 
