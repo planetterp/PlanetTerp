@@ -75,8 +75,7 @@ class ToolGradeInflation(TemplateView):
         # [labels, data]
         dist = [[], []]
         for value in values:
-            semester = Semester(value["semester"]).name(short=True,
-                year_first=True)
+            semester = value["semester"].name(short=True, year_first=True)
             dist[0].append(semester)
             average_gpa = value["average_gpa"]
             dist[1].append(f"{average_gpa:0.2f}")
