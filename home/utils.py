@@ -18,49 +18,75 @@ from home.models import Professor, Review
 from planetterp.config import (WEBHOOK_URL_UPDATE, EMAIL_HOST_USER,
     EMAIL_SERVICE_ACCOUNT_CREDENTIALS)
 
-def semester_name(semester_number, *, year_first=False, short=False):
-    seasons = {"01": "spring", "05": "summer", "08": "fall", "12": "winter"}
-    season = seasons[semester_number[4:6]]
+class Semester:
+    SPRING = 1
+    SUMMER = 5
+    FALL = 8
+    WINTER = 12
 
-    year = int(semester_number[:4])
+    SEASONS = {
+        "spring": SPRING,
+        "summer": SUMMER,
+        "fall": FALL,
+        "winter": WINTER
+    }
 
-    # The winter semester starting in january 2021 is actually called 202012
-    # internally, not 202112, so return the next year for winter to adjust.
-    if season == "winter":
-        year += 1
+    SEASONS_REVERSE = {v: k for k, v in SEASONS.items()}
 
-    season = season.capitalize()
-    if short:
-        # use first letter as acronym
-        season = season[0]
-    if year_first:
-        return f"{year} {season}"
-    return f"{season} {year}"
+    def __init__(self, semester):
+        semester = str(semester)
+        self.year = int(semester[0:4])
+        self.season_number = int(semester[4:6])
+        self.season = self.SEASONS_REVERSE[self.season_number]
 
-def semester_number(semester_name: str):
-    seasons = {"spring": "01", "summer": "05", "fall": "08", "winter": "12"}
-    season, year = semester_name.strip().split(' ')
+        # TODO more accurate measure
+        self.recent = datetime.now().year - self.year <= 1
 
-    if season.lower() == "winter":
-        year = int(year) + 1
 
-    return f"{year}{seasons[season.lower()]}"
+    @classmethod
+    def from_name(cls, name):
+        season = name.split(" ")[0]
+        year = name.split(" ")[1]
+        number = cls.SEASONS[season.lower()]
+        return Semester(f"{year}{number:02}")
 
-def current_semester():
-    now = datetime.now()
-    # fall
-    if 3 >= now.month >= 9:
-        semester = "08"
-    # spring
-    else:
-        semester = "01"
+    @staticmethod
+    def current():
+        now = datetime.now()
+        # fall
+        if 3 >= now.month >= 9:
+            semester = "08"
+        # spring
+        else:
+            semester = "01"
 
-    return f"{now.year}{semester}"
+        return Semester(f"{now.year}{semester}")
 
+    def name(self, *, year_first=False, short=False):
+        year = self.year
+        # The winter semester starting in january 2021 is actually called 202012
+        # internally, not 202112, so return the next year for winter to adjust.
+        if self.season_number == Semester.WINTER:
+            year += 1
+
+        season = self.season.capitalize()
+        if short:
+            # use first letter as acronym
+            season = season[0]
+
+        if year_first:
+            return f"{year} {season}"
+        return f"{season} {year}"
+
+    def number(self):
+        return f"{self.year}{self.season_number:02}"
 
 # This list must be kept in ascending order, as other parts of the codebase rely
 # on the ordering.
-RECENT_SEMESTERS = ["202008", "202012", "202101", "202105", "202108"]
+RECENT_SEMESTERS = [
+    Semester("202008"), Semester("202012"), Semester("202101"),
+    Semester("202105"), Semester("202108")
+]
 
 class AdminAction(Enum):
     # Review actions

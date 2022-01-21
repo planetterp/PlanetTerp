@@ -100,6 +100,29 @@ class ProfessorManager(Manager):
         return self.filter(status=Professor.Status.REJECTED)
 
 
+class SemesterField(CharField):
+    def __init__(self, *args, **kwargs):
+        kwargs["max_length"] = 6
+        super().__init__(*args, **kwargs)
+
+    def from_db_value(self, value, _expression, _connection):
+        # avoid circular import
+        from home.utils import Semester
+
+        if value is None:
+            return value
+        return Semester(value)
+
+    def to_python(self, value):
+        # avoid circular import
+        from home.utils import Semester
+
+        if isinstance(value, Semester):
+            return value
+        if value is None:
+            return value
+        return Semester(value)
+
 class Course(Model):
     department = CharField(max_length=4)
     course_number = CharField(max_length=6)
@@ -189,7 +212,7 @@ class ProfessorSection(Model):
 class Section(Model):
     course = ForeignKey(Course, CASCADE)
     professors = ManyToManyField(Professor, through=ProfessorSection)
-    semester = CharField(max_length=6)
+    semester = SemesterField()
     section_number = CharField(max_length=8)
     seats = PositiveIntegerField()
     available_seats = PositiveIntegerField()
@@ -342,7 +365,7 @@ class Grade(Model):
 
     course = ForeignKey(Course, CASCADE)
     professor = ForeignKey(Professor, CASCADE, null=True)
-    semester = CharField(max_length=6)
+    semester = SemesterField()
     section = CharField(max_length=10)
     num_students = PositiveIntegerField()
     a_plus  = PositiveIntegerField(db_column="APLUS")
@@ -396,7 +419,7 @@ class ProfessorCourse(Model):
 
     professor = ForeignKey(Professor, CASCADE)
     course = ForeignKey(Course, CASCADE)
-    recent_semester = CharField(max_length=6, null=True, blank=True)
+    recent_semester = SemesterField(null=True, blank=True)
     created_at = DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -437,7 +460,7 @@ class UserSchedule(Model):
     user = ForeignKey(User, CASCADE)
     section = ForeignKey(Section, CASCADE, null=True)
     active = BooleanField(default=True)
-    semester = CharField(max_length=6)
+    semester = SemesterField()
     loadtime = FloatField(blank=True, null=True)
     created_at = DateTimeField(auto_now_add=True)
 

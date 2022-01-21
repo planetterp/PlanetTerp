@@ -25,4 +25,4 @@ def full_static(context, name):
 
 @register.simple_tag
 def current_semester():
-    return utils.current_semester()
+    return utils.Semester.current().number()

@@ -5,7 +5,6 @@ from django.shortcuts import render, redirect
 from django.http import Http404
 from django.views import View
 
-from home import utils
 from home.models import ProfessorCourse, Course as CourseModel
 
 class Course(View):
@@ -33,10 +32,10 @@ class Course(View):
         for professor in professors:
             professor_course = ProfessorCourse.objects.get(
                 professor_id=professor.id, course_id=course.id)
-            professor.recent_semester = professor_course.recent_semester
+            recent_semester = professor_course.recent_semester
 
-            if professor.recent_semester in utils.RECENT_SEMESTERS:
-                semester = utils.semester_name(professor.recent_semester)
+            if recent_semester and recent_semester.recent:
+                semester = recent_semester.name()
             else:
                 semester = "Past Semesters"
             grouped_professors[semester].append(professor)

@@ -9,7 +9,7 @@ from crispy_forms.bootstrap import PrependedText
 from crispy_forms.helper import FormHelper
 
 from home.models import Professor, User, Grade, Course
-from home.utils import semester_name, semester_number
+from home.utils import Semester
 from planetterp.settings import DATE_FORMAT
 
 class ProfileForm(ModelForm):
@@ -148,7 +148,7 @@ class HistoricCourseGradeForm(Form):
             grades = Grade.objects.all().values('semester').distinct()
 
         def _semester_tuple(num):
-            return (num, semester_name(num))
+            return (num, Semester(num).name())
 
         semester_choices = [_semester_tuple(grade['semester']) for grade in grades]
         self.fields['semester'].widget.choices = [("", "All semesters")] + semester_choices

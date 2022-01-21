@@ -3,7 +3,7 @@ from django.views.generic import TemplateView
 from django.db.models import Sum
 
 from home.models import Grade, Course
-from home.utils import semester_name
+from home.utils import Semester
 
 
 class Tools(TemplateView):
@@ -75,7 +75,7 @@ class ToolGradeInflation(TemplateView):
         # [labels, data]
         dist = [[], []]
         for value in values:
-            semester = semester_name(value["semester"], short=True,
+            semester = Semester(value["semester"]).name(short=True,
                 year_first=True)
             dist[0].append(semester)
             average_gpa = value["average_gpa"]
