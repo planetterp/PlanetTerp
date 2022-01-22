@@ -79,29 +79,42 @@ class UserManager(DjangoUserManager):
             from_ourumd=True, **kwargs)
 
 
+class ReviewVerifiedManager(Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(status=Review.Status.VERIFIED)
+class ReviewPendingManager(Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(status=Review.Status.PENDING)
+class ReviewRejectedManager(Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(status=Review.Status.REJECTED)
 class ReviewManager(Manager):
     @property
     def verified(self):
         return self.filter(status=Review.Status.VERIFIED)
-
     @property
     def pending(self):
         return self.filter(status=Review.Status.PENDING)
-
     @property
     def rejected(self):
         return self.filter(status=Review.Status.REJECTED)
 
-
+class ProfessorVerifiedManager(Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(status=Professor.Status.VERIFIED)
+class ProfessorPendingManager(Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(status=Professor.Status.PENDING)
+class ProfessorRejectedManager(Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(status=Professor.Status.REJECTED)
 class ProfessorManager(Manager):
     @property
     def verified(self):
         return self.filter(status=Professor.Status.VERIFIED)
-
     @property
     def pending(self):
         return self.filter(status=Professor.Status.PENDING)
-
     @property
     def rejected(self):
         return self.filter(status=Professor.Status.REJECTED)
@@ -196,7 +209,16 @@ class Professor(Model):
         PENDING = "pending"
         REJECTED = "rejected"
 
-    objects = ProfessorManager()
+    # as a safety precuation, do away with the default "objects" manager on
+    # models which have a verification status (Professor and Review). This way,
+    # a consumer must access `Professor.unfiltered` explicitly
+    # (`Professor.objects` will error), which makes them reconsider whether they
+    # really want an "unfiltered" queryset (all objects in the database), or
+    # only the verified/pending/rejected reviews.
+    verified = ProfessorVerifiedManager()
+    pending = ProfessorPendingManager()
+    rejected = ProfessorRejectedManager()
+    unfiltered = ProfessorManager()
 
     name = CharField(max_length=100)
     slug = SlugField(max_length=100, null=True, unique=True)
@@ -204,6 +226,9 @@ class Professor(Model):
     status = CharField(choices=Status.choices, default=Status.PENDING,
         max_length=50)
     created_at = DateTimeField(auto_now_add=True)
+
+    class Meta:
+        default_manager_name = "unfiltered"
 
     def average_rating(self):
         return (
@@ -361,7 +386,10 @@ class Review(Model):
         W = ("W", "W")
         XF = ("XF", "XF")
 
-    objects = ReviewManager()
+    verified = ReviewVerifiedManager()
+    pending = ReviewPendingManager()
+    rejected = ReviewRejectedManager()
+    unfiltered = ReviewManager()
 
     professor = ForeignKey(Professor, CASCADE)
     course = ForeignKey(Course, CASCADE, null=True, blank=True)
@@ -378,6 +406,8 @@ class Review(Model):
     created_at = DateTimeField(auto_now_add=True)
     updated_at = DateTimeField(auto_now=True)
 
+    class Meta:
+        default_manager_name = "unfiltered"
 
 class Grade(Model):
     POSSIBLE_GRADES = [choice[0] for choice in Review.Grades.choices]

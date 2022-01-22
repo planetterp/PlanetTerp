@@ -75,7 +75,7 @@ class Command(BaseCommand):
         names = name.strip().split(",")
         lastname = names[0]
         firstname = names[-1].strip().split()[0]
-        professors = Professor.objects.filter(
+        professors = Professor.unfiltered.filter(
             Q(name__istartswith=firstname) & Q(name__iendswith=lastname)
         )
         if professors.exists():

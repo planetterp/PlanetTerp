@@ -278,7 +278,7 @@ class HistoricProfessorGradeForm(Form):
         clean_professor = self.cleaned_data.get('professor', None)
 
         if clean_professor:
-            professor = Professor.objects.filter(name=clean_professor).first()
+            professor = Professor.verified.filter(name=clean_professor).first()
             professor_data = Grade.objects.filter(professor=professor).first()
             if not professor:
                 message = "We don't have record of that professor"

@@ -36,7 +36,7 @@ class Courses(ListView):
     template_name = "course_list.html"
 
 class Professors(ListView):
-    queryset = Professor.objects.verified
+    queryset = Professor.verified.all()
     template_name = "professor_list.html"
 
 class Documents(TemplateView):
@@ -117,13 +117,12 @@ class CourseReviews(View):
 class Index(View):
     def get(self, request):
         num_courses = Course.objects.count()
-        num_professors = Professor.objects.verified.count()
-        num_reviews = Review.objects.verified.count()
+        num_professors = Professor.verified.count()
+        num_reviews = Review.verified.count()
         num_course_grades = Grade.objects.count()
 
         recent_reviews = (
             Review
-            .objects
             .verified
             .filter(professor__status=Professor.Status.VERIFIED)
             .order_by("-pk")[:3]
@@ -149,15 +148,9 @@ class SortReviewsTable(View):
         dir_ = data["direction"]
         key =  "-rating" if dir_ == "desc" else ("rating" if dir_ == "asc" else "-created_at")
         if data_type == "professor":
-            reviews = Review.objects.filter(
-                    status=Review.Status.VERIFIED,
-                    professor__id=obj_id
-                )
+            reviews = Review.verified.filter(professor__id=obj_id)
         elif data_type == "course":
-            reviews = Review.objects.filter(
-                    status=Review.Status.VERIFIED,
-                    course__id=obj_id
-                )
+            reviews = Review.verified.filter(course__id=obj_id)
         else:
             raise ValueError(f"Unknown type: {data_type}")
 

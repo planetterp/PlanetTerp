@@ -221,7 +221,7 @@ class ProfessorSlugForm(Form):
         slug = str(cleaned_data.get("slug"))
 
         slug = slug.lower().strip().replace(" ", "_")
-        professor = Professor.objects.filter(slug=slug).first()
+        professor = Professor.unfiltered.filter(slug=slug).first()
 
         if slug == '' or slug.isspace():
             error_msg = "You must enter a slug"
@@ -379,10 +379,10 @@ class ProfessorUpdateForm(ModelForm):
         name = str(cleaned_data.get("name"))
         slug = str(cleaned_data.get("slug"))
 
-        professor = Professor.objects.get(pk=professor_id)
+        professor = Professor.unfiltered.get(pk=professor_id)
 
         if not (name.strip() == "" or name == professor.name):
-            professor_obj = Professor.objects.filter(name=name).exclude(pk=professor_id)
+            professor_obj = Professor.unfiltered.filter(name=name).exclude(pk=professor_id)
 
             if professor_obj.exists():
                 error_msg = "A professor with this name already exists"
@@ -395,7 +395,7 @@ class ProfessorUpdateForm(ModelForm):
 
 
         if not (slug.strip() == "" or slug == professor.slug):
-            professor_obj = Professor.objects.filter(slug=slug).exclude(pk=professor_id)
+            professor_obj = Professor.unfiltered.filter(slug=slug).exclude(pk=professor_id)
 
             if professor_obj.exists():
                 error_msg = slug_in_use_err(slug, professor_obj.first().name)
@@ -594,8 +594,8 @@ class ProfessorMergeForm(Form):
                 error = ValidationError(error_msg, code='Self-Merge')
                 self.add_error('merge_target', error)
             else:
-                subject = Professor.objects.filter(pk=merge_subject_id).first()
-                target = Professor.objects.filter(pk=merge_target_id).first()
+                subject = Professor.unfiltered.filter(pk=merge_subject_id).first()
+                target = Professor.unfiltered.filter(pk=merge_target_id).first()
                 error_msg = f'''The highlighted {"names don't" if not (subject or target) else "name doesn't"} exist'''
                 error = ValidationError(error_msg, code='DNE')
                 if not subject:

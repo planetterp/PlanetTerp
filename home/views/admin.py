@@ -30,12 +30,11 @@ class Admin(UserPassesTestMixin, View):
 
     def get(self, request):
         reviews = (
-            Review.objects.pending
+            Review.pending
             .select_related("professor", "course", "user")
             .all()
         )
-        professors = Professor.objects.pending.all()
-
+        professors = Professor.pending.all()
 
         reviews_table = UnverifiedReviewsTable(reviews, request)
         professors_table = ProfessorsTable(professors, request)
@@ -65,7 +64,7 @@ class Admin(UserPassesTestMixin, View):
 
         if action_type is AdminAction.REVIEW_HELP:
             channel_url = config.WEBHOOK_URL_HELP
-            review = Review.objects.select_related().get(pk=int(data["review_id"]))
+            review = Review.unfiltered.select_related().get(pk=int(data["review_id"]))
             professor = review.professor
             professor_id = professor.id
             grade = review.grade if review.grade else "N/A"
@@ -91,7 +90,7 @@ class Admin(UserPassesTestMixin, View):
         elif action_type is AdminAction.PROFESSOR_VERIFY:
             verified_status = Professor.Status(data["verified"])
             professor_id = int(data["professor_id"])
-            professor = Professor.objects.filter(pk=professor_id).first()
+            professor = Professor.unfiltered.filter(pk=professor_id).first()
 
             if professor and professor.slug:
                 slug = professor.slug
@@ -102,7 +101,7 @@ class Admin(UserPassesTestMixin, View):
 
         elif action_type is AdminAction.PROFESSOR_EDIT:
             professor_id = data["hidden_professor_id"]
-            professor = Professor.objects.get(pk=professor_id)
+            professor = Professor.unfiltered.get(pk=professor_id)
             initial_data = {
                 "name": professor.name,
                 "slug": professor.slug,
@@ -144,7 +143,7 @@ class Admin(UserPassesTestMixin, View):
 
         elif action_type is AdminAction.PROFESSOR_MERGE:
             subject_id = request.POST['subject_id']
-            merge_subject = Professor.objects.get(pk=subject_id)
+            merge_subject = Professor.unfiltered.get(pk=subject_id)
             form = ProfessorMergeForm(request, merge_subject, data=request.POST)
 
             ctx = {}
@@ -155,10 +154,10 @@ class Admin(UserPassesTestMixin, View):
 
             if form.is_valid():
                 target_id = form.cleaned_data['target_id']
-                merge_target = Professor.objects.get(pk=target_id)
+                merge_target = Professor.unfiltered.get(pk=target_id)
 
                 ProfessorCourse.objects.filter(professor__id=subject_id).update(professor=merge_target)
-                Review.objects.filter(professor__id=subject_id).update(professor=merge_target)
+                Review.unfiltered.filter(professor__id=subject_id).update(professor=merge_target)
                 Grade.objects.filter(professor__id=subject_id).update(professor=merge_target)
                 context['success'] = True
                 context["target_slug"] = merge_target.slug
@@ -170,7 +169,7 @@ class Admin(UserPassesTestMixin, View):
         elif action_type is AdminAction.PROFESSOR_DELETE:
             professor_id = int(data["professor_id"])
             professor_type = str(data["professor_type"])
-            has_reviews = Review.objects.filter(professor__id=professor_id).exists()
+            has_reviews = Review.unfiltered.filter(professor__id=professor_id).exists()
             has_grades = Grade.objects.filter(professor__id=professor_id).exists()
             has_courses = ProfessorCourse.objects.filter(professor__id=professor_id).exists()
             response = {
@@ -195,14 +194,14 @@ class Admin(UserPassesTestMixin, View):
                     f"deleted! Please merge this {professor_type} then try again."
                 )
             else:
-                Professor.objects.filter(pk=professor_id).delete()
+                Professor.unfiltered.filter(pk=professor_id).delete()
                 response["success_msg"] = "deleted"
 
             return JsonResponse(response)
 
         elif action_type is AdminAction.PROFESSOR_SLUG:
             professor_id = int(data["professor_id"])
-            professor = Professor.objects.filter(pk=professor_id).first()
+            professor = Professor.unfiltered.filter(pk=professor_id).first()
             form = ProfessorSlugForm(professor, data=request.POST)
 
             ctx = {}
@@ -229,7 +228,7 @@ class Admin(UserPassesTestMixin, View):
         return f"{type_} not found"
 
     def verify_review(self, review_id: int, verified_status: Review.Status, user: User):
-        review = Review.objects.filter(pk=review_id).first()
+        review = Review.unfiltered.filter(pk=review_id).first()
         if not review:
             response = {
                 "error_msg": self.not_found_err("Review"),
@@ -282,10 +281,13 @@ class Admin(UserPassesTestMixin, View):
                 first_name = split_name[0].lower().strip()
                 last_name = split_name[-1].lower().strip()
 
-                query = Professor.objects.filter(
-                    (Q(name__istartswith=first_name) & Q(name__iendswith=last_name)) |
-                    Q(slug="_".join(reversed(split_name)).lower()),
-                    status=verified_status)
+                query = Professor.verified.filter(
+                    (
+                        Q(name__istartswith=first_name) &
+                        Q(name__iendswith=last_name)
+                    ) |
+                    Q(slug="_".join(reversed(split_name)).lower())
+                )
 
                 if query.exists():
                     response["error_msg"] = (
@@ -316,7 +318,7 @@ class Admin(UserPassesTestMixin, View):
         else:
             professor.slug = None
             if verified_status is Professor.Status.REJECTED:
-                reviews = Review.objects.filter(professor__id=professor.pk)
+                reviews = Review.unfiltered.filter(professor__id=professor.pk)
                 reviews.update(status=verified_status)
 
         professor.status = verified_status

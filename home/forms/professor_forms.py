@@ -194,9 +194,9 @@ class ProfessorForm(Form):
         webhook = DiscordWebhook(url=channel_url)
 
         if self.form_type is Review.ReviewType.REVIEW:
-            num = Review.objects.pending.count()
+            num = Review.pending.count()
         elif self.form_type is Review.ReviewType.ADD:
-            num = Professor.objects.pending.count()
+            num = Professor.pending.count()
         else:
             raise ValueError("Invalid form type!")
 

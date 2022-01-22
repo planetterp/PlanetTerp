@@ -7,8 +7,7 @@ from home.models import Professor, Course
 def search(search, num_results, *, offset=0, professors=False, courses=False):
     # TODO: allow option to search all professors
     professors_q = (
-        Professor.objects
-        .verified
+        Professor.verified
         .filter(name__icontains=search)
         .order_by("name")
     )
