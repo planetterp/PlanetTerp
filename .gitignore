@@ -7,3 +7,4 @@ static/documents/
 .env
 config.py
 rejected_imports.csv
+static_root/
