@@ -86,29 +86,32 @@ class ProfileForm(ModelForm):
             send_review_email_errors = None
 
         layout = Layout(
-            'username',
-            'date_joined',
-            Field(
-                'email',
-                placeholder=email_placeholder,
-                wrapper_class="mb-0"
-            ),
-            self.field_errors['email'],
-            send_review_email,
-            send_review_email_errors,
             Div(
-                Button(
-                    'save',
-                    'Save',
-                    css_class="btn-primary",
-                    onClick="updateProfile()"
+                'username',
+                'date_joined',
+                Field(
+                    'email',
+                    placeholder=email_placeholder,
+                    wrapper_class="mb-0"
                 ),
+                self.field_errors['email'],
+                send_review_email,
+                send_review_email_errors,
                 Div(
-                    css_id="profile-form-success",
-                    css_class="col text-success text-center d-none",
-                    style="font-size: 20px"
+                    Button(
+                        'save',
+                        'Save',
+                        css_class="btn-primary",
+                        onClick="updateProfile()"
+                    ),
+                    Div(
+                        css_id="profile-form-success",
+                        css_class="col text-success text-center d-none",
+                        style="font-size: 20px"
+                    ),
+                    css_class="mt-3"
                 ),
-                css_class="mt-3"
+                css_class="mb-3"
             )
         )
 
