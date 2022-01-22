@@ -5,7 +5,6 @@ from django.utils.safestring import mark_safe
 from django.forms import ModelForm, Form
 
 from crispy_forms.layout import Layout, Div, Field, HTML, Button
-from crispy_forms.bootstrap import PrependedText
 from crispy_forms.helper import FormHelper
 
 from home.models import Professor, User, Grade, Course
@@ -89,9 +88,8 @@ class ProfileForm(ModelForm):
         layout = Layout(
             'username',
             'date_joined',
-            PrependedText(
+            Field(
                 'email',
-                mark_safe('<i id="email-field-info" class="fas fa-info-circle"></i>'),
                 placeholder=email_placeholder,
                 wrapper_class="mb-0"
             ),
