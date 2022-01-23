@@ -1,5 +1,5 @@
 from enum import Enum, auto
-from functools import lru_cache, wraps
+from functools import lru_cache, wraps, total_ordering
 import time
 import base64
 from email.mime.text import MIMEText
@@ -18,6 +18,7 @@ from home.models import Professor, Review
 from planetterp.config import (WEBHOOK_URL_UPDATE, EMAIL_HOST_USER,
     EMAIL_SERVICE_ACCOUNT_CREDENTIALS)
 
+@total_ordering
 class Semester:
     SPRING = 1
     SUMMER = 5
@@ -48,6 +49,13 @@ class Semester:
     def __eq__(self, other):
         return (self.year == other.year and
             self.season_number == other.season_number)
+
+    def __le__(self, other):
+        if self.year < other.year:
+            return True
+        if self.year > other.year:
+            return False
+        return self.season_number < other.season_number
 
     @classmethod
     def from_name(cls, name):
