@@ -1,11 +1,10 @@
 from django.views import View
 from django.shortcuts import render
-from django.db.models import Sum, Count
 from django.http import Http404, JsonResponse
 
 from home.utils import send_updates_webhook
 from home.forms.professor_forms import ProfessorFormReview
-from home.models import Professor as ProfessorModel, Review, Course, Grade
+from home.models import Professor as ProfessorModel, Review, Course
 from home.tables.reviews_table import VerifiedReviewsTable
 from home.forms.admin_forms import ProfessorUpdateForm, ProfessorUnverifyForm, ProfessorMergeForm
 
@@ -14,7 +13,7 @@ class Professor(View):
     template = "professor.html"
 
     def get(self, request, slug):
-        professor = ProfessorModel.objects.verified.filter(slug=slug).first()
+        professor = ProfessorModel.verified.filter(slug=slug).first()
         if not professor:
             raise Http404()
 
@@ -23,8 +22,7 @@ class Professor(View):
         review_form = ProfessorFormReview(user, professor)
 
         reviews = (
-            professor.review_set
-            .verified
+            professor.review_set(manager="verified")
             .select_related("course")
             .order_by("-created_at")
         )
@@ -51,7 +49,7 @@ class Professor(View):
             courses_reviewed.append(value["course__name"])
 
         values = (
-            professor.grade_set
+            professor.grade_set(manager="recent")
             .order_by("course__name")
             .values("course__name")
             .distinct()

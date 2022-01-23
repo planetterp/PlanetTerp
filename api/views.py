@@ -118,7 +118,7 @@ class Grades(APIView):
             course = CourseModel.objects.filter(name=course_name).first()
             if not course:
                 raise ValidationError("course not found")
-            grades = course.grade_set
+            grades = course.grade_set(manger="recent")
 
         if professor_name:
             professor = (
@@ -126,7 +126,7 @@ class Grades(APIView):
             )
             if not professor:
                 raise ValidationError("professor not found")
-            grades = professor.grade_set
+            grades = professor.grade_set(manager="recent")
 
         if semester:
             grades = grades.filter(semester=semester)

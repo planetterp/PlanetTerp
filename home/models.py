@@ -71,6 +71,12 @@ class GradeQuerySet(QuerySet):
     average_gpa.queryset_only = True
     num_students.queryset_only = True
 
+class RecentGradeManager(Manager):
+    def get_queryset(self):
+        from home.utils import Semester
+        # TODO dont hardcode recent semester
+        return super().get_queryset().filter(semester__gte=Semester(201201))
+
 
 class UserManager(DjangoUserManager):
     def create_ourumd_user(self, username, email=None, **kwargs):
@@ -88,16 +94,6 @@ class ReviewPendingManager(Manager):
 class ReviewRejectedManager(Manager):
     def get_queryset(self):
         return super().get_queryset().filter(status=Review.Status.REJECTED)
-class ReviewManager(Manager):
-    @property
-    def verified(self):
-        return self.filter(status=Review.Status.VERIFIED)
-    @property
-    def pending(self):
-        return self.filter(status=Review.Status.PENDING)
-    @property
-    def rejected(self):
-        return self.filter(status=Review.Status.REJECTED)
 
 class ProfessorVerifiedManager(Manager):
     def get_queryset(self):
@@ -108,17 +104,6 @@ class ProfessorPendingManager(Manager):
 class ProfessorRejectedManager(Manager):
     def get_queryset(self):
         return super().get_queryset().filter(status=Professor.Status.REJECTED)
-class ProfessorManager(Manager):
-    @property
-    def verified(self):
-        return self.filter(status=Professor.Status.VERIFIED)
-    @property
-    def pending(self):
-        return self.filter(status=Professor.Status.PENDING)
-    @property
-    def rejected(self):
-        return self.filter(status=Professor.Status.REJECTED)
-
 
 class SemesterField(CharField):
     def __init__(self, *args, **kwargs):
@@ -190,7 +175,7 @@ class Course(Model):
         ]
 
     def average_gpa(self):
-        return self.grade_set.all().average_gpa()
+        return self.grade_set(manager="recent").all().average_gpa()
 
     def get_absolute_url(self):
         return reverse("course", kwargs={"name": self.name})
@@ -218,7 +203,7 @@ class Professor(Model):
     verified = ProfessorVerifiedManager()
     pending = ProfessorPendingManager()
     rejected = ProfessorRejectedManager()
-    unfiltered = ProfessorManager()
+    unfiltered = Manager()
 
     name = CharField(max_length=100)
     slug = SlugField(max_length=100, null=True, unique=True)
@@ -232,8 +217,7 @@ class Professor(Model):
 
     def average_rating(self):
         return (
-            self.review_set
-            .verified
+            self.review_set(manager="verified")
             .aggregate(
                 average_rating=Sum("rating", output_field=FloatField()) / Count("*")
             )
@@ -389,7 +373,7 @@ class Review(Model):
     verified = ReviewVerifiedManager()
     pending = ReviewPendingManager()
     rejected = ReviewRejectedManager()
-    unfiltered = ReviewManager()
+    unfiltered = Manager()
 
     professor = ForeignKey(Professor, CASCADE)
     course = ForeignKey(Course, CASCADE, null=True, blank=True)
@@ -408,6 +392,9 @@ class Review(Model):
 
     class Meta:
         default_manager_name = "unfiltered"
+        indexes = [
+            Index(fields=["status"])
+        ]
 
 class Grade(Model):
     POSSIBLE_GRADES = [choice[0] for choice in Review.Grades.choices]
@@ -434,13 +421,21 @@ class Grade(Model):
     w       = PositiveIntegerField(db_column="W")
     other   = PositiveIntegerField(db_column="OTHER")
 
-    objects = GradeQuerySet.as_manager()
+    recent = RecentGradeManager.from_queryset(GradeQuerySet)()
+    unfiltered = Manager.from_queryset(GradeQuerySet)()
 
     class Meta:
+        constraints = [
+            UniqueConstraint(
+                fields=["course", "semester", "section"],
+                name="unique_course_semester_section"
+            )
+        ]
         indexes = [
             Index(fields=["semester"]),
             Index(fields=["section"]),
         ]
+        default_manager_name = "unfiltered"
 
     def __str__(self):
         return (

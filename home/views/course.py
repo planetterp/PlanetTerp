@@ -33,6 +33,7 @@ class Course(View):
             professor_course = ProfessorCourse.objects.get(
                 professor_id=professor.id, course_id=course.id)
             recent_semester = professor_course.recent_semester
+            professor.num_reviews = professor.review_set(manager="verified").count()
 
             if recent_semester and recent_semester.recent:
                 grouped_professors[recent_semester].append(professor)

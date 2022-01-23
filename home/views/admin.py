@@ -158,7 +158,7 @@ class Admin(UserPassesTestMixin, View):
 
                 ProfessorCourse.objects.filter(professor__id=subject_id).update(professor=merge_target)
                 Review.unfiltered.filter(professor__id=subject_id).update(professor=merge_target)
-                Grade.objects.filter(professor__id=subject_id).update(professor=merge_target)
+                Grade.unfiltered.filter(professor__id=subject_id).update(professor=merge_target)
                 context['success'] = True
                 context["target_slug"] = merge_target.slug
                 merge_subject.delete()
@@ -170,7 +170,7 @@ class Admin(UserPassesTestMixin, View):
             professor_id = int(data["professor_id"])
             professor_type = str(data["professor_type"])
             has_reviews = Review.unfiltered.filter(professor__id=professor_id).exists()
-            has_grades = Grade.objects.filter(professor__id=professor_id).exists()
+            has_grades = Grade.unfiltered.filter(professor__id=professor_id).exists()
             has_courses = ProfessorCourse.objects.filter(professor__id=professor_id).exists()
             response = {
                 "id" : professor_id,

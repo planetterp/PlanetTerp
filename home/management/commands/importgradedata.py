@@ -43,7 +43,7 @@ class Command(BaseCommand):
             for row in reader:
                 self.add_grade(row)
 
-        grades = Grade.objects.bulk_create(self.grades)
+        grades = Grade.unfiltered.bulk_create(self.grades)
         self.stdout.write(f"Done, added {len(grades)} grades")
 
         if self.reject_rows:

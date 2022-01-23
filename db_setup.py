@@ -46,3 +46,6 @@ for row in to_rename:
     new_name = f"{old_name}_ourumd"
     db.query("UPDATE planetterp.reviews SET reviewer_name = $new_name WHERE reviewer_name = $old_name AND from_ourumd = 1",
         vars={"new_name": new_name, "old_name": old_name})
+
+print("  Removing duplicate grades from grades_historical...")
+db.query("DELETE FROM planetterp.grades_historical WHERE semester >= '201201'")

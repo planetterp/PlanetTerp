@@ -26,7 +26,7 @@ class ToolPopularCourses(TemplateView):
                 "characters.")
 
         values = (
-            Grade.objects
+            Grade.recent
             .filter(course__name__icontains=query)
             .values("course__name")
             .annotate(num_students=Sum("num_students"))
@@ -56,14 +56,15 @@ class ToolGradeInflation(TemplateView):
         if len(search) not in [0, 4, 5, 6, 7, 8]:
             return HttpResponseBadRequest("Invalid department or course.")
 
-        grades = Grade.objects.all()
+        grades = Grade.unfiltered.all()
         if len(search) == 4:
             grades = grades.filter(course__department=search)
         if len(search) > 4:
-            if not Course.objects.filter(name=search).exists():
+            course = Course.objects.filter(name=search).first()
+            if not course:
                 return HttpResponseBadRequest("Course does not exist.")
 
-            grades = grades.filter(course__name__istartswith=search)
+            grades = course.grade_set.all()
 
         values = (
             grades

@@ -105,7 +105,7 @@ class CourseReviews(View):
         if course is None:
             raise Http404()
 
-        reviews = course.review_set.verified.order_by("-created_at")
+        reviews = course.review_set(manager="verified").order_by("-created_at")
 
         context = {
             "course": course,
@@ -119,7 +119,7 @@ class Index(View):
         num_courses = Course.objects.count()
         num_professors = Professor.verified.count()
         num_reviews = Review.verified.count()
-        num_course_grades = Grade.objects.count()
+        num_course_grades = Grade.unfiltered.count()
 
         recent_reviews = (
             Review

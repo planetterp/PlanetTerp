@@ -77,7 +77,7 @@ class GradeData(View):
     def _course_grade_data(professor, pf_semesters):
         professor = Professor.verified.filter(name=professor).first()
         courses = professor.course_set.all().order_by("name")
-        grades = professor.grade_set.all()
+        grades = professor.grade_set(manager="recent").all()
 
         if not pf_semesters:
             grades = grades.exclude_pf()
@@ -102,7 +102,13 @@ class GradeData(View):
     @staticmethod
     @ttl_cache(24 * 60 * 60)
     def _grade_data(professor, course, semester, section, pf_semesters):
-        grades = Grade.objects.all()
+        # if we want a specific semester, grab all grades to start; we'll filter
+        # down to that specific semester later, and don't want to return no data
+        # for a request for an old (non-recent) semester.
+        if semester:
+            grades = Grade.unfiltered.all()
+        else:
+            grades = Grade.recent.all()
 
         if professor:
             professor = Professor.verified.filter(slug=professor).first()
@@ -165,7 +171,7 @@ class CourseDifficultyData(View):
         data = []
 
         values = (
-            Grade.objects
+            Grade.recent
             .exclude_pf()
             .values("course__name", total_students=Sum("num_students"))
             .filter(total_students__gte=100)
@@ -203,7 +209,7 @@ class CourseDifficultyData(View):
     @ttl_cache(24 * 60 * 60)
     def _departments_data():
         departments = (
-            Grade.objects
+            Grade.recent
             .exclude_pf()
             .values("course__department").distinct()
             .annotate(num_students=Sum("num_students"))
@@ -214,7 +220,7 @@ class CourseDifficultyData(View):
         for department in departments:
             department_name = department["course__department"]
             average_gpa = (
-                Grade.objects
+                Grade.recent
                 .filter(course__department=department_name)
                 .exclude_pf()
                 .average_gpa()

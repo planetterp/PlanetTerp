@@ -143,21 +143,22 @@ class HistoricCourseGradeForm(Form):
             # If user specified the course, only display semesters when
             # that course was offered
             course_obj = Course.objects.filter(name=self.course_name).first()
-            grades = Grade.objects.filter(course=course_obj).values('semester').distinct()
+            values = Grade.unfiltered.filter(course=course_obj).values('semester').distinct()
         else:
             # Otherwise, only display semesters we have data for
-            grades = Grade.objects.all().values('semester').distinct()
+            values = Grade.unfiltered.all().values('semester').distinct()
+        values = values.order_by("-semester")
 
         def _semester_tuple(semester):
             return (str(semester.number()), semester.name())
 
-        semester_choices = [_semester_tuple(grade["semester"]) for grade in grades]
+        semester_choices = [_semester_tuple(value["semester"]) for value in values]
         self.fields['semester'].widget.choices = [("", "All semesters")] + semester_choices
 
     def initialize_section(self):
         if self.semester and self.semester != '':
             course = Course.objects.filter(name=self.course_name).first()
-            grades = Grade.objects.filter(
+            grades = Grade.unfiltered.filter(
                 course=course, semester=Semester(self.semester)
             ).values('section').distinct()
 
@@ -221,7 +222,7 @@ class HistoricCourseGradeForm(Form):
 
         if clean_course:
             course = Course.objects.filter(name=clean_course).first()
-            course_data = Grade.objects.filter(course=course).first()
+            course_data = Grade.unfiltered.filter(course=course).first()
 
             if not course:
                 message = "We don't have record of that course"
@@ -279,7 +280,7 @@ class HistoricProfessorGradeForm(Form):
 
         if clean_professor:
             professor = Professor.verified.filter(name=clean_professor).first()
-            professor_data = Grade.objects.filter(professor=professor).first()
+            professor_data = professor.grade_set.all()
             if not professor:
                 message = "We don't have record of that professor"
                 self.add_error('professor', ValidationError(message, code="INVALID_PROFESSOR"))
