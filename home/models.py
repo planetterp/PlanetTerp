@@ -115,6 +115,7 @@ class SemesterField(CharField):
         del kwargs["max_length"]
         return name, path, args, kwargs
 
+    # called when reading from the database
     def from_db_value(self, value, _expression, _connection):
         # avoid circular import
         from home.utils import Semester
@@ -123,6 +124,7 @@ class SemesterField(CharField):
             return None
         return Semester(value)
 
+    # called when writing back to the database
     def get_prep_value(self, value):
         from home.utils import Semester
         if value is None:
@@ -132,6 +134,7 @@ class SemesterField(CharField):
                 "instead.")
         return str(value.number())
 
+    # called when deserializing, and by a form's `clean` method
     def to_python(self, value):
         from home.utils import Semester
 
@@ -140,6 +143,11 @@ class SemesterField(CharField):
         if value is None:
             return None
         return Semester(value)
+
+    # called when serialization
+    def value_to_string(self, obj):
+        value = self.value_from_object(obj)
+        return self.get_prep_value(value)
 
 class Course(Model):
     department = CharField(max_length=4)
