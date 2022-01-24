@@ -57,6 +57,9 @@ class Semester:
             return False
         return self.season_number < other.season_number
 
+    def __str__(self):
+        return str(self.number())
+
     @classmethod
     def from_name(cls, name):
         season = name.split(" ")[0]
