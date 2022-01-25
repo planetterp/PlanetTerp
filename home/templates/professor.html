@@ -4,7 +4,7 @@
 {% load crispy_forms_tags %}
 
 {% block title %}{{ professor.name }} | PlanetTerp{% endblock %}
-{% block description %}View reviews and grade data for {{ professor.name }}.\nAverage rating: {{ average_rating|floatformat:2 }} ({{ num_reviews }} reviews)\nCourses taught: {% for course in courses_taught %}{{ course.name }}{% if not forloop.last %}, {% endif %}{% endfor %}{% endblock %}
+{% block description %}View reviews and grade data for {{ professor.name }} at the University of Maryland &mdash; College Park.{% endblock %}
 
 {% block head %}
 <script type="text/javascript" src="{% static 'js/chart.min.js' %}"></script>

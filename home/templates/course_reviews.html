@@ -3,9 +3,7 @@
 {% load render_table from django_tables2 %}
 
 {% block title %}{{ course.name }} | PlanetTerp{% endblock %}
-{% block description %}
-View reviews for {{ course.name }}."
-{% endblock %}
+{% block description %}View reviews for {{ course.name }} at the University of Maryland &mdash; College Park.{% endblock %}
 
 {% block content %}
 <script type="text/javascript" src="{% static 'js/jquery-toggle.js' %}"></script>
