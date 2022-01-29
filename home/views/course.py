@@ -4,8 +4,9 @@ from collections import defaultdict
 from django.shortcuts import render, redirect
 from django.http import Http404
 from django.views import View
+from django.db.models import Count, Q, Sum, FloatField
 
-from home.models import ProfessorCourse, Course as CourseModel
+from home.models import ProfessorCourse, Course as CourseModel, Review
 
 class Course(View):
     template = "course.html"
@@ -26,20 +27,40 @@ class Course(View):
             .exclude(pk=course.id)
         )
 
-        professors = course.professors.all()
+        # calculate average rating for all professors as an optimization. Store
+        # in `average_rating_` so we don't accidentaly access `average_rating`
+        # and compute the average rating per professor. The template will need
+        # to be careful of this as well
+        professors = (
+            course
+            .professors.all()
+            .annotate(
+                num_reviews=Count(
+                    "review",
+                    filter=Q(review__status=Review.Status.VERIFIED),
+                )
+            )
+            .annotate(
+                average_rating_= (
+                    Sum("review__rating", output_field=FloatField())
+                    /
+                    Count("review")
+                )
+            )
+        )
+
         grouped_professors = defaultdict(list)
         past_professors = []
         for professor in professors:
             professor_course = ProfessorCourse.objects.get(
-                professor_id=professor.id, course_id=course.id)
+                professor_id=professor.pk, course_id=course.pk
+            )
             recent_semester = professor_course.recent_semester
-            professor.num_reviews = professor.review_set(manager="verified").count()
 
             if recent_semester and recent_semester.recent:
                 grouped_professors[recent_semester].append(professor)
             else:
                 past_professors.append(professor)
-
 
         course_description = course.description
         courses_replaced = []
