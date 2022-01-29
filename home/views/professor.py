@@ -60,7 +60,6 @@ class Professor(View):
             "user": user,
             "professor": professor,
             "form": review_form,
-            "average_rating": professor.average_rating(),
             "courses_taught": courses_taught,
             "courses_reviewed": courses_reviewed,
             "courses_graded": courses_graded,

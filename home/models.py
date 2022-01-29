@@ -3,6 +3,7 @@ from enum import Enum
 from django.contrib.auth.models import (AbstractUser,
     UserManager as DjangoUserManager)
 from django.utils.safestring import mark_safe
+from django.utils.functional import cached_property
 from django.urls import reverse
 from django.core import validators
 from django.db.models import (Model, CharField, DateTimeField, TextField,
@@ -221,6 +222,7 @@ class Professor(Model):
     class Meta:
         default_manager_name = "unfiltered"
 
+    @cached_property
     def average_rating(self):
         return (
             self.review_set(manager="verified")

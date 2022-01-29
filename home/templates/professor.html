@@ -129,7 +129,7 @@
 
 <script type="text/javascript">
 	var num_reviews = parseInt("{{ num_reviews }}");
-	var average_rating = {% if average_rating %} {{ average_rating }} {% else %} null {% endif %};
+	var average_rating = {% if professor.average_rating %} {{ professor.average_rating }} {% else %} null {% endif %};
 	var is_admin = {{ user.is_staff|yesno:"true,false" }};
 
 	$(function() {

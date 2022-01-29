@@ -67,7 +67,7 @@ class ProfessorSerializer(ModelSerializer):
         exclude = ["id", "status", "created_at"]
 
     def get_average_rating(self, professor):
-        return professor.average_rating()
+        return professor.average_rating
 
     def get_type(self, professor):
         # maintain backwards compatability
