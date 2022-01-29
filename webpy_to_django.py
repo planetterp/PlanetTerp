@@ -87,7 +87,7 @@ def migrate_courses():
             # if there's an existing course we're conflicting with, find it and
             # set our old historical course id to point to that course instead
             # of a new one
-            new_course = Course.objects.filter(name=course.name).get()
+            new_course = Course.unfiltered.filter(name=course.name).get()
             historical_courses[id_] = new_course
 
     return (courses, historical_courses)

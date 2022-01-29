@@ -100,7 +100,7 @@ class CourseReviews(View):
     def get(self, request, name):
         if name != name.upper():
             return redirect("course-reviews", name=name.upper())
-        course = Course.objects.filter(name=name).first()
+        course = Course.unfiltered.filter(name=name).first()
 
         if course is None:
             raise Http404()
@@ -116,7 +116,7 @@ class CourseReviews(View):
 
 class Index(View):
     def get(self, request):
-        num_courses = Course.objects.count()
+        num_courses = Course.unfiltered.count()
         num_professors = Professor.verified.count()
         num_reviews = Review.verified.count()
         num_course_grades = Grade.unfiltered.count()

@@ -30,7 +30,7 @@ class Professor(View):
         reviews_table = VerifiedReviewsTable(reviews, request)
 
         courses_taught = (
-            Course.objects
+            Course.recent
             .filter(professors__pk=professor.pk)
             .order_by("name")
         )
@@ -87,7 +87,7 @@ class Professor(View):
 
         if form.is_valid():
             cleaned_data = form.cleaned_data
-            course = Course.objects.filter(name=cleaned_data['course']).first()
+            course = Course.unfiltered.filter(name=cleaned_data['course']).first()
             review_data = {
                 "professor": professor,
                 "course": course,

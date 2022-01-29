@@ -20,7 +20,7 @@ class AddProfessor(View):
             )
             new_professor.save()
 
-            course = Course.objects.filter(name=cleaned_data['course']).first()
+            course = Course.unfiltered.filter(name=cleaned_data['course']).first()
 
             new_review = Review(
                 professor=new_professor,

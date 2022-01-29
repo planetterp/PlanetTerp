@@ -63,7 +63,7 @@ class Command(BaseCommand):
             raise ValidationError("Missing course")
 
         name = name.strip()
-        courses = Course.objects.filter(name=name)
+        courses = Course.unfiltered.filter(name=name)
         if not courses.exists():
             raise ValidationError("Course doesn't exist")
         return courses.get()

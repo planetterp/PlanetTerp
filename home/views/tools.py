@@ -60,7 +60,7 @@ class ToolGradeInflation(TemplateView):
         if len(search) == 4:
             grades = grades.filter(course__department=search)
         if len(search) > 4:
-            course = Course.objects.filter(name=search).first()
+            course = Course.recent.filter(name=search).first()
             if not course:
                 return HttpResponseBadRequest("Course does not exist.")
 

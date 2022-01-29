@@ -273,7 +273,7 @@ class ProfessorFormReview(ProfessorForm):
         else:
             clean_course = course
 
-        if clean_course and not Course.objects.filter(name=clean_course.replace(" ", "")).exists():
+        if clean_course and not Course.unfiltered.filter(name=clean_course.replace(" ", "")).exists():
             error_msg = '''The course you specified is not in our database.
                 If you think it should be, please email us at admin@planetterp.com.'''
             error = ValidationError(error_msg, code='Not Found')
@@ -360,7 +360,7 @@ class ProfessorFormAdd(ProfessorForm):
             error = ValidationError(self.error_message('type'), code='Empty')
             self.add_error("type_", error)
 
-        if course and not Course.objects.filter(name=course).exists():
+        if course and not Course.unfiltered.filter(name=course).exists():
             error_msg = '''The course you specified is not in our database.
                 If you think it should be, please email us at admin@planetterp.com.'''
             error = ValidationError(error_msg, code='Not Found')

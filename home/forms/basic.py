@@ -1,7 +1,6 @@
 from django.forms import CharField, DateTimeField
 from django.forms.widgets import DateInput, Select
 from django.core.exceptions import ValidationError
-from django.utils.safestring import mark_safe
 from django.forms import ModelForm, Form
 
 from crispy_forms.layout import Layout, Div, Field, HTML, Button
@@ -142,7 +141,7 @@ class HistoricCourseGradeForm(Form):
         if self.course_name and self.course_name != '':
             # If user specified the course, only display semesters when
             # that course was offered
-            course_obj = Course.objects.filter(name=self.course_name).first()
+            course_obj = Course.recent.filter(name=self.course_name).first()
             values = Grade.unfiltered.filter(course=course_obj).values('semester').distinct()
         else:
             # Otherwise, only display semesters we have data for
@@ -157,7 +156,7 @@ class HistoricCourseGradeForm(Form):
 
     def initialize_section(self):
         if self.semester and self.semester != '':
-            course = Course.objects.filter(name=self.course_name).first()
+            course = Course.recent.filter(name=self.course_name).first()
             grades = Grade.unfiltered.filter(
                 course=course, semester=Semester(self.semester)
             ).values('section').distinct()
@@ -221,7 +220,7 @@ class HistoricCourseGradeForm(Form):
         clean_course = self.cleaned_data.get('course', None)
 
         if clean_course:
-            course = Course.objects.filter(name=clean_course).first()
+            course = Course.recent.filter(name=clean_course).first()
             course_data = Grade.unfiltered.filter(course=course).first()
 
             if not course:

@@ -114,7 +114,7 @@ class GradeData(View):
             professor = Professor.verified.filter(slug=professor).first()
             grades = grades.filter(professor=professor)
         if course:
-            course = Course.objects.filter(name=course).first()
+            course = Course.unfiltered.filter(name=course).first()
             grades = grades.filter(course=course)
         if semester:
             grades = grades.filter(semester=Semester(semester))
@@ -241,7 +241,7 @@ class GenedData(View):
             return JsonResponse({"data": []})
 
         geneds = tuple(geneds)
-        courses = Course.objects.raw("""
+        courses = Course.recent.raw("""
             SELECT GROUP_CONCAT(name) AS geneds, course_id AS id
             FROM home_gened
             GROUP BY course_id

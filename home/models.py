@@ -9,7 +9,7 @@ from django.core import validators
 from django.db.models import (Model, CharField, DateTimeField, TextField,
     IntegerField, BooleanField, ForeignKey, PositiveIntegerField, EmailField,
     CASCADE, ManyToManyField, SlugField, TextChoices, FloatField, Manager,
-    QuerySet, Sum, UniqueConstraint, Index, Count)
+    QuerySet, Sum, UniqueConstraint, Index, Count, Max)
 
 class GradeQuerySet(QuerySet):
 
@@ -76,6 +76,16 @@ class RecentGradeManager(Manager):
         # TODO dont hardcode recent semester
         return super().get_queryset().filter(semester__gte=Semester(201201))
 
+class RecentCourseManager(Manager):
+    def get_queryset(self):
+        from home.utils import Semester
+        # a course is "recent" if we have a grade record for it since
+        # Semester(201201).
+        return (
+            super().get_queryset()
+            .annotate(max_semester=Max("grade__semester"))
+            .filter(max_semester__gte=Semester(201201))
+        )
 
 class UserManager(DjangoUserManager):
     def create_ourumd_user(self, username, email=None, **kwargs):
@@ -166,6 +176,9 @@ class Course(Model):
     professors = ManyToManyField("Professor", blank=True,
         through="ProfessorCourse")
 
+    recent = RecentCourseManager()
+    unfiltered = Manager()
+
     def save(self, *args, **kwargs):
         # `name` is essentially a computed field, and will never have a value
         # other than CONCAT("department", "course_number"). Ensure that this
@@ -180,6 +193,7 @@ class Course(Model):
         indexes = [
             Index(fields=["name"])
         ]
+        default_manager_name = "unfiltered"
 
     def average_gpa(self):
         return self.grade_set(manager="recent").all().average_gpa()

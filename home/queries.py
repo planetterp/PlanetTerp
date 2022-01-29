@@ -12,7 +12,7 @@ def search(search, num_results, *, offset=0, professors=False, courses=False):
         .order_by("name")
     )
     courses_q = (
-        Course.objects
+        Course.recent
         .filter(Q(name__icontains=search) | Q(title__icontains=search))
         .order_by("name")
     )

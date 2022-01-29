@@ -15,13 +15,13 @@ class Course(View):
 
         if name != name.upper():
             return redirect("course", name=name.upper())
-        course = CourseModel.objects.filter(name=name).first()
+        course = CourseModel.unfiltered.filter(name=name).first()
 
         if not course:
             raise Http404()
 
         sister_courses = (
-            CourseModel.objects
+            CourseModel.recent
             .filter(department=course.department, course_number__startswith=course.course_number[:3])
             .order_by("name")
             .exclude(pk=course.id)
@@ -41,6 +41,8 @@ class Course(View):
                 )
             )
             .annotate(
+                # TODO consolidate this with the Professor#average_rating
+                # method, will likely require a new Professors queryset
                 average_rating_= (
                     Sum("review__rating", output_field=FloatField())
                     /
@@ -69,7 +71,7 @@ class Course(View):
             for word in re.split(r' |\.', course_description):
                 # remove any character that is not a letter or number
                 word = re.sub(r'[\W_]+', '', word)
-                if not word in courses_replaced and re.match(r'^([A-Z]{4}(?:[A-Z]|[0-9]){3,6})$', word) and CourseModel.objects.filter(name=word).first():
+                if not word in courses_replaced and re.match(r'^([A-Z]{4}(?:[A-Z]|[0-9]){3,6})$', word) and CourseModel.recent.filter(name=word).first():
                     course_description = course_description.replace(word, '<a href="/course/{0}">{0}</a>'.format(word))
                     courses_replaced.append(word)
         course.description = course_description
