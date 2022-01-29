@@ -65,6 +65,7 @@ class ProfessorSerializer(ModelSerializer):
     class Meta:
         model = Professor
         exclude = ["id", "status", "created_at"]
+        list_serializer_class = VerifiedListSerializer
 
     def get_average_rating(self, professor):
         return professor.average_rating
