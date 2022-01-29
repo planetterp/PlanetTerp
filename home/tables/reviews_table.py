@@ -30,7 +30,9 @@ class BaseReviewsTable(tables.Table):
 
         self.row_attrs = None
         self.columns = columns
-        self.reviews = reviews
+        # performance tanks on large tables without this, since we're accessing
+        # these attributes for almost every review.
+        self.reviews = reviews.select_related("professor", "course", "user")
         self.request = request
         self.data = self.get_data(self.reviews)
 
