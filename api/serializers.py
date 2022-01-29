@@ -1,6 +1,6 @@
 from rest_framework.serializers import (ModelSerializer, Serializer,
     SerializerMethodField, RelatedField as _RelatedField, CharField,
-    DateTimeField, ListSerializer)
+    DateTimeField, ListSerializer, ManyRelatedField)
 
 from home.models import Course, Professor, Review, Grade
 
@@ -14,11 +14,33 @@ class CourseField(RelatedField):
     def to_representation(self, value):
         return value.name
 
+# unfortunately, django rest framework lacks good support for filtering on a
+# RelatedField (or if it does, I couldn't figure out how to do it). The
+# alternative I chose is to hook onto the creation of the `ManyRelatedField`
+# (which usually happens auto-magically behind the scenes thanks to django rest
+# framework - ie, it converts `RelatedField(many=True)` into instances of
+# `ManyRelatedField`). We provide our own `ManyRelatedField` subclass, which
+# does our filtering for us before handing the queryset back to
+# `ManyRelatedField.to_representation` (which will ultimately call our
+# `RelatedField.to_representation`).
+# I wish this wasn't necessary and hopefully we can find a way to remove it in
+# the future.
 class ProfessorField(RelatedField):
+    def __new__(cls, *args, **kwargs):
+        if "many" in kwargs:
+            return ManyProfessorField(child_relation=cls())
+        return super().__new__(cls, *args, **kwargs)
+
     def to_representation(self, value):
         return value.name
 
-# only return verified reviews. https://stackoverflow.com/a/28354281/12164878
+class ManyProfessorField(ManyRelatedField):
+    def to_representation(self, iterable):
+        iterable = iterable.filter(status=Professor.Status.VERIFIED)
+        return super().to_representation(iterable)
+
+# only return verified reviews and professors
+# https://stackoverflow.com/a/28354281/12164878
 class VerifiedListSerializer(ListSerializer):
     def to_representation(self, data):
         data = data.verified.all()
