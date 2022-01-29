@@ -31,7 +31,7 @@ class Course(APIView):
         name = param(request, "name")
         reviews = param_bool(request, "reviews", default=False)
 
-        course = CourseModel.objects.filter(name=name).first()
+        course = CourseModel.recent.filter(name=name).first()
         if not course:
             raise ValidationError("course not found")
 
@@ -54,7 +54,7 @@ class Courses(ListAPIView):
         if department and len(department) != 4:
             raise ValidationError("department parameter must be 4 characters")
 
-        courses = CourseModel.objects.all()
+        courses = CourseModel.recent.all()
         if department:
             courses = courses.filter(department=department)
 
@@ -115,7 +115,7 @@ class Grades(APIView):
                 "\"course\", \"professor\"")
 
         if course_name:
-            course = CourseModel.objects.filter(name=course_name).first()
+            course = CourseModel.recent.filter(name=course_name).first()
             if not course:
                 raise ValidationError("course not found")
             grades = course.grade_set(manger="recent")
