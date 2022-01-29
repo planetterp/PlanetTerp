@@ -41,10 +41,15 @@ class ManyProfessorField(ManyRelatedField):
 
 # only return verified reviews and professors
 # https://stackoverflow.com/a/28354281/12164878
-class VerifiedListSerializer(ListSerializer):
+class ReviewListSerializer(ListSerializer):
     def to_representation(self, data):
-        data = data.verified.all()
+        data = data.filter(status=Review.Status.VERIFIED)
         return super().to_representation(data)
+
+class ProfessorListSerializer(ListSerializer):
+    def to_representation(self, data):
+        data = data.filter(status=Professor.Status.VERIFIED)
+        return super().to_representation()
 
 class ReviewsSerializer(ModelSerializer):
     course = CourseField()
@@ -57,7 +62,7 @@ class ReviewsSerializer(ModelSerializer):
         model = Review
         fields = ["professor", "course", "review", "rating", "expected_grade",
             "created"]
-        list_serializer_class = VerifiedListSerializer
+        list_serializer_class = ReviewListSerializer
 
     # necessary for compatability with the pre-django api, which returned ""
     # for reviews with a null expected grade.
@@ -87,7 +92,7 @@ class ProfessorSerializer(ModelSerializer):
     class Meta:
         model = Professor
         exclude = ["id", "status", "created_at"]
-        list_serializer_class = VerifiedListSerializer
+        list_serializer_class = ProfessorListSerializer
 
     def get_average_rating(self, professor):
         return professor.average_rating
