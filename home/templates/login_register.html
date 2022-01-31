@@ -29,7 +29,8 @@
 </div>
 
 <script>
-	function submitLoginForm() {
+	$("#login-form-container").on("submit", "#login-form", function(event) {
+		event.preventDefault();
 		$.ajax({
 			type: "POST",
 			url: "{% url 'login' %}",
@@ -43,9 +44,10 @@
 				}
 			}
 		});
-	}
+	});
 
-	function submitRegisterForm() {
+	$("#register-form-container").on("submit", "#register-form", function(event) {
+		event.preventDefault();
 		$.ajax({
 			type: "POST",
 			url: "{% url 'register' %}",
@@ -59,13 +61,14 @@
 				}
 			}
 		});
-	}
+	});
 
-	function submitForgotPasswordForm() {
+	$("#password-reset-form-container").on("submit", "#reset-password-form", function(event) {
+		event.preventDefault();
 		$.ajax({
 			type: "POST",
 			url: "{% url 'password-reset' %}",
-			data: $("#reset_password_form").serialize(),
+			data: $("#reset-password-form").serialize(),
 			success: function(data) {
 				$(`#password-reset-modal`).modal('hide');
 				$(".modal-backdrop").remove();
@@ -74,6 +77,7 @@
 				$(`#password-reset-modal`).modal('show');
 			}
 		})
-	}
+	});
+
 </script>
 {% endblock %}
