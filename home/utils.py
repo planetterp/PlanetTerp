@@ -134,6 +134,9 @@ def slug_in_use_err(slug: str, name: str):
 # * we want to be able to force update values, even if the ttl hasn't expired
 #   yet. This is useful for scenarios where we eg add new grades and want to
 #   update all grade graphs immediately.
+# XXX: as we've handrolled our own (unbounded) cache implementation, this has
+# the potential to cause memory leaks. Investigate this first if memory leaks
+# arise in the future.
 _ttl_cache = {}
 def ttl_cache(max_age):
     """
