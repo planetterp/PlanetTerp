@@ -123,18 +123,30 @@ class ReviewsTableColumn(Enum):
 def slug_in_use_err(slug: str, name: str):
     return f"Slug '{slug}' is already in use by '{name}'. Please merge these professors together if they are the same person."
 
-# adapted from https://stackoverflow.com/a/63674816
-def ttl_cache(max_age, maxsize=128, typed=False):
+# We're going to handroll our own ttl cache instead of using python's
+# `lru_cache` with a time salt (which was the original implementation), for two
+# reasons:
+# * if the ttl has expired, we want to still return the cached result
+#   immediately, and then silently update the cached value so the updated result
+#   is returned for future calls. This means that the first unlucky soul to
+#   trigger a ttl cache after the ttl expires won't be hit with a delay, but
+#   will cause a recomputation.
+# * we want to be able to force update values, even if the ttl hasn't expired
+#   yet. This is useful for scenarios where we eg add new grades and want to
+#   update all grade graphs immediately.
+_ttl_cache = {}
+def ttl_cache(max_age):
     """
-    An @lru_cache, but instead of caching indefinitely (or until purged from
-    the cache, which in practice rarely happens), only caches for `max_age`
+    An @cache, instead of caching indefinitely, only caches for `max_age`
     seconds.
 
     That is, at the first function call with certain arguments, the result is
-    cached. Then, when the funcion is called again with those arguments, if it
-    has been more than `max_age` seconds since the first call, the result is
-    recalculated and that value is cached. Otherwise, the cached value is
-    returned.
+    computed and cached. Then, when the funcion is called again with those
+    arguments, if it has not been more than `max_age` seconds since the first
+    call, the cached value is returned. Otherwise, the cached value is still
+    returned, but the value is recomputed on a separate thread. This ensures
+    that the user which triggers the recomputation will not experience a delay,
+    but *will* update the value for the next users.
 
     Warnings
     --------
@@ -143,14 +155,33 @@ def ttl_cache(max_age, maxsize=128, typed=False):
     cached for at *most* `max_age` seconds. This is to simplify implementation.
     """
     def decorator(function):
-        @lru_cache(maxsize=maxsize, typed=typed)
-        def with_time_salt(*args, __time_salt, **kwargs):
-            return function(*args, **kwargs)
 
         @wraps(function)
         def wrapper(*args, **kwargs):
             time_salt = time.time() // max_age
-            return with_time_salt(*args, **kwargs, __time_salt=time_salt)
+            # make kwargs hashable
+            frozen_kwargs = tuple(sorted(kwargs.items()))
+            key = (function, args, frozen_kwargs)
+            if key in _ttl_cache:
+                (time_salt_cached, value) = _ttl_cache[key]
+
+                if time_salt_cached < time_salt:
+
+                    # recompute the new value in a separate thread, but return
+                    # the cached value immediately so we don't delay the
+                    # response.
+                    def recompute():
+                        value = function(*args, **kwargs)
+                        _ttl_cache[key] = (time_salt, value)
+                    thread = Thread(target=recompute)
+                    thread.start()
+                    return value
+
+                return value
+
+            value = function(*args, **kwargs)
+            _ttl_cache[key] = (time_salt, value)
+            return value
 
         return wrapper
     return decorator
