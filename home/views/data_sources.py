@@ -100,7 +100,7 @@ class GradeData(View):
         return grade_data
 
     @staticmethod
-    @ttl_cache(24 * 60 * 60)
+    @ttl_cache(24 * 60 * 60 * 7)
     def _grade_data(professor, course, semester, section, pf_semesters):
         # if we want a specific semester, grab all grades to start; we'll filter
         # down to that specific semester later, and don't want to return no data
@@ -166,7 +166,7 @@ class CourseDifficultyData(View):
         return JsonResponse({"data": data})
 
     @staticmethod
-    @ttl_cache(24 * 60 * 60)
+    @ttl_cache(24 * 60 * 60 * 7)
     def _course_data():
         data = []
 
@@ -206,7 +206,7 @@ class CourseDifficultyData(View):
         return data
 
     @staticmethod
-    @ttl_cache(24 * 60 * 60)
+    @ttl_cache(24 * 60 * 60 * 7)
     def _departments_data():
         departments = (
             Grade.recent
