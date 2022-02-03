@@ -13,10 +13,10 @@
 
 <ul class="nav nav-tabs" role="tablist">
 	<li class="nav-item">
-		<a class="nav-link active" data-toggle="tab" href="#reviews-noscroll" id="reviews-tab" role="tab" onclick="showReviews()">Unverified Reviews <span id="review-counter" class="badge badge-primary"></span></a>
+		<a class="nav-link active" data-toggle="tab" href="#reviews-noscroll" id="reviews-tab" role="tab">Unverified Reviews <span id="review-counter" class="badge badge-primary"></span></a>
 	</li>
 	<li class="nav-item">
-		<a class="nav-link" data-toggle="tab" href="#professors-noscroll" id="professors-tab" role="tab" onclick="hideReviews()">Unverified Professors <span id="professor-counter" class="badge badge-primary">{{ professors|length}}</span></a>
+		<a class="nav-link" data-toggle="tab" href="#professors-noscroll" id="professors-tab" role="tab">Unverified Professors <span id="professor-counter" class="badge badge-primary">{{ professors|length}}</span></a>
 	</li>
 </ul>
 
@@ -53,16 +53,6 @@
 			$("table.reviews-table > thead").show();
 		}
 	});
-
-	function showReviews() {
-		$("#reviews-table-container").show();
-		$("#unverified-professor-form").hide();
-	}
-
-	function hideReviews() {
-		$("#reviews-table-container").hide();
-		$("#unverified-professor-form").show();
-	}
 
 	function verifyReview(review_id, action) {
 		var args = null;
