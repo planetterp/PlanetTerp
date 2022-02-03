@@ -18,6 +18,9 @@
 	<li class="nav-item">
 		<a class="nav-link" data-toggle="tab" href="#professors-noscroll" id="professors-tab" role="tab">Unverified Professors <span id="professor-counter" class="badge badge-primary">{{ professors|length}}</span></a>
 	</li>
+	<li class="nav-item">
+		<a class="nav-link" data-toggle="tab" href="#maintenance-noscroll" id="professors-tab" role="tab">Maintenance</a>
+	</li>
 </ul>
 
 <div class="tab-content container mt-4">
@@ -28,6 +31,11 @@
 	<div class="tab-pane fade" id="professors-noscroll" role="tabpanel">
 		{% render_table professors_table %}
 		<div id="slug-modal-container"></div>
+	</div>
+	<div class="tab-pane fade" id="maintenance-noscroll" role="tabpanel">
+		<button class="btn btn-primary" onclick="recomputeTTLCache()">
+			Recompute TTL Caches
+		</button>
 	</div>
 </div>
 
@@ -84,6 +92,13 @@
 		var professor_counter = (prof_count > 0 ? --prof_count : 0)
 		var args = {"count" : professor_counter, "num_reviews" : num_reviews, "form": form};
 		sendResponse($(form).serialize(), "professor_verify", args);
+	}
+
+	function recomputeTTLCache() {
+		$.ajax({
+			type: "POST",
+			url: "{% url 'recompute-ttl-cache' %}",
+		});
 	}
 
 	// when a user changes tabs, change url hash as well

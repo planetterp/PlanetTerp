@@ -189,6 +189,19 @@ def ttl_cache(max_age):
         return wrapper
     return decorator
 
+def recompute_ttl_cache():
+    # TODO this is an imperfect implementation because although this will
+    # recompute all values in the ttl cache, it will take two calls per cached
+    # key for any difference to be perceived. The first call we see that we set
+    # time_salt to 0 here and so will recompute the value, but it will return
+    # the previously cached value before it does so. Only on the second call
+    # will we return the truly updated value.
+    for key, value in _ttl_cache.copy().items():
+        (_time_salt, *values) = value
+        # set time_salt to 0 to force recomputation on next call
+        value = (0, *values)
+        _ttl_cache[key] = value
+
 def send_updates_webhook(request, *, include_professors=True, include_reviews=True):
     if not WEBHOOK_URL_UPDATE:
         return

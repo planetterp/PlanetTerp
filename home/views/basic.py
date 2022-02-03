@@ -4,6 +4,7 @@ from django.shortcuts import redirect, render
 from django.views import View
 from django.views.generic import TemplateView, RedirectView, ListView
 from django.http import HttpResponse, Http404
+from django.contrib.auth.mixins import UserPassesTestMixin
 
 from crispy_forms.utils import render_crispy_form
 
@@ -11,6 +12,7 @@ from home.models import Organization, Professor, Course, Review, Grade
 from home.tables.reviews_table import VerifiedReviewsTable
 from home.forms.basic import HistoricCourseGradeForm, HistoricProfessorGradeForm
 from home.views.data_sources import GradeData
+from home.utils import recompute_ttl_cache
 
 class About(View):
     def get(self, request):
@@ -161,3 +163,11 @@ class SortReviewsTable(View):
         }
 
         return JsonResponse(context)
+
+class RecomputeTTLCache(UserPassesTestMixin, View):
+    def test_func(self):
+        return self.request.user.is_staff
+
+    def post(self, _request):
+        recompute_ttl_cache()
+        return HttpResponse()
