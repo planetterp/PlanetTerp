@@ -9,17 +9,14 @@ from django.contrib.auth.mixins import UserPassesTestMixin
 from django.urls import reverse
 
 from crispy_forms.utils import render_crispy_form
-
-# https://pypi.org/project/discord-webhook/
-from discord_webhook import DiscordWebhook
-from discord_webhook.webhook import DiscordEmbed
+from discord_webhook import DiscordWebhook, DiscordEmbed
 
 from home.models import Review, Professor, ProfessorCourse, Grade, User
 from home.utils import AdminAction
 from home.tables.reviews_table import UnverifiedReviewsTable
 from home.tables.basic import ProfessorsTable
 from home.forms.admin_forms import (ProfessorMergeForm, ProfessorSlugForm,
-ProfessorUpdateForm, ReviewActionForm)
+    ProfessorUpdateForm, ReviewActionForm)
 from home.utils import send_email
 from planetterp import config
 
