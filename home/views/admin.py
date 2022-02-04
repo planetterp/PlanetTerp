@@ -300,10 +300,9 @@ class Admin(UserPassesTestMixin, View):
                         "can't be slugged automatcially. Please enter a slug below."
                     )
 
-                    # Create the modal form to manualy enter
-                    #   a slug and add it to the response. The
-                    #   form creates the modal, though it's
-                    #   actually summoned from admin-action.js
+                    # Create the modal form to manualy enter a slug and add it
+                    # to the response. The form creates the modal, though it's
+                    # actually summoned from admin-action.js
                     ctx = {}
                     ctx.update(csrf(request))
                     form = ProfessorSlugForm(professor, modal_title=modal_msg)
