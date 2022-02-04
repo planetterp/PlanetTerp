@@ -124,7 +124,7 @@ class Register(View):
                 email=email,
                 password=password
             )
-            login(request, user, backend='django.contrib.auth.backends.ModelBackend')
+            login(request, user)
         else:
             ctx = {}
             ctx.update(csrf(request))

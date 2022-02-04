@@ -100,7 +100,7 @@ class ResetPassword(View):
             cleaned_reset_code.invalid = True
             cleaned_reset_code.save()
 
-            login(request, user, backend='django.contrib.auth.backends.ModelBackend')
+            login(request, user)
             context['success'] = True
 
         return JsonResponse(context)
