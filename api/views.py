@@ -70,7 +70,7 @@ class Professor(APIView):
         name = param(request, "name")
         reviews = param_bool(request, "reviews", default=False)
 
-        professor = ProfessorModel.objects.verified.filter(name=name).first()
+        professor = ProfessorModel.verified.filter(name=name).first()
         if not professor:
             raise ValidationError("professor not found")
 
@@ -93,7 +93,7 @@ class Professors(ListAPIView):
         if type_ == "ta":
             type_ = "TA"
 
-        professors = ProfessorModel.objects.all()
+        professors = ProfessorModel.verified.all()
         if type_:
             professors = professors.filter(type=type_)
 
@@ -122,7 +122,7 @@ class Grades(APIView):
 
         if professor_name:
             professor = (
-                ProfessorModel.objects.filter(name=professor_name).first()
+                ProfessorModel.verified.filter(name=professor_name).first()
             )
             if not professor:
                 raise ValidationError("professor not found")
