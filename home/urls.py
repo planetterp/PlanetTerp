@@ -7,7 +7,7 @@ from home.views.admin import Admin
 from home.views.authentication import Login, Logout, ForgotPassword, Register
 from home.views.basic import (About, Contact, PrivacyPolicy, TermsOfUse,
     Courses, Professors, Documents, SetColorScheme, Robots, Grades,
-    CourseReviews, Index, SortReviewsTable, RecomputeTTLCache)
+    CourseReviews, Index, SortReviewsTable, RecomputeTTLCache, UserProfile)
 from home.views.course import Course
 from home.views.data_sources import GradeData, CourseDifficultyData, GenedData
 from home.views.endpoints import Autocomplete
@@ -133,6 +133,7 @@ urlpatterns = [
     # profile
     path('profile', Profile.as_view(), name='profile'),
     path('profile/resetpassword/<reset_code:reset_code>', ResetPassword.as_view(), name='reset-password'),
+    path('users/<int:user_id>', UserProfile.as_view(), name='user-profile'),
 
     # tools
     path('tools', Tools.as_view(), name='tools'),

@@ -4,6 +4,7 @@ from abc import abstractmethod
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 from django.template.context_processors import csrf
+from django.urls import reverse
 
 from crispy_forms.utils import render_crispy_form
 import django_tables2 as tables
@@ -96,9 +97,13 @@ class InformationColumn(tables.Column):
                         <i class="fa fa-eye"></i>
                     </span>
                 '''
+            profile_link = reverse("user-profile", kwargs={"user_id": review.user.id})
+            column_html += f"<a href='{profile_link}'>{{username}}</a>"
+        else:
+            column_html += "{username}"
 
         column_html += '''
-            {anonymous}</span>
+            </span>
             <br />
             {created_at}
         '''
@@ -109,11 +114,16 @@ class InformationColumn(tables.Column):
         if review.created_at.date() >= date(2020, 3, 10) and review.created_at.date() <= date(2021, 8, 30):
             column_html += ' <i class="fas fa-head-side-mask" data-toggle="tooltip" data-placement="right" title="This review was submitted while most classes were online during the COVID-19 pandemic. It may not be indicative of a regular semester."></i>'
 
+        if not review.user or (review.anonymous and not is_staff):
+            username = "Anonymous"
+        else:
+            username = review.user.username
+
         kwargs = {
             "professor_slug": review.professor.slug,
             "professor_name": review.professor.name,
             "course_name": review.course.name if review.course else None,
-            "anonymous": "Anonymous" if not review.user or (review.anonymous and not is_staff) else review.user.username,
+            "username": username,
             "created_at": review.created_at.date().strftime(DATE_FORMAT)
         }
 

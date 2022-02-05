@@ -8,9 +8,10 @@ from django.contrib.auth.mixins import UserPassesTestMixin
 
 from crispy_forms.utils import render_crispy_form
 
-from home.models import Organization, Professor, Course, Review, Grade
-from home.tables.reviews_table import VerifiedReviewsTable
-from home.forms.basic import HistoricCourseGradeForm, HistoricProfessorGradeForm
+from home.models import Organization, Professor, Course, Review, Grade, User
+from home.tables.reviews_table import VerifiedReviewsTable, ProfileReviewsTable
+from home.forms.basic import (HistoricCourseGradeForm,
+    HistoricProfessorGradeForm, ProfileForm)
 from home.views.data_sources import GradeData
 from home.utils import recompute_ttl_cache
 
@@ -171,3 +172,25 @@ class RecomputeTTLCache(UserPassesTestMixin, View):
     def post(self, _request):
         recompute_ttl_cache()
         return HttpResponse()
+
+class UserProfile(UserPassesTestMixin, View):
+    # as all accounts have the option to still leave anonymous reviews, only
+    # allow admins to view individual user profiles for now.
+    # We may want to allow people to view a subset of other user's profiles,
+    # containing only their public reviews.
+    def test_func(self):
+        return self.request.user.is_staff
+
+    def get(self, request, user_id):
+        user = User.objects.filter(pk=user_id).first()
+        if not user:
+            raise Http404()
+
+        reviews = user.review_set.order_by("created_at")
+
+        context = {
+            "reviews_table": ProfileReviewsTable(reviews, request),
+            "form": ProfileForm(instance=user, allow_edits=False)
+        }
+
+        return render(request, "profile.html", context)

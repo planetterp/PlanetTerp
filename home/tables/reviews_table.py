@@ -26,7 +26,7 @@ class BaseReviewsTable(tables.Table):
         request: WSGIRequest,
         *args,
         **kwargs
-        ):
+    ):
 
         self.row_attrs = None
         self.columns = columns
