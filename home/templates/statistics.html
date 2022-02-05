@@ -1,0 +1,81 @@
+{% extends "base_main.html" %}
+{% load static %}
+
+{% block title %}Statistics | PlanetTerp{% endblock %}
+{% block description %}View statistics for PlanetTerp, a community for students at the University of Maryland &mdash; College Park.{% endblock %}
+
+{% block head %}
+<script type="text/javascript" src="{% static 'js/chart.min.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+
+<div style="display: flex; justify-content: center; flex-wrap: wrap;">
+	<canvas id="review-rating-graph" class="my-5" style="max-width: 60rem;"></canvas>
+	<canvas id="review-date-graph" class="mb-5" style="max-width: 60rem;"></canvas>
+	<canvas id="professor-ratings-graph" class="mb-4" style="max-width: 60rem;"></canvas>
+</div>
+
+<script type="text/javascript">
+const reviewRatingGraph = document.getElementById("review-rating-graph").getContext("2d");
+const reviewRatingChart = new Chart(reviewRatingGraph, {
+    type: 'bar',
+    data: {
+		labels: [0, 1, 2, 3, 4],
+		datasets: [
+			{
+				label: "Review Count by Rating",
+				data: {{ review_ratings }},
+				//backgroundColor: "#007bff"
+				backgroundColor: '#008D94',
+				borderColor: '#0DB537'
+	  		}
+		]
+	}
+});
+
+const reviewDateGraph =  document.getElementById("review-date-graph").getContext("2d");
+const reviewDateChart = new Chart(reviewDateGraph, {
+    type: 'line',
+    data: {
+		labels: Array.from({length: 53}, (v, k) => k + 1),
+		datasets: [
+			{
+				label: "Review Count by Week Submitted",
+				data: {{ review_dates|safe }},
+				backgroundColor: '#008D94',
+				borderColor: '#0DB537'
+			}
+		]
+	},
+    options: {
+        scales: {
+            x: {
+                type: 'time',
+                time: {
+                    unit: 'week'
+                }
+            }
+        }
+    }
+});
+
+const professorRatingsGraph =  document.getElementById("professor-ratings-graph").getContext("2d");
+const professorRatingsChart = new Chart(professorRatingsGraph, {
+    type: 'bar',
+    data: {
+		labels: Array.from({length: 40}, (v, k) => (k + 10) / 10),
+		datasets: [
+			{
+				label: "Professor Count by Average Rating",
+				data: {{ professor_ratings }},
+				//backgroundColor: "#007bff"
+				backgroundColor: '#008D94',
+				borderColor: '#0DB537'
+	  		}
+		]
+	}
+});
+
+</script>
+{% endblock %}

@@ -7,7 +7,8 @@ from home.views.admin import Admin
 from home.views.authentication import Login, Logout, ForgotPassword, Register
 from home.views.basic import (About, Contact, PrivacyPolicy, TermsOfUse,
     Courses, Professors, Documents, SetColorScheme, Robots, Grades,
-    CourseReviews, Index, SortReviewsTable, RecomputeTTLCache, UserProfile)
+    CourseReviews, Index, SortReviewsTable, RecomputeTTLCache, UserProfile,
+    Statistics)
 from home.views.course import Course
 from home.views.data_sources import GradeData, CourseDifficultyData, GenedData
 from home.views.endpoints import Autocomplete
@@ -129,6 +130,7 @@ urlpatterns = [
     path('admin', Admin.as_view(), name='admin'),
     path('add_professor', AddProfessor.as_view(), name='add-professor'),
     path('recompute_ttl_cache', RecomputeTTLCache.as_view(), name="recompute-ttl-cache"),
+    path("statistics", Statistics.as_view(), name="statistics"),
 
     # profile
     path('profile', Profile.as_view(), name='profile'),
