@@ -53,7 +53,9 @@
 
 	// when a user changes tabs, change url hash as well
 	$('.nav-tabs a').on('shown.bs.tab', function (e) {
-		window.location.hash = e.target.hash.replace("-noscroll", "");
+		let hash = e.target.hash.replace("-noscroll", "");
+		// change hash without modifying history stack
+		history.replaceState(undefined, undefined, hash);
 	});
 
 	function updateProfile() {
