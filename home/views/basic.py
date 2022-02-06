@@ -46,6 +46,11 @@ class Professors(ListView):
 class Documents(TemplateView):
     template_name = "documents.html"
 
+class Ads(View):
+    CONTENT = "google.com, pub-8981508768288124, DIRECT, f08c47fec0942fa0"
+    def get(self, _request):
+        return HttpResponse(self.CONTENT, content_type="text/plain")
+
 class SetColorScheme(View):
     def post(self, request):
         request.session["color_scheme"] = request.POST["scheme"]

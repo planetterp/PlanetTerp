@@ -8,7 +8,7 @@ from home.views.authentication import Login, Logout, ForgotPassword, Register
 from home.views.basic import (About, Contact, PrivacyPolicy, TermsOfUse,
     Courses, Professors, Documents, SetColorScheme, Robots, Grades,
     CourseReviews, Index, SortReviewsTable, RecomputeTTLCache, UserProfile,
-    Statistics)
+    Statistics, Ads)
 from home.views.course import Course
 from home.views.data_sources import GradeData, CourseDifficultyData, GenedData
 from home.views.endpoints import Autocomplete
@@ -112,6 +112,7 @@ urlpatterns = [
     path('sitemap.xml', sitemap, {"sitemaps": sitemaps}, name="sitemap"),
     path('table_sort', SortReviewsTable.as_view(), name="table_sort"),
     path('recompute_ttl_cache', RecomputeTTLCache.as_view(), name="recompute-ttl-cache"),
+    path("ads.txt", Ads.as_view(), name="ads"),
 
     # data sources
     path('data_sources/grade_data', GradeData.as_view(), name='grade-data'),
