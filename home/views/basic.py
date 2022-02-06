@@ -177,8 +177,12 @@ class RecomputeTTLCache(UserPassesTestMixin, View):
 class UserProfile(UserPassesTestMixin, View):
     # as all accounts have the option to still leave anonymous reviews, only
     # allow admins to view individual user profiles for now.
-    # We may want to allow people to view a subset of other user's profiles,
-    # containing only their public reviews.
+    #
+    # We may want to allow people to view a subset of other user's profiles
+    # in the future, which would show only the public reviews of that user, and
+    # definitely not their settings. We would probably want to move to an
+    # entirely different template at that point instead of hijacking
+    # profile.html.
     def test_func(self):
         return self.request.user.is_staff
 
