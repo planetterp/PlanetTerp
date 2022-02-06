@@ -111,6 +111,7 @@ urlpatterns = [
     path('robots.txt', Robots.as_view(), name="robots"),
     path('sitemap.xml', sitemap, {"sitemaps": sitemaps}, name="sitemap"),
     path('table_sort', SortReviewsTable.as_view(), name="table_sort"),
+    path('recompute_ttl_cache', RecomputeTTLCache.as_view(), name="recompute-ttl-cache"),
 
     # data sources
     path('data_sources/grade_data', GradeData.as_view(), name='grade-data'),
@@ -129,7 +130,6 @@ urlpatterns = [
     path('course/<course:name>/reviews', CourseReviews.as_view(), name='course-reviews'),
     path('admin', Admin.as_view(), name='admin'),
     path('add_professor', AddProfessor.as_view(), name='add-professor'),
-    path('recompute_ttl_cache', RecomputeTTLCache.as_view(), name="recompute-ttl-cache"),
     path("statistics", Statistics.as_view(), name="statistics"),
 
     # profile
