@@ -100,7 +100,6 @@ urlpatterns = [
 
     # basic
     path('', Index.as_view(), name='index'),
-    path('grades', Grades.as_view(), name='grades'),
     path('about', About.as_view(), name='about'),
     path('privacypolicy', PrivacyPolicy.as_view(), name='privacy-policy'),
     path('termsofuse', TermsOfUse.as_view(), name='terms-of-use'),
@@ -133,6 +132,7 @@ urlpatterns = [
     path('admin', Admin.as_view(), name='admin'),
     path('add_professor', AddProfessor.as_view(), name='add-professor'),
     path("statistics", Statistics.as_view(), name="statistics"),
+    path('grades', Grades.as_view(), name='grades'),
 
     # profile
     path('profile', Profile.as_view(), name='profile'),
