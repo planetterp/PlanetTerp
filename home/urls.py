@@ -6,9 +6,10 @@ from home.views.add_professor import AddProfessor
 from home.views.admin import Admin
 from home.views.authentication import Login, Logout, ForgotPassword, Register
 from home.views.basic import (About, Contact, PrivacyPolicy, TermsOfUse,
-    Courses, Professors, Documents, SetColorScheme, Robots, Grades,
-    CourseReviews, Index, SortReviewsTable, RecomputeTTLCache, UserProfile,
-    Statistics, Ads)
+    Courses, Professors, Documents, SetColorScheme, Robots, CourseReviews,
+    Index, SortReviewsTable, RecomputeTTLCache, UserProfile, Ads)
+from home.views.grades import Grades
+from home.views.statistics import Statistics
 from home.views.course import Course
 from home.views.data_sources import GradeData, CourseDifficultyData, GenedData
 from home.views.endpoints import Autocomplete

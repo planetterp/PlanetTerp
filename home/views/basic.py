@@ -1,20 +1,14 @@
-from django.template.context_processors import csrf
 from django.http.response import JsonResponse
 from django.shortcuts import redirect, render
 from django.views import View
 from django.views.generic import TemplateView, RedirectView, ListView
 from django.http import HttpResponse, Http404
 from django.contrib.auth.mixins import UserPassesTestMixin
-from django.db.models import Count, Sum, Q, FloatField
-
-from crispy_forms.utils import render_crispy_form
 
 from home.models import Organization, Professor, Course, Review, Grade, User
 from home.tables.reviews_table import VerifiedReviewsTable, ProfileReviewsTable
-from home.forms.basic import (HistoricCourseGradeForm,
-    HistoricProfessorGradeForm, ProfileForm)
-from home.views.data_sources import GradeData
-from home.utils import recompute_ttl_cache, ttl_cache
+from home.forms.basic import ProfileForm
+from home.utils import recompute_ttl_cache
 
 class About(View):
     def get(self, request):
@@ -59,51 +53,6 @@ class SetColorScheme(View):
 class Robots(TemplateView):
     content_type = "text/plain"
     template_name = "robots.html"
-
-class Grades(View):
-    template_name = "grades.html"
-
-    def get(self, request):
-        context = {
-            "course_form": HistoricCourseGradeForm(),
-            "professor_form": HistoricProfessorGradeForm()
-        }
-        return render(request, self.template_name, context)
-
-    def post(self, request):
-        course = request.POST.get('course', None)
-        semester = request.POST.get('semester', None)
-        semester = semester if semester != '' else None
-        pf_semesters = request.POST.get("pf_semesters", False) == "true"
-
-        course_form = HistoricCourseGradeForm(course, semester, data=request.POST)
-        professor_form = HistoricProfessorGradeForm(data=request.POST)
-
-        ctx = {}
-        ctx.update(csrf(request))
-        context = {
-            "course_search_success": False,
-            "professor_search_success": False
-        }
-
-        if course is None and professor_form.is_valid():
-            context["professor_search_success"] = True
-            data = professor_form.cleaned_data
-            professor = data.get("professor", None)
-            context['professor_data'] = GradeData.compose_course_grade_data(professor, pf_semesters)
-
-        if course is not None and course_form.is_valid():
-            context["course_search_success"] = True
-            data = course_form.cleaned_data
-            professor = data.get("professor", None)
-            course = data.get("course", None)
-            semester = data.get("semester", None)
-            section = data.get("section", None)
-            context['course_data'] = GradeData.compose_grade_data(professor, course, semester, section, pf_semesters)
-
-        context["professor_form"] = render_crispy_form(professor_form, professor_form.helper, context=ctx)
-        context["course_form"] = render_crispy_form(course_form, course_form.helper, context=ctx)
-        return JsonResponse(context)
 
 class CourseReviews(View):
     def get(self, request, name):
@@ -204,59 +153,3 @@ class UserProfile(UserPassesTestMixin, View):
         }
 
         return render(request, "profile.html", context)
-
-class Statistics(View):
-    def get(self, request):
-        (review_ratings, review_dates, professor_ratings) = self.graph_data()
-        context = {
-            "review_ratings": review_ratings,
-            "review_dates": review_dates,
-            "professor_ratings": professor_ratings
-        }
-        return render(request, "statistics.html", context)
-
-    @staticmethod
-    @ttl_cache(24 * 60 * 60)
-    def graph_data():
-        reviews = Review.verified.all()
-        professors = (
-            Professor.verified
-            .annotate(
-                # TODO consolidate this with the Professor#average_rating
-                # method, will likely require a new Professors queryset
-                average_rating_= (
-                    Sum(
-                        "review__rating",
-                        output_field=FloatField(),
-                        filter=Q(review__status=Review.Status.VERIFIED)
-                    )
-                    /
-                    Count(
-                        "review",
-                        filter=Q(review__status=Review.Status.VERIFIED)
-                    )
-                )
-            )
-        )
-
-        review_ratings = [0] * 5
-        # not a typo - there are actually 53 weeks in an isocalendar year.
-        review_dates = [0] * 53
-        # we'll divide each of the 4 intervals (1-2, 2-3, 3-4, 4-5) into 10
-        # segments each. So bucket 1.0 - 1.1 together, 1.1 - 1.2 together, etc.
-        professor_ratings = [0] * 10 * 4
-
-        for review in reviews:
-            review_ratings[review.rating - 1] += 1
-            week = review.created_at.isocalendar()[1]
-            review_dates[week - 1] += 1
-
-        professors = professors.annotate()
-        for professor in professors:
-            rating = professor.average_rating_
-            if rating is None:
-                continue
-            bucket = int((rating - 1) // 0.1)
-            professor_ratings[bucket] += 1
-
-        return (review_ratings, review_dates, professor_ratings)
