@@ -45,14 +45,14 @@ class CourseSitemap(Sitemap):
     priority = 0.5
 
     def items(self):
-        return CourseModel.objects.all().order_by("pk")
+        return CourseModel.unfiltered.all().order_by("pk")
 
 class ProfessorSitemap(Sitemap):
     changefreq = "daily"
     priority = 0.5
 
     def items(self):
-        return ProfessorModel.objects.verified.all().order_by("pk")
+        return ProfessorModel.verified.all().order_by("pk")
 
 class StaticSitemap(Sitemap):
     def location(self, item):
