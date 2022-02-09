@@ -90,8 +90,11 @@ class Course(View):
         grouped_professors = {
             k.name(): v for k, v in sorted(grouped_professors.items(), key=key, reverse=True)
         }
-        # then add "past semesters" at the end
-        grouped_professors["Past Semesters"] = past_professors
+        # then add "past semesters" at the end, but only if there are any
+        # past professors to begin with - we don't want to display this block at
+        # all otherwise
+        if past_professors:
+            grouped_professors["Past Semesters"] = past_professors
 
         context = {
             "course": course,
