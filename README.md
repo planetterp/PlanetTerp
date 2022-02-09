@@ -16,6 +16,8 @@ You'll also need to set up [MySQL](https://www.mysql.com/) if you haven't alread
 
 Once you have MySQL, you'll need to create a database for PlanetTerp. This can be named anything, but you'll probably want to call it something like `planetterp`.
 
+Note that when you create this database, you **must** select `utf8mb4` as the character set (collation can be left as the default). The django code expects the database to have a character set of `utf8mb4`, and in particular the data import described below will fail if you create a database with the default character set (`latin1`).
+
 Now we can start setting up PlanetTerp:
 
 ```bash
