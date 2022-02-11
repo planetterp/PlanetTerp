@@ -31,7 +31,31 @@ const reviewRatingChart = new Chart(reviewRatingGraph, {
 				borderColor: '#0DB537'
 	  		}
 		]
-	}
+	},
+    options: {
+        scales: {
+			xAxes: [{
+				scaleLabel: {
+					display: true,
+					labelString: "Rating"
+				},
+			}],
+			yAxes: [{
+				scaleLabel: {
+					display: true,
+					labelString: "Count"
+				},
+			}]
+        },
+		legend: {
+            display: false
+        },
+		title: {
+			display: true,
+			text: 'Review Count by Rating',
+			fontSize: 15
+		}
+    }
 });
 
 const reviewDateGraph =  document.getElementById("review-date-graph").getContext("2d");
@@ -55,14 +79,58 @@ const reviewDateChart = new Chart(reviewDateGraph, {
                 time: {
                     unit: 'week'
                 }
-            }
-        }
+            },
+			xAxes: [{
+				scaleLabel: {
+					display: true,
+					labelString: "Week Submitted"
+				},
+			}],
+			yAxes: [{
+				scaleLabel: {
+					display: true,
+					labelString: "Count"
+				},
+			}]
+        },
+		legend: {
+            display: false
+        },
+		title: {
+			display: true,
+			text: 'Review Count by Week Submitted',
+			fontSize: 15
+		}
     }
 });
 
 const professorRatingsGraph =  document.getElementById("professor-ratings-graph").getContext("2d");
 const professorRatingsChart = new Chart(professorRatingsGraph, {
     type: 'bar',
+	options: {
+		scales: {
+			xAxes: [{
+				scaleLabel: {
+					display: true,
+					labelString: "Average Rating"
+				},
+			}],
+			yAxes: [{
+				scaleLabel: {
+					display: true,
+					labelString: "Count"
+				},
+			}]
+		},
+		legend: {
+            display: false
+        },
+		title: {
+			display: true,
+			text: 'Professor Count by Average Rating',
+			fontSize: 15
+		}
+	},
     data: {
 		labels: Array.from({length: 41}, (v, k) => (k + 10) / 10),
 		datasets: [
