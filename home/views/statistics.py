@@ -1,6 +1,7 @@
+import math
+
 from django.views import View
 from django.shortcuts import render
-
 from django.db.models import Count, Sum, Q, FloatField
 
 from home.models import Review, Professor
@@ -45,7 +46,8 @@ class Statistics(View):
         review_dates = [0] * 53
         # we'll divide each of the 4 intervals (1-2, 2-3, 3-4, 4-5) into 10
         # segments each. So bucket 1.0 - 1.1 together, 1.1 - 1.2 together, etc.
-        professor_ratings = [0] * 10 * 4
+        # We need one additional bucket to deal with inclusivity on both ends.
+        professor_ratings = [0] * (10 * 4 + 1)
 
         for review in reviews:
             review_ratings[review.rating - 1] += 1
@@ -57,7 +59,10 @@ class Statistics(View):
             rating = professor.average_rating_
             if rating is None:
                 continue
-            bucket = int((rating - 1) // 0.1)
+            # careful: due to floating point errors, (rating - 1) // 0.1 is
+            # incorrect. Try evaluating `5.0 // 0.1` in a terminal yourself if
+            # you don't believe me!
+            bucket = math.floor((rating - 1) / 0.1)
             professor_ratings[bucket] += 1
 
         return (review_ratings, review_dates, professor_ratings)
