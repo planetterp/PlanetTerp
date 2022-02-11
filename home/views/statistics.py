@@ -54,7 +54,6 @@ class Statistics(View):
             week = review.created_at.isocalendar()[1]
             review_dates[week - 1] += 1
 
-        professors = professors.annotate()
         for professor in professors:
             rating = professor.average_rating_
             if rating is None:
