@@ -6,16 +6,17 @@ from django.forms import Form, ModelForm
 
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Div, Field, Layout, Button, HTML
-from crispy_forms.bootstrap import FormActions, StrictButton
+from crispy_forms.bootstrap import FormActions
 
 from .layout_objects.bootstrap_modal import BootstrapModal
 from home.utils import AdminAction, slug_in_use_err
 from home.models import Review, Professor
 from planetterp.settings import DATE_FORMAT
 
-# used for verifying, rejecting, and asking for help on unverified reviews
-class ReviewActionForm(Form):
-    review_id = IntegerField(required=True, widget=HiddenInput)
+# For verifying, rejecting, and asking for help on unverified reviews
+# and verifying/rejecting unverified professors
+class ActionForm(Form):
+    id_ = IntegerField(required=True, widget=HiddenInput)
     verified = CharField(required=True, widget=HiddenInput)
     action_type = CharField(required=True, widget=HiddenInput)
 
@@ -23,15 +24,15 @@ class ReviewActionForm(Form):
         super().__init__(**kwargs)
 
         self.helper = FormHelper()
-        self.helper.form_id = "review_action_form"
+        self.helper.form_id = "action_form"
         self.helper.form_show_errors = False
         self.helper.layout = self.generate_layout()
 
     def generate_layout(self):
         return Layout(
-            Field('review_id', id="review_id"),
-            Field('verified', id="review_verified"),
-            Field('action_type', id="review_action_type")
+            Field('id_', id="id_"),
+            Field('verified', id="verified"),
+            Field('action_type', id="action_type")
         )
 
 # For unverifying a verified review. Currently used on /professor
@@ -64,99 +65,20 @@ class ReviewUnverifyForm(Form):
             FormActions(submit_button)
         )
 
-# For verifying unverified professors
-class ProfessorVerifyForm(Form):
-    professor_id = IntegerField(required=True, widget=HiddenInput)
-    verified = CharField(required=True, widget=HiddenInput, initial=Professor.Status.VERIFIED.value)
-    action_type = CharField(required=True, widget=HiddenInput, initial=AdminAction.PROFESSOR_VERIFY.value)
-
-    def __init__(self, professor_id, **kwargs):
-        super().__init__(**kwargs)
-        self.fields['professor_id'].initial = professor_id
-
-        self.helper = FormHelper()
-        self.helper.form_id = f"{Professor.Status.VERIFIED.value}_{professor_id}"
-        self.helper.form_class = "unverified_professor_form"
-        self.helper.form_show_errors = False
-        self.helper.layout = self.generate_layout()
-
-    def generate_layout(self):
-        submit_button = Button(
-            "verify",
-            "Verify",
-            css_class="btn-success rounded-left",
-            style="border-bottom-right-radius: 0; border-top-right-radius: 0;",
-            onClick=f"verifyProfessor('#{self.helper.form_id}')"
-        )
-        return Layout(
-            'professor_id',
-            'verified',
-            'action_type',
-            FormActions(submit_button)
-        )
-
-# For rejecting unverified professors
-class ProfessorRejectForm(Form):
-    professor_id = IntegerField(required=True, widget=HiddenInput)
-    verified = CharField(required=True, widget=HiddenInput, initial=Professor.Status.REJECTED.value)
-    action_type = CharField(required=True, widget=HiddenInput, initial=AdminAction.PROFESSOR_VERIFY.value)
-
-    def __init__(self, professor_id, **kwargs):
-        super().__init__(**kwargs)
-        self.fields['professor_id'].initial = professor_id
-
-        self.helper = FormHelper()
-        self.helper.form_id = f"{Professor.Status.REJECTED.value}_{professor_id}"
-        self.helper.form_class = "unverified_professor_form"
-        self.helper.form_show_errors = False
-        self.helper.layout = self.generate_layout()
-
-    def generate_layout(self):
-        submit_button = Button(
-            "reject",
-            "Reject",
-            css_class="btn-danger rounded-right",
-            style="border-bottom-left-radius: 0; border-top-left-radius: 0;",
-            onClick=f"verifyProfessor('#{self.helper.form_id}')"
-        )
-        return Layout(
-            'professor_id',
-            'verified',
-            'action_type',
-            FormActions(submit_button)
-        )
-
 # For deleting unverified professors. This action cannot be undone.
 # Use carefully: Once a professor is deleted, all their data is lost
 # and cannot be retrived!
-class ProfessorDeleteForm(Form):
-    professor_id = IntegerField(required=True, widget=HiddenInput)
+class ProfessorDeleteForm(ActionForm):
     professor_type = CharField(required=True, widget=HiddenInput)
-    action_type = CharField(required=True, widget=HiddenInput, initial=AdminAction.PROFESSOR_DELETE.value)
 
     def __init__(self, professor: Professor, **kwargs):
-        super().__init__(**kwargs)
-        self.fields['professor_id'].initial = professor.pk
         self.fields['professor_type'].initial = professor.type
-
-        self.helper = FormHelper()
-        self.helper.form_id = f"delete_{professor.pk}"
-        self.helper.form_class = "unverified_professor_form"
-        self.helper.form_show_errors = False
-        self.helper.layout = self.generate_layout()
+        super().__init__(**kwargs)
 
     def generate_layout(self):
-        submit_button = StrictButton(
-            "Delete",
-            css_class="btn-dark",
-            onClick=f"deleteProfessor('#{self.helper.form_id}')",
-            style="border-bottom-right-radius: 0; border-top-right-radius: 0;"
-        )
         return Layout(
-            'professor_id',
-            'professor_type',
-            'action_type',
-            FormActions(submit_button)
+            super().generate_layout(),
+            'professor_type'
         )
 
 # For manually entering a professor's slug when
@@ -356,7 +278,8 @@ class ProfessorUpdateForm(ModelForm):
                         'merge',
                         'Merge',
                         css_id="merge-professor",
-                        css_class="btn-secondary"
+                        css_class="btn-secondary",
+                        onclick=format_html("mergeProfessor('{name}', '{id}')", name=self.professor.name, id=self.professor.pk)
                     ),
                     Button(
                         'unverify',
@@ -467,12 +390,11 @@ class ProfessorMergeForm(Form):
         widget=HiddenInput
     )
 
-    def __init__(self, request, merge_subject: Professor, **kwargs):
+    def __init__(self, request, **kwargs):
         super().__init__(**kwargs)
 
-        self.professor = merge_subject
         self.helper = FormHelper()
-        self.helper.form_id = f"merge-form-{merge_subject.pk}"
+        self.helper.form_id = "merge-form"
         self.helper.form_show_errors = False
         self.helper.form_show_labels = False
         self.helper.layout = self.generate_layout()
@@ -486,8 +408,6 @@ class ProfessorMergeForm(Form):
         # If it does, the value will be replaced with that professor's id. These values must be different or the validation
         # will think the inputs are the same and return an error. These values must also be negative because a professor
         # could have an id of any non-negative number.
-        self.fields['merge_subject'].initial = merge_subject
-        self.fields['subject_id'].initial = merge_subject.pk
         self.fields['target_id'].initial = "-1"
 
     def generate_layout(self):
@@ -503,7 +423,7 @@ class ProfessorMergeForm(Form):
                             {{ form.merge_subject.errors|striptags }}
                         {% endif %}
                     '''),
-                    css_id=f"merge-errors-{self.professor.pk}",
+                    css_id="merge-errors",
                     css_class="row justify-content-center merge-errors invalid-feedback mb-1",
                     style="display: none;"
                 ),
@@ -535,7 +455,7 @@ class ProfessorMergeForm(Form):
                         ),
                         Field(
                             'merge_target',
-                            id=f"id_merge_target_{self.professor.pk}",
+                            id="id_merge_target",
                             css_class="rounded-right",
                             wrapper_class="mb-0",
                             placeholder="Merge Target",
@@ -544,7 +464,7 @@ class ProfessorMergeForm(Form):
                         ),
                         Field(
                             'target_id',
-                            id=f"id_target_id_{self.professor.pk}"
+                            id="id_target_id"
                         ),
                         css_class="input-group justify-content-center mb-1"
                     ),
@@ -555,7 +475,7 @@ class ProfessorMergeForm(Form):
                         'merge',
                         'Merge',
                         css_class="btn-primary mt-3 w-100",
-                        onClick=f'sendResponse($("#{self.helper.form_id}").serialize(), "professor_merge", {{ "prof_id": {self.professor.pk} }})'
+                        onClick=f'sendResponse($("#{self.helper.form_id}").serialize(), "professor_merge")'
                     ),
                     css_class="row"
                 ),
@@ -566,7 +486,7 @@ class ProfessorMergeForm(Form):
         )
         layout = BootstrapModal(
             fields,
-            css_id=f"merge-modal-{self.professor.pk}",
+            css_id="merge-modal",
             title_id="merge-professor-label",
             title='Search for a professor/TA to merge with'
         )

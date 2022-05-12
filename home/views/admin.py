@@ -16,7 +16,7 @@ from home.utils import AdminAction
 from home.tables.reviews_table import UnverifiedReviewsTable
 from home.tables.basic import ProfessorsTable
 from home.forms.admin_forms import (ProfessorMergeForm, ProfessorSlugForm,
-    ProfessorUpdateForm, ReviewActionForm)
+    ProfessorUpdateForm, ActionForm)
 from home.utils import send_email
 from planetterp import config
 
@@ -35,14 +35,16 @@ class Admin(UserPassesTestMixin, View):
 
         reviews_table = UnverifiedReviewsTable(reviews, request)
         professors_table = ProfessorsTable(professors, request)
-        review_action_form = ReviewActionForm()
+        merge_professor_form = ProfessorMergeForm(request)
+        action_form = ActionForm()
 
         context = {
             "reviews": reviews,
             "professors": professors,
             "reviews_table": reviews_table,
             "professors_table": professors_table,
-            "review_action_form": review_action_form
+            "action_form": action_form,
+            "merge_professor_form": merge_professor_form
         }
 
         context.update(csrf(request))
@@ -56,12 +58,12 @@ class Admin(UserPassesTestMixin, View):
 
         if action_type is AdminAction.REVIEW_VERIFY:
             verified_status = Review.Status(data["verified"])
-            review_id = int(data["review_id"])
+            review_id = int(data["id_"])
             return self.verify_review(review_id, verified_status, user)
 
         if action_type is AdminAction.REVIEW_HELP:
             channel_url = config.WEBHOOK_URL_HELP
-            review = Review.unfiltered.select_related().get(pk=int(data["review_id"]))
+            review = Review.unfiltered.select_related().get(pk=int(data["id_"]))
             professor = review.professor
             professor_id = professor.id
             grade = review.grade if review.grade else "N/A"
@@ -86,7 +88,7 @@ class Admin(UserPassesTestMixin, View):
 
         elif action_type is AdminAction.PROFESSOR_VERIFY:
             verified_status = Professor.Status(data["verified"])
-            professor_id = int(data["professor_id"])
+            professor_id = int(data["id_"])
             professor = Professor.unfiltered.filter(pk=professor_id).first()
 
             if professor and professor.slug:
@@ -141,7 +143,7 @@ class Admin(UserPassesTestMixin, View):
         elif action_type is AdminAction.PROFESSOR_MERGE:
             subject_id = request.POST['subject_id']
             merge_subject = Professor.unfiltered.get(pk=subject_id)
-            form = ProfessorMergeForm(request, merge_subject, data=request.POST)
+            form = ProfessorMergeForm(request, data=request.POST)
 
             ctx = {}
             ctx.update(csrf(request))
@@ -160,11 +162,13 @@ class Admin(UserPassesTestMixin, View):
                 context["target_slug"] = merge_target.slug
                 merge_subject.delete()
 
+            context["prof_name"] = merge_subject.name
+            context["prof_id"] = merge_subject.pk
             context['form'] = render_crispy_form(form, form.helper, context=ctx)
             return JsonResponse(context)
 
         elif action_type is AdminAction.PROFESSOR_DELETE:
-            professor_id = int(data["professor_id"])
+            professor_id = int(data["id_"])
             professor_type = str(data["professor_type"])
             has_reviews = Review.unfiltered.filter(professor__id=professor_id).exists()
             has_grades = Grade.unfiltered.filter(professor__id=professor_id).exists()

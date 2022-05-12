@@ -11,9 +11,7 @@ import django_tables2 as tables
 
 from planetterp.settings import DATE_FORMAT
 from home.models import Review, Grade
-from home.forms.admin_forms import (ReviewUnverifyForm, ProfessorMergeForm,
-ProfessorVerifyForm, ProfessorRejectForm,
-ProfessorDeleteForm)
+from home.forms.admin_forms import ReviewUnverifyForm
 
 class InformationColumn(tables.Column):
     def __init__(self, *args, **kwargs):
@@ -238,35 +236,24 @@ class UnverifiedProfessorsActionColumn(ActionColumn):
         ctx = {}
         ctx.update(csrf_token)
 
-        verify_form = ProfessorVerifyForm(model_obj.pk)
-        reject_form = ProfessorRejectForm(model_obj.pk)
-        delete_form = ProfessorDeleteForm(model_obj)
-        merge_form = ProfessorMergeForm(request, model_obj)
-
         column_html = '''
-            <div style="white-space: nowrap;">
-                <div class="btn-group">
-                    {verify_form}
-                    {reject_form}
-                </div>
-                <div class="btn-group" style="align-items: flex-start;">
-                    {delete_form}
-                    <button class="btn btn-primary rounded-right"
-                        data-toggle="modal" data-target="#merge-modal-{id}"
-                        onclick="initalizeAutoComplete('{csrf}', {id})">Merge
-                    </button>
-                    <div id="merge-container-{id}">
-                        {merge_form}
+            <div class="unverified_professor_{id} container" style="white-space: nowrap;">
+                <div class="row">
+                    <div class="col">
+                        <button class="btn btn-success w-100" onClick="verifyProfessor('{id}', 'verified')" style="border-bottom-left-radius: 0; border-bottom-right-radius: 0;">Verify</button>
                     </div>
                 </div>
-            </div>
+                <div class="row">
+                    <div class="col btn-group">
+                        <button class="btn btn-danger w-50" onClick="verifyProfessor('{id}', 'rejected')" style="border-top-left-radius: 0;">Reject</button>
+                        <button class="btn btn-primary rounded-0" onclick="mergeProfessor('{name}', '{id}')">Merge</button>
+                        <button class="btn btn-dark" onClick="verifyProfessor('{id}', 'professor_delete')" style="border-top-right-radius: 0;">Delete</button>
+                    </div>
+                </div>
         '''
         kwargs = {
-            "verify_form": render_crispy_form(verify_form, verify_form.helper, context=ctx),
-            "reject_form": render_crispy_form(reject_form, reject_form.helper, context=ctx),
-            "delete_form": render_crispy_form(delete_form, delete_form.helper, context=ctx),
-            "merge_form": render_crispy_form(merge_form, merge_form.helper, context=ctx),
             "id": model_obj.pk,
+            "name": model_obj.name,
             "csrf": csrf_token['csrf_token']
         }
         return format_html(column_html, **kwargs)

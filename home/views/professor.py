@@ -70,7 +70,7 @@ class Professor(View):
         if request.user.is_staff:
             edit_professor_form = ProfessorUpdateForm(professor, instance=professor)
             unverify_professor_form = ProfessorUnverifyForm(professor.pk)
-            merge_professor_form = ProfessorMergeForm(request, professor)
+            merge_professor_form = ProfessorMergeForm(request)
             context["edit_professor_form"] = edit_professor_form
             context['unverify_professor_form'] = unverify_professor_form
             context['merge_professor_form'] = merge_professor_form

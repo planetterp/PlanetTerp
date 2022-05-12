@@ -31,6 +31,7 @@ function sendResponse(form_data, tool_type, args = {}) {
         data: form_data,
         success: function(data) {
             if (data["success"] || data["success_msg"] != null) {
+                console.log(tool_type);
                 responses[tool_type].SUCCESS(data, args);
             } else {
                 responses[tool_type]?.ERROR(data, args);
@@ -190,19 +191,21 @@ function mergeProfessorSuccess(data, args) {
         var successText = '<div class="alert alert-success text-center success-alert">'
             successText += 'Professor merged successfully!</div>'
 
-        $(`#id_merge_subject_${args['prof_id']}`).removeClass("is-invalid").val("");
-        $(`#id_merge_target_${args['prof_id']}`).removeClass("is-invalid").val("");
+        $("#id_merge_subject").removeClass("is-invalid").val("");
+        $("#id_merge_target").removeClass("is-invalid").val("");
 
         location.reload();
     }
 }
 function mergeProfessorError(data, args) {
-    $(`#merge-container-${args["prof_id"]}`).html(data["form"]);
-    $(`#merge-errors-${args["prof_id"]}`).css("display", "flex");
-    var csrf_token = $(`#merge-form-${args["prof_id"]} > input[name="csrfmiddlewaretoken"]`).val();
+    $("#merge-container").html(data["form"]);
+    $("#merge-errors").css("display", "flex");
+    var csrf_token = $('#merge-form > input[name="csrfmiddlewaretoken"]').val();
+    initalizeAutoComplete(csrf_token);
+    $('#id_merge_subject').val(data["prof_name"]);
+    $('#id_subject_id').val(data["prof_id"]);
     $(".modal-backdrop").remove();
-    $(`#merge-modal-${args["prof_id"]}`).modal('show');
-    initalizeAutoComplete(csrf_token, args["prof_id"]);
+    $("#merge-modal").modal('show');
 }
 
 /* ********* SLUG PROFESSOR FUNCTIONS ********* */
@@ -237,8 +240,8 @@ function slugProfessorError(data, args) {
 }
 
 /* SHARED FUNCTIONS */
-function initalizeAutoComplete(csrf_token, prof_id) {
-    $(`#id_merge_target_${prof_id}`).autocomplete({
+function initalizeAutoComplete(csrf_token) {
+    $("#id_merge_target").autocomplete({
         minLength: 3,
         source: function(request, response) {
             $.ajax({
@@ -256,8 +259,21 @@ function initalizeAutoComplete(csrf_token, prof_id) {
             })
         },
         select: function(event, ui) {
-            $(`#id_merge_target_${prof_id}`).val(ui.item.result.name);
-            $(`#id_target_id_${prof_id}`).val(ui.item.result.pk);
+            $("#id_merge_target").val(ui.item.result.name);
+            $("#id_target_id").val(ui.item.result.pk);
         }
     });
+}
+
+function mergeProfessor(name, id_) {
+    initalizeAutoComplete('{{ csrf_token }}');
+    $('#id_merge_subject').val(name);
+    $('#id_subject_id').val(id_);
+
+    if (location.pathname.includes("professor")) {
+        $("#edit-professor-modal").modal('hide');
+        $(".modal-backdrop").hide();
+    }
+
+    $('#merge-modal').modal('show');
 }

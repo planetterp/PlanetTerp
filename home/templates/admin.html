@@ -8,6 +8,10 @@
 {% endblock %}
 
 {% block content %}
+
+
+{% crispy action_form %}
+
 <div id="admin-tool-response" class="fixed-top hidden"></div>
 <br />
 
@@ -25,11 +29,12 @@
 
 <div class="tab-content container mt-4">
 	<div class="tab-pane fade show active" id="reviews-noscroll" role="tabpanel">
-		{% crispy review_action_form %}
 		{% render_table reviews_table %}
 	</div>
 	<div class="tab-pane fade" id="professors-noscroll" role="tabpanel">
 		{% render_table professors_table %}
+
+		<div id="merge-container">{% crispy merge_professor_form %}</div>
 		<div id="slug-modal-container"></div>
 	</div>
 	<div class="tab-pane fade" id="maintenance-noscroll" role="tabpanel">
@@ -67,31 +72,34 @@
 		var action_type = action;
 
 		if (action != "review_help") {
-			$('#review_verified').val(action);
+			$('#verified').val(action);
 			args = {"count" : (num_reviews > 0 ? --num_reviews : 0)};
 			action_type = "review_verify";
 		}
 
-		$('#review_id').val(review_id);
-		$('#review_action_type').val(action_type);
-		sendResponse($('#review_action_form').serialize(), action_type, args);
+		$('#id_').val(review_id);
+		$('#action_type').val(action_type);
+		sendResponse($('#action_form').serialize(), action_type, args);
 	}
 
-	function verifyProfessor(form) {
-		var professor_counter = (prof_count > 0 ? --prof_count : 0)
+	function verifyProfessor(professor_id, action) {
+		var action_type = action;
+		var professor_counter = (prof_count > 0 ? --prof_count : 0);
 		args = {"count" : professor_counter, "num_reviews" : num_reviews}
-		sendResponse($(form).serialize(), "professor_verify", args);
+
+		if (action != "professor_delete") {
+			$('#verified').val(action);
+			action_type = "professor_verify";
+		}
+
+		$('#id_').val(professor_id);
+		$('#action_type').val(action_type);
+		sendResponse($('#action_form').serialize(), action_type, args);
 	}
 
 	function verifySlug(form) {
 		var professor_counter = (prof_count > 0 ? --prof_count : 0)
 		sendResponse($(form).serialize(), "professor_slug", {"count" : professor_counter});
-	}
-
-	function deleteProfessor(form) {
-		var professor_counter = (prof_count > 0 ? --prof_count : 0)
-		var args = {"count" : professor_counter, "num_reviews" : num_reviews, "form": form};
-		sendResponse($(form).serialize(), "professor_verify", args);
 	}
 
 	function recomputeTTLCache() {
