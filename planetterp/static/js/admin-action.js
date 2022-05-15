@@ -51,17 +51,9 @@ function addAdminResponse(target, msg) {
 
 /* ********* VERIFY REVIEW FUNCTIONS ********* */
 function verifyReviewSuccess(data, args) {
-    var msg = data['success_msg'];
     var verified_status = data['verified_status'];
     var unverified_count = Number($("#unverified_count").html());
     $("#unverified_count").html(unverified_count - 1);
-    var successText = '<div class="alert alert-success text-center success-alert">'
-        successText += `<strong>Successfully ${verified_status} review</strong>`
-
-    if (msg != null) {
-        successText += msg
-    }
-    successText += "</div><br />";
 
     if (verified_status == "unverified") {
         location.reload();
@@ -70,7 +62,7 @@ function verifyReviewSuccess(data, args) {
     $("#review-counter").html(args["count"]);
 
     $(`#review-${data["review_id"]}`).remove();
-    addAdminResponse("#admin-tool-response", successText);
+    //addAdminResponse("#admin-tool-response", successText);
 }
 function verifyReviewError(data, args) {
     var errorText = '<div class="alert alert-danger text-center error-alert">'
@@ -95,13 +87,11 @@ function verifyProfessorSuccess(data, args) {
     } else {
         var unverified_count;
         if (data['success_msg'] != "unverified") {
-            var successText = '<div class="alert alert-success text-center success-alert">'
             var msg = data['success_msg'];
 
             $("#professor-counter").html(args["count"]);
 
             if (msg != null) {
-                successText += `<strong>Successfully ${msg} ${data["type"]}.`
                 if (msg != "verified") {
                     var professor_reviews = $(`div.unverified_review_${data['id']}`);
 
@@ -111,16 +101,11 @@ function verifyProfessorSuccess(data, args) {
                         professor_reviews.each(function() {
                             $(this).parents("tr").remove();
                         });
-                        successText += ` Any associated reviews have also been been ${msg}.`
                     }
                 }
-                successText += "</strong>"
-            } else
-                successText += `<strong>Successfully slugged and verified ${data["type"]}.</strong>`
+            }
 
-            successText += "</div><br />";
             $(`#professor-${data['id']}`).remove();
-            addAdminResponse("#admin-tool-response", successText);
             unverified_count = Number($("#unverified_count").html());
             $("#unverified_count").html(unverified_count - 1);
         } else
