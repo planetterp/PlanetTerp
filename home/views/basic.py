@@ -84,6 +84,7 @@ class Index(View):
             .verified
             .filter(professor__status=Professor.Status.VERIFIED)
             .order_by("-pk")[:3]
+            .select_related()
         )
         random_organization = Organization.objects.order_by("?")
         random_organization = random_organization and random_organization[0]
