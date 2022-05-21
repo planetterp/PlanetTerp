@@ -4,9 +4,9 @@ from collections import defaultdict
 from django.shortcuts import render, redirect
 from django.http import Http404
 from django.views import View
-from django.db.models import Count, Q, Sum, FloatField
+from django.db.models import Count, Q, Sum, FloatField, F
 
-from home.models import ProfessorCourse, Course as CourseModel, Review
+from home.models import Course as CourseModel, Review
 
 class Course(View):
     template = "course.html"
@@ -56,15 +56,15 @@ class Course(View):
                     )
                 )
             )
+            .annotate(
+                recent_semester=F("professorcourse__recent_semester")
+            )
         )
 
         grouped_professors = defaultdict(list)
         past_professors = []
         for professor in professors:
-            professor_course = ProfessorCourse.objects.get(
-                professor_id=professor.pk, course_id=course.pk
-            )
-            recent_semester = professor_course.recent_semester
+            recent_semester = professor.recent_semester
 
             if recent_semester and recent_semester.recent:
                 grouped_professors[recent_semester].append(professor)
