@@ -8,7 +8,7 @@ from django.contrib.auth.mixins import UserPassesTestMixin
 from home.models import Organization, Professor, Course, Review, Grade, User
 from home.tables.reviews_table import VerifiedReviewsTable, ProfileReviewsTable
 from home.forms.basic import ProfileForm
-from home.utils import recompute_ttl_cache
+from home.utils import recompute_ttl_cache, ttl_cache
 
 class About(View):
     def get(self, request):
@@ -73,12 +73,20 @@ class CourseReviews(View):
         return render(request, "course_reviews.html", context)
 
 class Index(View):
-    def get(self, request):
+
+    @staticmethod
+    @ttl_cache(24 * 60 * 60 * 7)
+    def get_counts():
         num_courses = Course.unfiltered.count()
         num_professors = Professor.verified.count()
         num_reviews = Review.verified.count()
         num_course_grades = Grade.unfiltered.count()
+        return (num_courses, num_professors, num_reviews, num_course_grades)
 
+
+    def get(self, request):
+        counts = self.get_counts()
+        num_courses, num_professors, num_reviews, num_course_grades = counts
         recent_reviews = (
             Review
             .verified
