@@ -4,7 +4,7 @@ mysqlclient==2.1.0
 
 # Django add-ons explicity used by us
 django-tables2==2.4.0
-django-crispy-forms==1.12.0
+django-crispy-forms==1.14.0
 
 # for the api
 djangorestframework==3.12.4
