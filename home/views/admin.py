@@ -212,14 +212,17 @@ class Admin(UserPassesTestMixin, View):
             }
             ctx.update(csrf(request))
 
-            if form.is_valid():
-                professor.slug = form.cleaned_data['slug']
-                professor.status = Professor.Status.VERIFIED
-                professor.save()
+            if not form.is_valid():
+                context["error_msg"] = form.errors.as_json()
+                return JsonResponse(context)
 
-                form = ProfessorSlugForm(professor)
-                context['success'] = True
-                context['type'] = professor.type
+            professor.slug = form.cleaned_data['slug']
+            professor.status = Professor.Status.VERIFIED
+            professor.save()
+
+            form = ProfessorSlugForm(professor)
+            context['success'] = True
+            context['type'] = professor.type
 
             context['form'] = render_crispy_form(form, form.helper, context=ctx)
             return JsonResponse(context)

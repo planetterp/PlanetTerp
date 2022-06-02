@@ -102,11 +102,8 @@ class ProfessorSlugForm(Form):
     def generate_layout(self):
         slug_errors = HTML(
             '''
-            {% if form.slug.errors %}
-                <div id="slug_errors" class="invalid-feedback" style="font-size: 15px">
-                    {{ form.slug.errors|striptags }}
-                </div>
-            {% endif %}
+            <div id="slug_errors" class="invalid-feedback" style="font-size: 15px">
+            </div>
             '''
         )
         return Layout(

@@ -212,14 +212,16 @@ function slugProfessorSuccess(data, args) {
         addAdminResponse("#admin-tool-response", successText);
 
         $(".modal").modal('hide');
-        $(".slug-errors").html();
+        $("#slug_errors").html();
         $(`#slug-form-slug-${data['id']}`).removeClass("is-invalid");
+        $('#slug-modal-container').html();
     }
 }
 function slugProfessorError(data, args) {
-    var msg = data['error_msg'];
-    $(".slug-errors").html(msg);
-    $(".slug-errors").show();
+    var parsed_data = JSON.parse(data["error_msg"]);
+    var msg = parsed_data['slug'][0]['message'];
+    $("#slug_errors").html(msg);
+    $("#slug_errors").show();
     $(`#slug-form-slug-${data['id']}`).addClass("is-invalid");
 }
 
