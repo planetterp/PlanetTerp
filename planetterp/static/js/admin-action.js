@@ -31,7 +31,6 @@ function sendResponse(form_data, tool_type, args = {}) {
         data: form_data,
         success: function(data) {
             if (data["success"] || data["success_msg"] != null) {
-                console.log(tool_type);
                 responses[tool_type].SUCCESS(data, args);
             } else {
                 responses[tool_type]?.ERROR(data, args);
