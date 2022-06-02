@@ -287,7 +287,7 @@ class ProfessorUpdateForm(ModelForm):
                 ),
                 css_id="edit-professor-modal",
                 title_id="edit-professor-label",
-                title=format_html('Viewing info for <b>{}</b>. Click a field to edit its contents.', (self.professor.name))
+                title=format_html('Viewing info for <b>{}</b>. Click a field to edit its contents then click update to save your changes.', (self.professor.name))
             )
         )
         return layout
