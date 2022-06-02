@@ -80,7 +80,7 @@ class Professor(View):
     def post(self, request, slug):
         data = request.POST
         slug = data['slug']
-        professor = ProfessorModel.objects.verified.filter(slug=slug).first()
+        professor = ProfessorModel.verified.filter(slug=slug).first()
         user = request.user
 
         form = ProfessorFormReview(user, professor, data=request.POST)
