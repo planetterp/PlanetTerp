@@ -300,7 +300,7 @@ class Admin(UserPassesTestMixin, View):
 
                 if len(split_name) > 2:
                     modal_msg = (
-                        f"The name '{professor.name}' is too long and"
+                        f"The name '{professor.name}' is too long and "
                         "can't be slugged automatcially. Please enter a slug below."
                     )
 
