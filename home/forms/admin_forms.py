@@ -6,9 +6,8 @@ from django.forms import Form, ModelForm
 
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Div, Field, Layout, Button, HTML
-from crispy_forms.bootstrap import FormActions
+from crispy_forms.bootstrap import FormActions, Modal
 
-from .layout_objects.bootstrap_modal import BootstrapModal
 from home.utils import AdminAction, slug_in_use_err
 from home.models import Review, Professor
 from planetterp.settings import DATE_FORMAT
@@ -111,7 +110,7 @@ class ProfessorSlugForm(Form):
             '''
         )
         return Layout(
-            BootstrapModal(
+            Modal(
                 Field(
                     'slug',
                     id=f"slug-form-slug-{self.professor.pk}",
@@ -234,7 +233,7 @@ class ProfessorUpdateForm(ModelForm):
 
     def generate_layout(self):
         layout = Layout(
-            BootstrapModal(
+            Modal(
                 'action_type',
                 'hidden_professor_id',
                 Div(
@@ -484,7 +483,7 @@ class ProfessorMergeForm(Form):
                 css_id="merge-form-container"
             )
         )
-        layout = BootstrapModal(
+        layout = Modal(
             fields,
             css_id="merge-modal",
             title_id="merge-professor-label",

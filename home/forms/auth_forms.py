@@ -7,8 +7,8 @@ from django.forms import ModelForm, Form
 
 from crispy_forms.layout import Layout, Div, Field, HTML, Submit
 from crispy_forms.helper import FormHelper
+from crispy_forms.bootstrap import Modal
 
-from home.forms.layout_objects.bootstrap_modal import BootstrapModal
 from home.models import User, ResetCode
 
 class LoginForm(ModelForm):
@@ -188,7 +188,7 @@ class ForgotPasswordForm(Form):
 
     def generate_layout(self):
         return Layout(
-            BootstrapModal(
+            Modal(
                 Field('email', placeholder="Email", wrapper_class="mb-0"),
                 HTML('''
                     {% if form.email.errors %}

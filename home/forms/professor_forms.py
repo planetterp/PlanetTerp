@@ -10,11 +10,10 @@ from django.utils.html import format_html
 
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Fieldset, Layout, Div, Field, HTML, Button
-from crispy_forms.bootstrap import FormActions, Alert, InlineRadios
+from crispy_forms.bootstrap import FormActions, Alert, InlineRadios, Modal
 from discord_webhook import DiscordWebhook
 from discord_webhook.webhook import DiscordEmbed
 
-from home.forms.layout_objects.bootstrap_modal import BootstrapModal
 from home.models import Review, Professor, Course
 from planetterp import config
 
@@ -336,7 +335,7 @@ class ProfessorFormAdd(ProfessorForm):
 
     def generate_layout(self):
         layout = Layout(
-            BootstrapModal(
+            Modal(
                 super().generate_layout(),
                 css_id="add-professor-modal",
                 title_id="add-professor-label",
