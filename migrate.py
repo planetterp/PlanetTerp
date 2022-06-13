@@ -2,13 +2,26 @@
 
 import os
 
+SUCCESS = 0
 print("Migrating DB to django:\nResetting django tables...")
-os.system("python3 reset_django.py")
 
-print("DB successfully reset\nPreparing DB for migration (will take a while)...")
-os.system("python3 db_setup.py")
+ret = os.system("python3 reset_django.py")
+if ret != SUCCESS:
+    print("\nDjango reset failed!")
+    exit()
+
+print("DB successfully reset\nPreparing DB for migration...")
+
+ret = os.system("python3 db_setup.py")
+if ret != SUCCESS:
+    print("\nDB setup failed!")
+    exit()
+
 print("DB prepared successfully\nMigrating to django. This might take a few minutes...")
 
-os.system("python3 webpy_to_django.py")
+ret = os.system("python3 webpy_to_django.py")
+if ret != SUCCESS:
+    print("\nwebpy_to_django to failed!")
+    exit()
 
-print("Success!")
+print("\nSuccess!")

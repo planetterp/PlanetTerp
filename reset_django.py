@@ -9,11 +9,15 @@ db = web.database(dbn='mysql', db=db_name, user=USER, pw=PASSWORD, charset='utf8
 
 os.system("python3 manage.py makemigrations")
 # django_site needs to be dropped before migrating for the first time or we
-# might try to create it again
+# might try to create it again.
+#
+# If you keep getting an error saying that django_site doesn't exist, comment out the query.
+"""
 db.query('''
 DROP TABLE IF EXISTS
 `planetterp`.`django_site`
 ''')
+"""
 
 os.system("python3 manage.py migrate")
 db.query('''

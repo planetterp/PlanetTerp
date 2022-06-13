@@ -1,5 +1,3 @@
-# DO NOT RUN THIS SCRIPT YOURSELF
-
 import os
 import web
 from django.core.wsgi import get_wsgi_application
@@ -56,6 +54,11 @@ def _foreign_key(objects, row, name, nullable=False):
     id_ = row[name]
     if id_ is None and nullable:
         return None
+
+    if id_ not in objects:
+        print(f"id {id_} not found")
+        exit(1)
+
     return objects[id_]
 
 def migrate_courses():
@@ -182,9 +185,6 @@ def migrate_reviews(users, courses, professors):
         }
         return mapping[row["verified"]]
 
-    def _anonymous(row):
-        return row['reviewer_name'].lower() == "anonymous"
-
     mapping = {
         "professor": lambda row: _foreign_key(professors, row, "professor_id"),
         "course": lambda row: _foreign_key(courses, row, "course_id", True),
@@ -194,22 +194,17 @@ def migrate_reviews(users, courses, professors):
         "rating": "rating",
         "grade": "expected_grade",
         "status": _status,
-        "anonymous": _anonymous,
+        "anonymous": lambda row: row["reviewer_name"].lower() == "anonymous",
         "from_ourumd": "from_ourumd",
         "created_at": "created"
     }
     return _create_table("reviews", Review, mapping)
 
 def migrate_grades(courses, historical_courses, professors):
-    print("  Migrating grades...")
-
-    def _semester(row):
-        return Semester(row["semester"])
-
     mapping = {
         "course": lambda row: _foreign_key(courses, row, "course_id"),
         "professor": lambda row: _foreign_key(professors, row, "professor_id", True),
-        "semester": _semester,
+        "semester": lambda row: Semester(row["semester"]),
         "section": "section",
         "num_students": "num_students",
         "a_plus": "APLUS",
@@ -229,6 +224,7 @@ def migrate_grades(courses, historical_courses, professors):
         "other": "OTHER"
     }
 
+    print("  Migrating grades...")
     grades = _create_table("grades", Grade, mapping)
 
     # use historical_courses for the course fk in grades_historical instead
@@ -238,6 +234,7 @@ def migrate_grades(courses, historical_courses, professors):
     # a keyerror above if we didn't modify this.
     mapping["professor"] = lambda row: None
 
+    print("  Migrating historical grades...")
     historical_grades = _create_table("grades_historical", Grade, mapping)
 
     return (grades, historical_grades)
@@ -324,7 +321,6 @@ def migrate_organizations():
     }
 
     return _create_table("organizations", Organization, mapping)
-
 
 # disable all auto_now_add fields, if we don't they won't respect our values,
 # even if we pass it as a param
