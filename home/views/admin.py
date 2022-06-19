@@ -17,7 +17,7 @@ from home.tables.reviews_table import UnverifiedReviewsTable
 from home.tables.basic import ProfessorsTable
 from home.forms.admin_forms import (ProfessorMergeForm, ProfessorSlugForm,
     ProfessorUpdateForm, ActionForm)
-from home.utils import send_email
+from home.utils import send_email, _ttl_cache
 from planetterp import config
 
 class Admin(UserPassesTestMixin, View):
@@ -38,13 +38,20 @@ class Admin(UserPassesTestMixin, View):
         merge_professor_form = ProfessorMergeForm(request)
         action_form = ActionForm()
 
+        ttl_cache_items = []
+        for key, item in _ttl_cache.items():
+            # [key, time_salt, value]
+            val = [key, item[0], item[1]]
+            ttl_cache_items.append(val)
+
         context = {
             "reviews": reviews,
             "professors": professors,
             "reviews_table": reviews_table,
             "professors_table": professors_table,
             "action_form": action_form,
-            "merge_professor_form": merge_professor_form
+            "merge_professor_form": merge_professor_form,
+            "ttl_cache_items": ttl_cache_items
         }
 
         context.update(csrf(request))

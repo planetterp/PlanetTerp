@@ -41,6 +41,28 @@
 		<button class="btn btn-primary" onclick="recomputeTTLCache()">
 			Recompute TTL Caches
 		</button>
+
+
+		<table class="table table-bordered mt-4 mb-4">
+			<thead>
+				<tr>
+					<th style="width: 25%;">key</th>
+					<th style="width: 15%;">time_salt</th>
+					<th style="width: 60%;">value</th>
+				</tr>
+			</thead>
+
+			<tbody>
+				{% for item in ttl_cache_items %}
+					<tr>
+						<td>{{ item.0 }}</td>
+						<td>{{ item.1 }}</td>
+						<td>{{ item.2 }}</td>
+					</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+
 	</div>
 </div>
 
