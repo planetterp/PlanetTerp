@@ -6,7 +6,7 @@ PlanetTerp is a website designed to help students at the University of Maryland 
 
 This is the second version of PlanetTerp. The first version was written in [webpy](https://github.com/webpy/webpy), and was closed source. It was rewritten in [django](https://github.com/django/django) at the beginning of 2022, which is the version you see here.
 
-All contributions are welcome, whether that be opening an issue with a bug or feature request, or opening a pull requets. See below for how to set up PlanetTerp locally.
+All contributions are welcome, whether that be opening an issue with a bug or feature request, or opening a pull request. See below for how to set up PlanetTerp locally.
 
 ### Setup
 
