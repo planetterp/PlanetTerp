@@ -10,21 +10,24 @@ application = get_wsgi_application()
 web.config.debug = False
 db_name = os.environ.get("PLANETTERP_MYSQL_DB_NAME", "planetterp")
 db = web.database(dbn='mysql', db=db_name, user=USER, pw=PASSWORD, charset='utf8mb4')
-print("    Dropping useless tables...")
-db.query('DROP TABLE planetterp.views')
-db.query('DROP TABLE planetterp.discussions')
-db.query('DROP TABLE planetterp.fall_2020_searches')
-db.query('DROP TABLE planetterp.replies')
-db.query('DROP TABLE planetterp.groupme_auth')
-db.query('DROP TABLE planetterp.groupme_user_groups')
-db.query('DROP TABLE planetterp.courses_copy')
-db.query('DROP TABLE planetterp.grades2')
-db.query('DROP TABLE planetterp.professor_courses_copy')
-db.query('DROP TABLE planetterp.professors_copy')
-db.query('DROP TABLE planetterp.reviews_copy')
-db.query('DROP TABLE planetterp.organizations_review')
 
-# Handling random things that need to be changed
+print("  Dropping useless tables...")
+db.query('''
+    DROP TABLE IF EXISTS
+        planetterp.views,
+        planetterp.discussions,
+        planetterp.fall_2020_searches,
+        planetterp.replies,
+        planetterp.groupme_auth,
+        planetterp.groupme_user_groups,
+        planetterp.courses_copy,
+        planetterp.grades2,
+        planetterp.professor_courses_copy,
+        planetterp.professors_copy,
+        planetterp.reviews_copy,
+        planetterp.organizations_review
+    ''')
+
 print("  Handling werid edge cases...")
 db.query("UPDATE planetterp.users SET email = NULL WHERE CHARACTER_LENGTH(email) > 254 OR email = ''")
 db.query('DELETE FROM planetterp.reviews WHERE professor_id < 0')

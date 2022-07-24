@@ -10,7 +10,7 @@ db = web.database(dbn='mysql', db=db_name, user=USER, pw=PASSWORD, charset='utf8
 os.system("python3 manage.py makemigrations")
 os.system("python3 manage.py migrate")
 db.query('''
-    DROP TABLE
+    DROP TABLE IF EXISTS
     `planetterp`.`auth_group`,
     `planetterp`.`auth_permission`,
     `planetterp`.`auth_group_permissions`,
