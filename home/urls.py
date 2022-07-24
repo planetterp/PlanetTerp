@@ -1,4 +1,4 @@
-from django.urls import path, register_converter, reverse
+from django.urls import path, register_converter, reverse, include
 from django.contrib.sitemaps import Sitemap
 from django.contrib.sitemaps.views import sitemap
 
@@ -19,6 +19,8 @@ from home.views.search import Search
 from home.views.tools import (Tools, ToolDemographics, ToolPopularCourses,
     ToolGradeInflation, ToolGeneds, ToolCourseDifficulty)
 from home.models import Course as CourseModel, Professor as ProfessorModel
+
+import debug_toolbar
 
 
 class CourseConverter:
@@ -146,4 +148,6 @@ urlpatterns = [
     path('tools/geneds', ToolGeneds.as_view(), name='tools-geneds'),
     path('tools/gradeinflation', ToolGradeInflation.as_view(), name='tools-grade-inflation'),
     path('tools/popularcourses', ToolPopularCourses.as_view(), name='tools-popular-courses'),
+
+    path('__debug__/', include(debug_toolbar.urls)),
 ]

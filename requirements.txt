@@ -17,3 +17,7 @@ google-auth-httplib2
 
 # can be removed after migration scripts are removed
 web.py
+
+# for debug toolbar
+django-debug-toolbar
+django-debug-toolbar-template-profiler
