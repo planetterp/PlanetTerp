@@ -1,0 +1,325 @@
+{% load static %}
+{% load professor_form_add %}
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+        <link rel="shortcut icon" type="image/x-icon" href="{% static 'favicon.ico' %}">
+
+        <script type="text/javascript" src="{% static 'js/jquery-3.5.1.min.js' %}"></script>
+        <script type="text/javascript" src="{% static 'js/jquery-ui-1.12.1.min.js' %}"></script>
+        <script type="text/javascript" src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+
+        <script type="text/javascript" src="{% static 'js/rateyo.min.js' %}"></script>
+        <script type="text/javascript" src="{% static 'js/rating.js' %}"></script>
+        <script type="text/javascript" src="{% static 'js/iziToast.min.js' %}"></script>
+        <script type="text/javascript" src="{% static 'js/professor-form.js' %}"></script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=UA-109898068-1"></script>
+
+        <link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap.min.css' %}">
+        <link rel="stylesheet" type="text/css" href="{% static 'css/jquery-ui-1.12.1.min.css' %}">
+        <link rel="stylesheet" type="text/css" href="{% static 'css/jquery-autocomplete.css' %}">
+        <link rel="stylesheet" type="text/css" href="{% static 'css/rateyo.min.css' %}">
+        <link rel="stylesheet" type="text/css" href="{% static 'css/iziToast.min.css' %}">
+        <link rel="stylesheet" type="text/css" href="{% static 'css/progressbar.css' %}">
+        <link rel="stylesheet" type="text/css" href="{% static 'fontawesome-5.15.3/css/all.min.css' %}">
+
+        {% if user and user.is_staff %}
+            <script type="text/javascript" src="{% static 'js/admin-action.js' %}"></script>
+        {% endif %}
+
+        <!-- must come at the end so we override other css files when specificity is equal -->
+        <link rel="stylesheet" href="{% static 'css/stylesheet.css' %}">
+
+        {% if request.session.color_scheme == "dark" %}
+            <link rel="stylesheet" type="text/css" href="../static/css/darktheme.css">
+        {% endif %}
+
+
+        {% block head %}{% endblock %}
+
+        <title>{% block title %}{% endblock %}</title>
+
+        <meta name="description" content="{% block description %}PlanetTerp is a website designed to help students at the University of Maryland &mdash; College Park make informed decisions.{% endblock %}"/>
+        <style type="text/css">
+            @media (min-width: 800px) {
+                .iziToast, .iziToast-title {
+                    width: 430px;
+                }
+            }
+        </style>
+
+        <script>
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+
+            gtag('config', 'UA-109898068-1');
+
+            // (function(d, s, id) {
+            // var js, fjs = d.getElementsByTagName(s)[0];
+            // 	if (d.getElementById(id)) return;
+            // 	js = d.createElement(s); js.id = id;
+            // 	js.src = 'https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.11&appId=396580890766412';
+            // 	fjs.parentNode.insertBefore(js, fjs);
+            // }(document, 'script', 'facebook-jssdk'));
+
+
+            /* Track outbound clicks */
+            /* from: https://support.google.com/analytics/answer/7478520 */
+            var trackOutboundLink = function(url) {
+                gtag('event', 'click', {
+                    'event_category': 'outbound',
+                    'event_label': url,
+                    'transport_type': 'beacon'
+                    // 'event_callback': function(){document.location = url;}
+            });
+            }
+
+            /* Modified from: https://millionclues.com/internet/tracking-outbound-links-google-analytics/ (partially from https://stackoverflow.com/a/8496919/8255629) */
+            function onclickCallback(e) {
+                var e = window.e || e;
+
+                var target = e.target;
+
+                /* If clicked on an image, get the parent element, which
+                    should be an anchor element */
+                if (target.tagName === 'IMG') {
+                    target = target.parentElement;
+                }
+
+                if ((target.tagName !== 'A') || (target.host == window.location.host)) {
+                    return;
+                }
+
+                trackOutboundLink(target); // GA event tracker
+            }
+
+            if (document.addEventListener) {
+                document.addEventListener('click', onclickCallback, false);
+            }
+            else {
+                document.attachEvent('onclick', onclickCallback);
+            }
+
+            $(function () {
+                $('[data-toggle="tooltip"]').tooltip();
+            });
+        </script>
+    </head>
+
+    <body>
+        <div id="canvas-wrapper">
+            <div id="navbar-wrapper">
+                <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+                    <a class="navbar-brand p-0" href="/" title="Home"><img src="{% static 'images/logo.png' %}" class="logo" alt="PlanetTerp's logo. The logo is a circle with a blue background and light green blots appearing on it. The word 'TERP' is in dark green in the middle." /></a>
+                    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#site-navbar" aria-controls="site-navbar" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+
+                    <div class="collapse navbar-collapse" id="site-navbar">
+                        <ul class="navbar-nav mr-auto">
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'about' %}" title="About">About</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'grades' %}" title="Grades">Grades</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'tools' %}" title="Tools">Tools</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'schedule-new' %}" title="Schedule" style="z-index: 2;">Schedule</a>
+                                <!-- <div class="navbar-new" style="z-index: 0;">New!</div> -->
+                            </li>
+                            <!-- <li class="nav-item"  title="Marketing Intern">
+                                <a class="nav-link" href="https://bit.ly/planetterp-marketing-intern" style="z-index: 2;" target="_blank">Marketing Intern</a>
+                                <div class="navbar-new" style="z-index: 0;">Apply!</div>
+                            </li> -->
+                            <li class="nav-item"  title="API">
+                                <a class="nav-link" href="https://api.planetterp.com">API</a>
+                            </li>
+                            <!-- li class="nav-item"  title="Join The Team">
+                                <a class="nav-link" href="https://bit.ly/planetterp-team" style="z-index: 2;" target="_blank">Join The Team</a>
+                                <div class="navbar-new" style="z-index: 0;">Apply!</div>
+                            </li> -->
+                            <!-- <li class="nav-item"  title="Get a PlanetTerp T-shirt">
+                                <a class="nav-link" href="https://bit.ly/planetterp-shirt" style="z-index: 2;" target="_blank">T-shirts</a>
+                                <div class="navbar-new" style="z-index: 0;">$10!</div>
+                            </li> -->
+
+                            <li class="nav-item">
+                                <a class="nav-link" href="#" title="Add Professor/TA" data-toggle="modal" data-target="#add-professor-modal" style="color: #9af99a;">Add Professor/TA</a>
+                            </li>
+                        </ul>
+
+                        <ul class="navbar-nav navbar-right mr-3">
+                            {% if user.is_staff %}
+                                <li class="nav-item">
+                                    <a style="color: #ffc17f;" class="nav-link" href="{% url 'admin' %}#reviews" title="Admin Page">Admin Panel</a>
+                                </li>
+                            {% endif %}
+                            <li class="nav-item mr-3">
+                                {% if user.is_authenticated %}
+                                    <div class="dropdown">
+                                        <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdown-menu-button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="border: none;">{{ user.username }}</button>
+                                        <div class="dropdown-menu" aria-labelledby="dropdown-menu-button" role="menu">
+                                            <a class="dropdown-item" href="{% url 'profile' %}">Your Reviews</a>
+                                            <a class="dropdown-item" onClick="onProfileSettingsClick()" href="{% url 'profile' %}#settings">Settings</a>
+                                            <a class="dropdown-item" href="{% url 'logout' %}">Logout</a>
+                                        </div>
+                                    </div>
+                                {% else %}
+                                    <a class="nav-link" href="/login" title="Login / Register">Login / Register</a>
+                                {% endif %}
+                            </li>
+
+
+                            <li class="nav-item">
+                                <form action="{% url 'search' %}" class="form-inline">
+                                    <label for="header-search" style="display: none;">Search for a professor or course</label>
+                                    <input id="header-search" class="form-control" type="search" name="query" placeholder="Search..." aria-label="Search for a course, professor, or teaching assistant">
+                                    <button class="btn btn-primary" type="submit">Search</button>
+                                </form>
+                            </li>
+                        </ul>
+                    </div>
+                </nav>
+            </div>
+            {% comment %}TODO rewrite star generation so this isn't necessary {% endcomment %}
+            {% if request.session.color_scheme == "dark" %}
+                <canvas id="navbar-canvas"></canvas>
+                <div id="filler-div"></div>
+            {% endif %}
+        </div>
+
+        <div class="modal fade" id="add-professor-modal" tabindex="-1" role="dialog" aria-labelledby="add-modal-label">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title" id="add-modal-label">Add a new Professor/TA</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true" style="float: left">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        {% professor_form_add %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="content">
+            {% block content %}{% endblock %}
+        </div>
+
+        <footer id="page-footer" class="text-center w-100">
+            <div class="footer-color">
+                <span class="set-color-scheme" id="color-scheme-light" title="Set color scheme to light."></span>
+                <span class="set-color-scheme" id="color-scheme-dark" title="Set color scheme to dark."></span>
+            </div>
+            <div style="position: relative; top: 15px;" class="copyright-text">
+                Copyright &copy; 2017 &mdash; 2021 PlanetTerp
+                <div class="footer-info">
+                    <a href="{% url 'privacy-policy' %}">Privacy Policy</a> | <a href="{% url 'terms-of-use' %}">Terms of Use</a>
+                </div>
+            </div>
+        </footer>
+
+        <script type="text/javascript">
+            $(function() {
+                $("#header-search").autocomplete({
+                    minLength: 3,
+                    source: function(request, response) {
+                        $.get("{% url 'autocomplete' %}", {"query": request.term, "types[]": ["professor", "course"], "return_attrs[]": ["url"]},  function(data) {
+                            response(data);
+                        });
+                    },
+                    select: function(event, ui) {
+                        var location = ui.item.result.url;
+                        window.location.href = location;
+                        // prevent autocomplete from handling the event
+                        return false;
+                    }
+                });
+
+                /* Temporary work-around to remove space under
+                anonymous field in add professor form */
+                $(".anonymous-checkbox > div.form-group").addClass("mb-0");
+
+                initializeRateYo(2.5, "add");  // Located in rating.js
+
+                if (window.location.href.includes("/professor/")) {
+                    initializeRateYo(3.1, "review");
+                }
+            });
+
+            function changeColorScheme(scheme) {
+                $.ajax({
+                    url: "{% url 'set-color-scheme' %}",
+                    type: "POST",
+                    data: {
+                        'scheme': scheme,
+                        // for some reason our ajaxSetup call hasn't taken effect by this point in the file, so we need
+                        // to specify the csrf token manually.
+                        // (or perhaps I'm mistaken and have made a mistake somewhere else that has caused the csrf
+                        // token not to be passed).
+                        'csrfmiddlewaretoken': '{{ csrf_token }}'
+                    },
+                    // make sure the server has received our POST before refreshing, else the
+                    // session's color scheme may not be set yet
+                    success: function(data) {
+                        location.reload();
+                    }
+                });
+            }
+            $("#color-scheme-light").click(function() {
+                changeColorScheme("light");
+            });
+
+            $("#color-scheme-dark").click(function() {
+                changeColorScheme("dark");
+            });
+
+            function setUpDarkScheme() {
+                // "Stars" in navbar:
+                var navbar = document.getElementById('navbar-wrapper');
+
+                var fillerDiv = document.getElementById('filler-div');
+                fillerDiv.setAttribute('style', 'width:' + navbar.offsetWidth + 'px;height:' + navbar.offsetHeight + 'px;');
+
+                var canvas = document.getElementById('navbar-canvas');
+                canvas.width = navbar.offsetWidth;
+                canvas.height = navbar.offsetHeight;
+                var ctx = canvas.getContext("2d");
+                ctx.fillStyle = 'rgba(255,255,255,1)';
+
+                for (var x = 0; x < navbar.offsetWidth; x += 1) {
+                    for (var y = 0; y < navbar.offsetHeight; y += 1) {
+                        if (Math.random() <= .003 ) { // ~1/333 chance
+                            ctx.fillRect(x, y, 1, 1);
+                        }
+                    }
+                }
+                if (typeof Chart !== 'undefined') {
+                    Chart.defaults.global.defaultFontColor = 'white';
+                }
+            }
+
+            {% if request.session.color_scheme == "dark" %}
+                $(function() {
+                    setUpDarkScheme();
+                });
+            {% endif %}
+
+        function onProfileSettingsClick() {
+            // Allows user to switch to settings page from navbar dropdown when already on the profile page.
+            // Without this the settings link in the navbar dropdown won't be able to switch you from
+            // 'your reviews' to 'settings'. See also https://stackoverflow.com/a/19170628
+            location.hash = "settings"
+            location.reload();
+        }
+        </script>
+    </body>
+</html>

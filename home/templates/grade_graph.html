@@ -1,0 +1,171 @@
+<div class="text-center">
+    <strong id="average-gpa-text"></strong>
+</div>
+
+<span style="float: left;" id="only-spring-2020-notice"></span>
+<label style="float: left;" id="exclude-spring-2020">
+    exclude spring 2020
+    <input type="checkbox" id="exclude-spring-2020-checkbox" checked>
+</label>
+
+{% if lookup_by_courses %}
+    <span style="float: right;">
+        <label for="grades-by-course">Lookup by course:</label>
+        <select id="grades-by-course">
+            <option value="All courses">All courses</option>
+            {% for course in lookup_by_courses %}
+                <option value="{{ course }}">{{ course }}</option>
+            {% endfor %}
+        </select>
+    </span>
+{% endif %}
+
+<canvas id="grades" width="500px" height="400px"></canvas>
+
+<small>* "W"s are considered to be 0.0 quality points. "Other" grades are not factored into GPA calculation.</small><br />
+
+<script type="text/javascript">
+    const graph = $("#grades")[0].getContext("2d");
+    const chart = new Chart(graph, {
+        type: 'bar',
+        data: {
+            labels: ["A", "B", "C", "D", "F", "W", "other"],
+            datasets: [
+                {
+                label: "-",
+                data: [],
+                backgroundColor: [
+                    'rgba(58, 215, 65, .4)',
+                    'rgba(58, 215, 65, .4)',
+                    'rgba(58, 215, 65, .4)',
+                    'rgba(58, 215, 65, .4)'
+                ],
+                borderColor: [
+                    'rgba(29, 77, 0, 1)',
+                    'rgba(29, 77, 0, 1)',
+                    'rgba(29, 77, 0, 1)',
+                    'rgba(29, 77, 0, 1)'
+                ],
+                borderWidth: 2
+                },
+                {
+                label: "",
+                data: [],
+                backgroundColor: [
+                    'rgba(25, 140, 35, .5)',
+                    'rgba(25, 140, 35, .5)',
+                    'rgba(25, 140, 35, .5)',
+                    'rgba(25, 140, 35, .5)',
+                    'rgba(226, 0, 0, .7)',
+                    'rgba(226, 0, 0, .7)',
+                    'rgba(217, 217, 217, .4)',
+                ],
+                borderColor: [
+                    'rgba(29, 77, 0, 1)',
+                    'rgba(29, 77, 0, 1)',
+                    'rgba(29, 77, 0, 1)',
+                    'rgba(29, 77, 0, 1)',
+                    'rgba(196, 0, 0, 1)',
+                    'rgba(196, 0, 0, 1)',
+                    'rgba(201, 201, 201, 1)'
+                ],
+                borderWidth: 2
+                },
+                {
+                label: "+",
+                data: [],
+                backgroundColor: [
+                    'rgba(6, 74, 12, .7)',
+                    'rgba(6, 74, 12, .7)',
+                    'rgba(6, 74, 12, .7)',
+                    'rgba(6, 74, 12, .7)'
+                ],
+                borderColor: [
+                    'rgba(29, 77, 0, 1)',
+                    'rgba(29, 77, 0, 1)',
+                    'rgba(29, 77, 0, 1)',
+                    'rgba(29, 77, 0, 1)'
+                ],
+                borderWidth: 2
+                }
+            ]
+        },
+        options: {
+            title: {
+                display: true,
+                text: "{% if professor %}{{ professor.name }}{% else %}{{ course.name }}{% endif %} Grade Distribution"
+            },
+            scales: {
+                xAxes: [{stacked: true}],
+                yAxes: [{
+                    stacked: true,
+                    scaleLabel: {
+                        display: true,
+                        labelString: "% of students"
+                    }}
+                ]
+            },
+            legend: {
+                reverse: true
+            },
+            responsive: true,
+            tooltips: {
+                callbacks: {
+                    title: function(tooltipItem, data) {
+                        return tooltipItem[0]['xLabel'] + data['datasets'][tooltipItem[0]['datasetIndex']]['label'];
+                    }
+                }
+            },
+            animation: {
+                duration: 0
+            }
+        }
+    });
+
+    function updateGraph(params) {
+        $.get("{% url 'grade-data' %}", params, function(grade_data) {
+
+            var average_gpa = grade_data.average_gpa ?? 0;
+            var num_students = grade_data.num_students ?? 0;
+
+            $("#average-gpa-text").text(`Average GPA: ${average_gpa.toFixed(2)} between ${num_students.toLocaleString()} students*`);
+            chart.data.datasets[0].data = grade_data.data_minus
+            chart.data.datasets[1].data = grade_data.data_flat
+            chart.data.datasets[2].data = grade_data.data_plus
+            chart.update();
+
+            {% if callback %}
+                {{ callback }}(chart);
+            {% endif %}
+        });
+    }
+
+    var params = {
+        course: "{{ course }}",
+        professor: "{{ professor }}",
+        spring_2020: false
+    }
+
+    $(function() {
+        updateGraph(params);
+
+        if ($("#grades-by-course").length) {
+            $("#grades-by-course").on("change", function() {
+                if (this.value == "All courses") {
+                    // unset filter if user reselects "all courses"
+                    params.course = "";
+                } else {
+                    // otherwise, filter to only the specified course
+                    params.course = this.value;
+                }
+                updateGraph(params);
+            });
+        }
+    });
+
+    $("#exclude-spring-2020-checkbox").on("change", function() {
+        params.spring_2020 = !this.checked
+        updateGraph(params);
+    });
+
+</script>

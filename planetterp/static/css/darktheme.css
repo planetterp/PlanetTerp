@@ -1,0 +1,144 @@
+body,
+i.fas.fa-star.professor-rating:after,
+#add-professor-modal .modal-content,
+#tutorial-modal .modal-content {
+	background-color: #1B1B1B;
+}
+
+#grades-modal .modal-content {
+	/* slightly lighter than the background color above so it stands out */
+	background-color: #313131;
+}
+
+*, h1, h3, h4, #add-professor-form .row {
+	color: white;
+}
+
+.navbar {
+	/* necessary to override bootstrap's .bg-primary */
+	background-color: black !important;
+}
+
+#page-footer {
+	background-color: black;
+}
+
+#canvas-wrapper {
+	position: relative;
+}
+
+#navbar-wrapper {
+	position: absolute;
+	width: 100%;
+}
+
+#navbar-canvas {
+	position: absolute;
+}
+
+.logo, #site-navbar, .navbar-right, .navbar-toggler-icon {
+	position: relative;
+	z-index: 1;
+}
+
+.card-title {
+	color: #313131;
+}
+
+/* general case link colors */
+a:link, a:visited, a:hover, a:active {
+	color: #C3C3C3;
+}
+
+/* special case link colors where we need increased specificity to override our regular stylesheet */
+.navbar-dark .navbar-nav .nav-link, #page-footer a {
+	color: #C3C3C3;
+}
+
+i.fa.fa-star {
+	color: #A5A5A5;
+}
+
+.ui-menu-item-wrapper {
+	color: black;
+}
+
+#semester-search {
+	color: black;
+}
+
+select {
+	background-color: black;
+}
+
+.alert {
+	background-color: grey;
+	border: black;
+	color: white;
+}
+
+.btn-primary, .btn-info, .btn-warning {
+	background-color: #00356E;
+	border-color: #00356E;
+	color: white;
+}
+
+#other_course {
+	color: black;
+}
+
+#grades-button {
+	background-color: #7B7B7B;
+	border-color: #7B7B7B;
+}
+
+/* second rule is so that we tie in specificity with izi's css and therefore override it*/
+.iziToast.iziToast-theme-dark {
+	background-color: #383838;
+}
+
+img {
+	filter: grayscale(100%);
+	-webkit-filter: grayscale(100%);
+	-moz-filter: grayscale(100%);
+	-o-filter: grayscale(100%);
+	-ms-filter: grayscale(100%);
+}
+
+hr {
+	color: black;
+	background-color: black;
+}
+
+.professor-card .card-text {
+	color: black;
+}
+
+.days-of-week label {
+	color: black;
+}
+
+.input-time-wrapper .fa-clock {
+	color: black;
+}
+
+.bootstrap-datetimepicker-widget {
+	background-color: grey;
+}
+
+.bootstrap-datetimepicker-widget :not(.btn-primary) {
+	color: unset;
+}
+
+.bootstrap-datetimepicker-widget .fa-arrow-up,
+.bootstrap-datetimepicker-widget .fa-arrow-down {
+	color: black;
+}
+
+.bootstrap-datetimepicker-widget table td.day:hover,
+.bootstrap-datetimepicker-widget table td.hour:hover,
+.bootstrap-datetimepicker-widget table td.minute:hover,
+.bootstrap-datetimepicker-widget table td.second:hover,
+.bootstrap-datetimepicker-widget table td span:hover {
+	background-color: lightblue;
+}

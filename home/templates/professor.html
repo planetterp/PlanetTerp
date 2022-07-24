@@ -1,0 +1,282 @@
+{% extends "base_main.html" %}
+{% load static %}
+{% load render_table from django_tables2 %}
+{% load crispy_forms_tags %}
+
+{% block title %}{{ professor.name }} | PlanetTerp{% endblock %}
+{% block description %}View reviews and grade data for {{ professor.name }} at the University of Maryland &mdash; College Park.{% endblock %}
+
+{% block head %}
+<script type="text/javascript" src="../static/js/chart.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+{% endblock %}
+
+{% block content %}
+<script type="text/javascript" src="{% static 'js/jquery-toggle.js' %}"></script>
+<br />
+
+<div id="admin-tool-response" class="fixed-top hidden"></div>
+
+<div class="container mw-100 px-5">
+	<div class="row">
+		<div class="col-xs-12 col-sm-6 col-md-6 offset-md-1">
+			{% if user.is_staff %}
+				<div class="professor-header input-group">
+					<h1 class="input-group">
+						<span id="professor-name"><strong>{{ professor.name }}</strong></span>
+						<div class="input-group-append"><i class="fas fa-pencil-alt pl-3 pt-2 admin-tool-icon" data-toggle="modal" data-target="#edit-professor-modal"></i></div>
+						<div class="input-group-append"><i class="fas fa-people-arrows pl-3 pt-2 admin-tool-icon" data-toggle="modal" data-target="#merge-professor-modal"></i></div>
+					</h1>
+				</div>
+
+				{% crispy edit_professor_form %}
+				{% crispy unverify_professor_form %}
+
+				<div id="merge-professor-container">
+					{% crispy merge_professor_form %}
+				</div>
+
+			{% else %}
+				<h1 class="professor-header"><strong>{{ professor.name }}</strong></h1>
+			{% endif %}
+
+			<h5 id="review-counter"></h5>
+
+			<div id="professor-stats"></div>
+		</div>
+
+		<div class="mt-2 col-xs-6 col-md-4 offset-xs-4 offset-md-1">
+			{% if courses_taught %}
+				This {{ professor.type }} has taught:
+				{% for course in courses_taught %}
+					<a href="/course/{{ course.department }}{{ course.course_number }}">{{ course.department }}{{ course.course_number }}</a>{% if not forloop.last %},{% endif %}
+				{% endfor %}
+			{% endif %}
+			<br />
+			<div class="text-center">
+				<button id="grades-button" class="btn btn-primary btn-sm btn-info mt-3" data-toggle="modal" data-target="#grades-modal">View grade data for this {{ professor.type }}</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="review-container mb-3" style="text-align: center;">
+	<button id="review-btn" class="btn btn-primary">Review this {{ professor.type }}</button>
+	<div id="review-form-container" style="display: none;">
+		{% crispy form %}
+	</div>
+</div>
+
+{% if num_reviews > 0 %}
+	<div>
+		<div class="input-group ml-3">
+			<div class="input-group-prepend">
+				<label class="input-group-text" for="course-select" style="border-bottom-left-radius: 0;">Sort By:</label>
+			</div>
+
+			<select name="course-select" id="course-select" class="custom-select form-control">
+				<option>Course</option>
+				{% for course_name in courses_reviewed %}:
+					<option>{{ course_name }}</option>
+				{% endfor %}
+			</select>
+
+			<div id="rating-sort" class="input-group-append">
+				<select name="rating-select" id="rating-select" class="d-none">
+					<option value="normal">Rating</option>
+					<option value="desc">Rating</option>
+					<option value="asc">Rating</option>
+				</select>
+			</div>
+		</div>
+	</div>
+{% endif %}
+
+<div id="reviews-table-container" class="px-3">
+	{% render_table reviews_table %}
+</div>
+
+<div class="modal fade" id="grades-modal" tabindex="-1" role="dialog" aria-labelledby="grades-modal-label">
+	<div class="modal-dialog modal-lg" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h4 class="modal-title" id="grades-modal-label">Grades</h4>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true" style="float: left">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body text-center">
+				<script>
+					function callback(chart) {
+						// hack to make graphs look better on mobile devices. On mobile you have more vertical real estate
+						// than horizontal, so when we generate our graph and stop when we reach the horizontal limit, it's
+						// still not very tall. By making the aspect ratio 1:1 we get a taller graph which looks better.
+						// The default aspect ratio for chartjs is, I believe, 2, so this is what we get on all other devices
+						// (when aspectRatio is null).
+						var aspectRatio = $(window).width() > 800 ? null : 1;
+						if (aspectRatio) {
+							// https://stackoverflow.com/a/58816740
+							chart.aspectRatio = aspectRatio;
+							chart.resize();
+						}
+					}
+				</script>
+				{% include "grade_graph.html" with professor=professor.slug lookup_by_courses=courses_graded callback="callback" only %}
+			</div>
+		</div>
+	</div>
+</div>
+
+<script type="text/javascript">
+	var num_reviews = parseInt("{{ num_reviews }}");
+	var average_rating = {{ average_rating }};
+	var is_admin = {{ user.is_staff|yesno:"true,false" }};
+
+	$(function() {
+		$("#review-counter").html(`${num_reviews} review${num_reviews == 1 ? '' : 's'}`);
+
+		if (num_reviews > 0) {
+			generateProfessorStats();
+		}
+
+		if (is_admin) {
+			initalizeAutoComplete('{{ csrf_token }}');
+		}
+	});
+
+	function courseChange(element) {
+		if ($(element).val() == "other") {
+			$("#id_other_course").show();
+        } else
+			$("#id_other_course").hide();
+			$("#other_course_errors").hide();
+	}
+
+	var is_closed = true
+	$("#review-btn").click(function() {
+		var time = 0.5;
+		$("#review-form-container").animate({height: 'toggle', opacity: 'toggle' }, 'slow');
+		var el = document.getElementById("review-btn");
+
+		if (is_closed) {
+			el.style.animation = "opening " + time + "s linear";
+			setTimeout('$("#review-form-container").css("display", "grid");', 550);
+		} else {
+			el.style.animation = "closing " + time + "s linear";
+			setTimeout('$("#review-form-container").css("display", "none");', 550);
+		}
+		el.style.animationFillMode = "forwards";
+		is_closed = !is_closed;
+	});
+
+	function generateProfessorStats() {
+		var stats = `
+			<h5>Average rating: <span id="professor_rating">${average_rating}</span></h5>
+			<span style="white-space: nowrap;">
+		`
+
+		for (let i = 0; i < parseInt(average_rating); i++) {
+			stats += `
+				<i class="fas fa-star fa-2x"></i>
+				<i class="far fa-star fa-2x"></i>
+			`
+		}
+
+		stats += `
+			<style>
+				i.fas.fa-star.professor-rating:after {
+					width: ${100 - (100 * (average_rating % 1))}%;
+					left: ${100 * (average_rating % 1)}%;
+				}
+			</style>
+		`
+
+		if (parseInt(average_rating) != 5) {
+			stats += `
+				<i class="fas fa-star fa-2x professor-rating"></i>
+				<i class="far fa-star fa-2x professor-rating"></i>
+			`
+
+			for (let i = parseInt(average_rating) + 1; i < 5; i++) {
+				stats += `<i class="far fa-star fa-2x"></i>`
+			}
+		}
+
+		stats += `</span>`;
+
+		$("#professor-stats").html(stats);
+	}
+
+	function unverifyReview(form) {
+		sendResponse($(form).serialize(), 'review_verify', {"count" : --num_reviews});
+	}
+
+	$("#merge-professor").click(
+		function() {
+			$("#edit-professor-modal").modal('hide');
+			$(".modal-backdrop").hide();
+			$("#merge-professor-modal").modal('show');
+		}
+	)
+
+	function fixReviewsTableStyle() {
+		var selectedCourse = $("#course-select").val();
+		if (selectedCourse != "Course") {
+			$("table.reviews-table").removeClass("table-striped");
+			$("#reviews-table-container tr").filter(":visible").even().css("background-color", "rgba(0,0,0,.05)");
+		} else {
+			$("table.reviews-table").addClass("table-striped");
+		}
+	}
+
+	// https://github.com/apluslms/js-jquery-toggle
+	$("#rating-sort").replaceInputsWithMultiStateButtons({
+		font_awesome: true,
+		icon_0: "fas fa-sort",
+		icon_1: "fas fa-sort-down",
+		icon_2: "fas fa-sort-up",
+		color_0: "secondary",
+		color_1: "secondary",
+		color_2: "secondary",
+	});
+
+	$("#course-select").on('change', function() {
+		var selectedCourse = $(this).val();
+		var selector = $("#reviews-table-container tr");
+		$(selector).show();
+		if (selectedCourse != "Course") {
+			$(selector).not(`.${selectedCourse}`).hide();
+		}
+		fixReviewsTableStyle();
+	});
+
+	function sortReviews(direction) {
+		var data = {
+			"csrfmiddlewaretoken": "{{ csrf_token }}",
+			"direction": direction,
+			"type": "professor",
+			"obj_id": "{{ professor.pk }}"
+		}
+
+		$.ajax({
+			type: "POST",
+			url: "{% url 'table_sort' %}",
+			data: data,
+			success: function(data) {
+				$("#reviews-table-container").html(data["reviews_table"]);
+
+				var selectedCourse = $("#course-select").val();
+				if (selectedCourse != "Course") {
+					$("#reviews-table-container tr").not(`.${selectedCourse}`).hide();
+				}
+				fixReviewsTableStyle();
+			}
+		});
+	}
+
+	$("#rating-select").on("change", function() {
+		var selectedRating = $(this).val();
+		sortReviews(selectedRating);
+	});
+</script>
+{% endblock %}

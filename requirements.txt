@@ -1,0 +1,12 @@
+requests
+bcrypt
+# https://github.com/planetterp/PlanetTerp/pull/43#discussion_r559918111
+pymysql >= 1.0.2
+web.py
+google-api-python-client
+google-auth-httplib2
+django
+mysqlclient
+discord-webhook
+django-tables2
+django-crispy-forms

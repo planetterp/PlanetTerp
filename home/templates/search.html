@@ -1,0 +1,24 @@
+{% extends "base_main.html" %}
+
+{% block title %}Search | PlanetTerp{% endblock %}
+
+{% block content %}
+<div class="text-center">
+	<h2>Search results</h2>
+
+	{% for result in results %}
+		<h3>
+			<a href="{{ result.source }}/{{ result.slug }}">{{ result.name }}</a>
+		</h3>
+	{% endfor %}
+
+	{% if not results %}
+		<h4><strong>Error:</strong> No results found.</h4>
+	{% endif %}
+
+	<span style="font-size: 22px; font-weight: bold; vertical-align: middle;">Professor/TA not found?</span> <button class="btn btn-primary btn-lg" data-toggle="modal" data-target="#add-professor-modal">Add a new Professor/TA</button> <!-- todo: on same line -->
+	{% if results|length_is:"30" %}
+		<h4>Want to see more results? Search with a more specific query.</h4>
+	{% endif %}
+</div>
+{% endblock %}

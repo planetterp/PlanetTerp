@@ -1,0 +1,216 @@
+{% extends "base_main.html" %}
+{% load utils %}
+
+{% block title %}Home | PlanetTerp{% endblock %}
+
+{% block head %}
+<script type="text/javascript" src="../static/js/chart.min.js"></script>
+
+<meta property="og:title" content="PlanetTerp">
+<meta property="og:description" name="description" content="A community for students at the University of Maryland &mdash; College Park containing grade data, professor reviews, tools, and more.">
+<meta property="og:type" content="website">
+<meta property="og:image" content="https://planetterp.com/static/images/homepage.png">
+<meta property="og:image:alt" content="A screenshot of the homepage of planetterp.com. The page has a header which states &quot;Welcome to PlanetTerp&quot;.">
+<meta property="og:url" content="https://planetterp.com">
+{% endblock %}
+
+{% block content %}
+<h1 class="text-center" style="font-weight: bold;">Welcome to PlanetTerp</h1>
+
+<p class="text-center" style="font-size: 15px; margin-top: -10px;"><em>a community for students at the university of maryland</em></p>
+
+<form action="/search" class="form-inline justify-content-center">
+	<label for="main-search" class="text-center" style="font-size: 1.75rem; font-weight: 500; margin-left: 10%; margin-right: 10%;">Search for a course, professor, or teaching assistant</label>
+	<input type="search" id="main-search" name="query" class="form-control form-control-lg w-50" placeholder="Search...">
+	<button type="submit" class="btn btn-primary ml-3">Search</button>
+</form>
+
+<br /><br />
+
+<div class="container">
+	<div class="row">
+		<div id="homepage-support" class="col-md-4 text-center">
+			<div style="font-size: 20px;">PlanetTerp is proud to support</div>
+			<a href="{{ random_organization.url }}" target="_blank"><img src="../static/images/organizations/{{ random_organization.image }}" style="width: {{ random_organization.width }}px; height: {{ random_organization.height }}px;" alt='{{ random_organization.alt }}'></a>
+			<br />
+			<a href="{% url 'about' %}#organizations"><small>Want to see your organization here?</small></a>
+		</div>
+		<div id="homepage-stats" class="col-md-4 text-center">
+			<h3><strong>PlanetTerp includes...</strong></h3>
+			<h3><span id="numCourses">{{ num_courses }}</span> courses</h3>
+			<h3><span id="numProfessors">{{ num_professors }}</span> professors</h3>
+			<h3><span id="numReviews">{{ num_reviews }}</span> reviews</h3>
+			<h3><span id="numCourseGrades">{{ num_course_grades }}</span> course grades</h3>
+		</div>
+	</div>
+</div>
+
+
+<div class="container">
+	<div class="row">
+		<div class="col-md-6" id="recent-reviews">
+			<h4>Recent reviews</h4>
+			{% for review in recent_reviews %}
+				<strong><a href="/professor/{{ review.professor.slug }}">{{ review.professor.name }}</a></strong>
+				{% if review.course %}
+					<small>({{ review.course.department }}{{ review.course.course_number }})</small>
+				{% endif %}
+				<br />
+
+				{% for i in 0|range:review.rating %}
+					<i class="fas fa-star" style="margin-top: 4px;"></i>
+					<i class="far fa-star"></i>
+				{% endfor %}
+
+				{% for i in review.rating|range:5 %}
+					<i class="far fa-star"></i>
+				{% endfor %}
+
+				<blockquote>
+					{% if review.content|length > 120 %}
+						&#8220; {{ review.content|slice:":120" }}...&#8221;
+					{% else %}
+						&#8220;{{ review.content }}&#8221;
+					{% endif %}
+					<footer class="blockquote-footer"><span>
+						{% if not review.anonymous or user and user.is_staff %}
+							{{ review.user.username }}
+						{% else %}
+							Anonymous
+						{% endif %}</span>
+					</footer>
+				</blockquote>
+			{% endfor %}
+		</div>
+		<div class="col-md-6" id="grades-graph">
+			{% include "grade_graph.html" only %}
+		</div>
+	</div>
+</div>
+
+<script type="text/javascript">
+	$(document).ready(function() {
+		$("#main-search").autocomplete({
+			minLength: 3,
+			source: function(request, response) {
+				$.get("{% url 'autocomplete' %}", {"query": request.term, "types[]": ["professor", "course"]}, function(data) {
+					response(data);
+				});
+			},
+			select: function(event, ui) {
+				var location = ui.item.value;
+				window.location.href = location;
+				return false;
+			}
+		});
+	});
+
+	function writeStat(id, totalCount, randomIncrement) {
+		var el = document.getElementById(id);
+		var i = 0;
+
+		var fn = function() {
+			i += Math.floor(Math.random() * 31) + randomIncrement; /* random number randomIncrement -> randomIncrement + 30 */
+
+			var isDone = i > totalCount;
+
+			if (isDone) {
+				i = totalCount;
+			}
+
+			el.innerHTML = i.toLocaleString();
+
+			if (!isDone) {
+				window.requestAnimationFrame(fn);
+			}
+		};
+
+		window.requestAnimationFrame(fn);
+	}
+
+	writeStat("numCourses", {{ num_courses }}, 50);
+	writeStat("numProfessors", {{ num_professors }}, 30);
+	writeStat("numReviews", {{ num_reviews }}, 40);
+	writeStat("numCourseGrades", {{ num_course_grades }}, 400);
+
+
+	function sleep(ms) {
+		return new Promise(resolve => setTimeout(resolve, ms));
+	}
+
+
+	async function write (values) {
+		var search = document.getElementById("main-search");
+
+		var last;
+
+		var typed = false;
+
+		while (!typed) {
+			shuffle(values);
+
+			// Make sure we don't get the same random value twice in a row
+			while (last == values[0]) {
+				shuffle(values);
+			}
+
+			for (var i = 0; i < values.length; i++) {
+				var s = values[i];
+
+				for (var j = 0; j <= s.length; j++) {
+					search.placeholder = s.substring(0, j);
+					await sleep(50);
+				}
+
+				for (var j = 1; j <= 3; j++) {
+					search.placeholder += "|";
+					await sleep(500);
+					search.placeholder = search.placeholder.substring(0, search.placeholder.length - 1);
+
+					if (j != 3) {
+						await sleep(500);
+					}
+
+				}
+
+				for (var j = search.placeholder.length; j >= 0; j--) {
+					search.placeholder = search.placeholder.substring(0, j);
+					await sleep(50);
+				}
+
+				if (search.value != "") {
+					search.placeholder = "";
+					typed = true;
+					break;
+				}
+			}
+
+			last = s;
+		}
+	}
+
+
+	// from https://stackoverflow.com/a/2450976/2150542
+	function shuffle(array) {
+		var currentIndex = array.length, temporaryValue, randomIndex;
+
+		// While there remain elements to shuffle...
+		while (0 !== currentIndex) {
+			// Pick a remaining element...
+			randomIndex = Math.floor(Math.random() * currentIndex);
+			currentIndex -= 1;
+
+			// And swap it with the current element.
+			temporaryValue = array[currentIndex];
+			array[currentIndex] = array[randomIndex];
+			array[randomIndex] = temporaryValue;
+		}
+
+		return array;
+	}
+
+	var values = ["CMSC131", "Tyrion Lannister", "MATH140", "Jon Snow", "Ned Stark", "Daenerys Targaryen", "Cersei Lannister", "PSYC406", "AMST340", "PHYS", "FILM3", "DANC138D"];
+
+	write(values);
+</script>
+{% endblock %}

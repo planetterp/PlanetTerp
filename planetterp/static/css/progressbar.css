@@ -1,0 +1,18 @@
+/* Modified from: https://stackoverflow.com/a/7191095/2150542 */
+
+#progressbar-wrapper {
+	width: 15%;
+	margin-right: 30px;
+}
+
+#progressbar {
+	background-color: #E8F9FF;
+	border-radius: 6px;
+}
+
+#progressbar > div {
+	 background-color: #119E1B;
+	 height: 20px;
+	 border-radius: 6px;
+	 opacity: 0.8;
+}

@@ -1,0 +1,555 @@
+.navbar-dark .navbar-nav .nav-link {
+	color: white;
+	position: relative;
+}
+
+div.dropdown #dropdown-menu-button {
+	background-color: transparent;
+}
+
+div.dropdown #dropdown-menu-button:hover {
+	color: #fff;
+    background-color:#0069d9;
+	border-color: #0062cc;
+	cursor: pointer;
+}
+
+#add-professor-form {
+	text-align: center;
+	margin: 0 auto;
+}
+
+#add-professor-modal div.modal-dialog {
+	max-width: 1140px;
+}
+
+#rate-professor-form {
+	text-align: center;
+	margin: -0.1rem 1rem;
+	display: none;
+}
+
+#form-success {
+	cursor: default;
+	display: none;
+	position: absolute;
+	top: 0;
+	left: 0;
+	z-index: 1;
+	width: 100%;
+}
+
+#new-post-form {
+	text-align: center;
+	width: 40%;
+	margin: 0 auto;
+}
+
+.logo {
+	width: 60px;
+	height: 60px;
+}
+
+.original-post {
+	width: 80%;
+	border: 1px solid black;
+	margin-left: 30px;
+	display: inline-block;
+}
+
+.success-alert, .error-alert, .warning-alert {
+	margin: 0 auto;
+	width: 50%;
+}
+
+.info-alert {
+	margin: 0 auto;
+	width: 70%;
+}
+
+table {
+	table-layout: fixed;
+	word-wrap: break-word;
+}
+
+.profile-form-field {
+	text-align: -webkit-center;
+}
+
+#profile-form #hint_id_email {
+	text-align: justify;
+}
+
+#div_id_email span.input-group-text:hover{
+	background-color: #c4c4c4;
+}
+
+/** Begin star code **/
+
+i.fas.fa-star {
+	color: gold;
+	position: absolute;
+}
+
+
+i.far.fa-star {
+	position: relative;
+}
+
+i.fas.fa-star.professor-rating:after {
+	content: "";
+	position: absolute;
+	background: #fff;
+	height: 100%;
+}
+
+/** End star code **/
+
+
+/** Begin review table styling **/
+
+.reviews-table {
+	table-layout: auto;
+}
+
+/* For review tables, every column except the review content can be reasonably approximated by a fixed width,
+   so give most columns a fixed width and leave the table's auto-sizing to give the rest of the width to the
+   review column. */
+
+.review-table-information { width: 150px; }
+.review-table-professor   { width: 150px; }
+.review-table-verify      { width: 250px; }
+.review-table-status      { width: 150px; }
+
+/** End review table column width styling **/
+
+.info-page {
+	margin-top: 20px;
+	margin-left: 5%;
+	margin-right: 5%;
+}
+
+.member-info {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	flex-wrap: wrap;
+}
+
+.member-pic {
+	width: 10rem;
+	border-style: solid;
+	border-width: medium;
+	border-radius: 0.3rem;
+	margin-right: 1rem;
+	margin-bottom: 1rem;
+	float: left;
+}
+
+.member-pic > img {
+	max-width: 100%;
+	max-height: 100%;
+}
+
+.member-desc {
+	text-align: left;
+	font-size: 0.9rem;
+	margin-bottom: 0.3rem;
+	margin-right: 1rem;
+}
+
+.member-name {
+	text-align: center;
+	background-color: #007bff;
+	color: white;
+	margin-bottom: 0;
+	padding: 0.3rem;
+}
+
+html {
+	position: relative;
+	min-height: 100%;
+}
+
+body {
+	margin-bottom: 50px;
+}
+
+#page-footer {
+	height: 50px;
+	background-color: #52D4FF;
+	position: absolute;
+	bottom: 0;
+}
+
+.set-color-scheme:before {
+	content: '\25CF';
+}
+
+#color-scheme-light {
+	color: white;
+	cursor: pointer;
+}
+
+#color-scheme-dark {
+	color: #1B1B1B;
+	cursor: pointer;
+}
+
+.footer-color a {
+	text-decoration: none;
+}
+
+.footer-color {
+	bottom: 10px;
+	left: 30px;
+	position: absolute;
+	z-index: 1;
+}
+
+.footer-info {
+	top: 0px;
+	right: 30px;
+	position: absolute;
+}
+
+#page-footer a {
+	color: darkblue;
+}
+
+.professor-card {
+	margin-bottom: 10px;
+}
+
+.professor-card .card-header {
+	padding-top: 5px;
+	padding-bottom: 0;
+}
+
+.professor-card .card-body {
+	padding-top: 0;
+	padding-bottom: 0;
+	font-size: 18px;
+}
+
+.card-header-gened {
+	text-align: center;
+}
+
+.navbar-new {
+	transform: rotate(340deg);
+	-webkit-transform: rotate(340deg);
+	-ms-transform: rotate(340deg);
+	-moz-transform: rotate(340deg);
+	-o-transform: rotate(340deg);
+
+	position: absolute;
+	/* For schedule */
+	/*margin-left: 50px;*/
+	/*margin-top: -20px;*/
+	/*color: #FF9D00;*/
+
+	/* For team */
+	/*margin-left: 85px;*/
+	/*margin-top: -20px;*/
+	/*color: #00ce2d;*/
+
+	margin-left: 95px;
+	margin-top: -20px;
+	color: #00d82f;
+}
+
+#homepage-support {
+	right: 60px;
+}
+
+#information-container .row {
+	width: 100%;
+	margin: 0 auto;
+}
+
+#course-grades {
+	padding-right: 5%;
+}
+
+.course-professors {
+	margin: 0 auto;
+}
+
+#course-grades {
+	max-width: 45%;
+}
+
+#course-reviews-button {
+	left: 0;
+	margin-top: 10px;
+	margin-left: 10px;
+	position: absolute;
+	z-index: 1;
+}
+
+#testudo-button {
+	right: 0;
+	margin-top: 10px;
+	margin-right: 10px;
+	position: absolute;
+	z-index: 1;
+}
+
+.textbook-button {
+	width: 500px;
+	height: 100px;
+	font-size: 50px;
+}
+
+.tools-article {
+	margin-left: 8%;
+	margin-right: 8%;
+}
+
+.textbook-buttons {
+	display: flex;
+	justify-content: center;
+}
+
+#review-form-container {
+	border-style: solid;
+	border-width: medium;
+	border-color: #007bff;
+	border-radius: 0.3rem;
+	position: relative;
+	width: 97%;
+	margin: auto;
+	padding-bottom: 1rem;
+}
+
+@keyframes opening {
+	from {border-bottom-left-radius: 0.3rem; border-bottom-right-radius: 0.3rem;}
+	to {border-bottom-left-radius: 0; border-bottom-right-radius: 0;}
+}
+
+@keyframes closing {
+	from {border-bottom-left-radius: 0; border-bottom-right-radius: 0;}
+	to {border-bottom-left-radius: 0.3rem; border-bottom-right-radius: 0.3rem;}
+}
+
+#review-btn {
+	padding: .2rem .6rem;
+	border-radius: 0.3rem;
+	font-size: 27px;
+	margin-left: 0;
+	margin-right: 0;
+}
+
+/* https://stackoverflow.com/a/4407335/12164878 */
+.noselect {
+	-webkit-touch-callout: none; /* iOS Safari */
+	  -webkit-user-select: none; /* Safari */
+	   -khtml-user-select: none; /* Konqueror HTML */
+		 -moz-user-select: none; /* Old versions of Firefox */
+		  -ms-user-select: none; /* Internet Explorer/Edge */
+			  user-select: none; /* Non-prefixed version, currently
+									supported by Chrome, Edge, Opera and Firefox */
+  }
+
+.close-btn {
+	cursor: pointer;
+	width: 3rem;
+	height: 1rem;
+}
+
+.anonymous-checkbox {
+	width: fit-content;
+	border-style: solid;
+	border-width: thin;
+	border-color: lightslategray;
+	border-bottom-right-radius: 0.3rem;
+	border-bottom-left-radius: 0.3rem;
+	color: white;
+	background: lightslategray;
+	font-size: small;
+	padding: 0.375rem;
+	float: left;
+}
+
+.review-right-wrapper {
+	width: 81%;
+	float: right;
+}
+
+.review-left-wrapper {
+	float: left;
+	padding-right: 0.4rem;
+	width: 17%;
+}
+
+.admin-tool-icon:hover {
+	color: #dc3545;
+	cursor: pointer;
+}
+
+#admin-tool-response > div.alert {
+	border-top-left-radius: 0;
+	border-top-right-radius: 0;
+}
+
+.merge-subject {
+	border-bottom-right-radius: 0;
+	border-top-right-radius: 0;
+}
+
+.merge-target {
+	border-bottom-left-radius: 0;
+	border-top-left-radius: 0;
+}
+
+/* make sure autocomplete messages show above bootstrap modals (which have z-index 1050) */
+.ui-autocomplete.ui-front {
+	z-index: 1051;
+}
+
+#course-select {
+	width: 10%;
+	flex: none;
+}
+
+div#toggle-btn button {
+	border-bottom-left-radius: 0;
+	border-top-left-radius: 0;
+	border-bottom-right-radius: 0;
+}
+
+/** Profile dropdown button padding **/
+@media only screen and (max-width: 991px) {
+	div.dropdown #dropdown-menu-button {
+		padding-left: 0ch;
+	}
+}
+
+
+/*Mobile for professor reviews page (mobile breakpoint for boostrap col-lg)*/
+@media (max-width: 992px) {
+
+	.professor-header {
+		white-space: normal;
+	}
+
+	#professors-other-courses {
+		padding-top: 20px;
+	}
+	.row {
+		text-align: center;
+	}
+
+	#rate-button {
+		margin: auto;
+		display: inline-block;
+	}
+	#grades-button {
+		margin: 0 auto;
+		display: inline-block;
+	}
+
+}
+
+/** Begin mobile **/
+
+@media (max-width: 800px) {
+	/* Begin homepage */
+
+	#homepage-support {
+		order: 2;
+		right: 0px;
+	}
+
+	#homepage-stats {
+		order: 1;
+	}
+
+	#recent-reviews {
+		text-align: center;
+	}
+
+	/* End homepage*/
+
+	.card {
+		margin: 0 auto;
+	}
+
+	.review-table-information { width: 125px; }
+	.review-table-professor   { width: 100px; }
+	.review-table-verify      { width: 100px; }
+	.review-table-status      { width: 100px; }
+
+	table {
+		word-wrap: normal;
+	}
+
+	.footer-color {
+		padding-top: 15px;
+		position: relative;
+		font-size: 30px;
+		float: left;
+		z-index: 1;
+	}
+
+	#page-footer {
+		font-size: 10px;
+		height: 50px;
+		background-color: #52D4FF;
+		position: absolute;
+		bottom: 0;
+	}
+
+	.copyright-text {
+		align-content: center;
+		margin-right: 10%;
+	}
+
+	.footer-info {
+		position: static;
+	}
+
+	#rateyo-rating {
+		margin: 0 auto;
+	}
+
+	#course-reviews-button, #testudo-button {
+		position: relative;
+	}
+
+	#testudo-button {
+		float: right;
+	}
+
+
+	.course-professors {
+		order: 2;
+	}
+
+	#course-grades {
+		order: 1;
+		max-width: 95%;
+		margin: 0 auto;
+	}
+
+	#review-right-wrapper {
+		width: 67%;
+		float: right;
+	}
+
+	#review-left-wrapper {
+		width: 30%;
+		float: left;
+		padding-right: 0.4rem;
+	}
+}
+
+@media (max-width: 350px) {
+	.copyright-text {
+		float: right;
+		margin-right: 5px;
+	}
+}
+
+/** End mobile **/

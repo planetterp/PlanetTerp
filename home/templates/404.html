@@ -1,0 +1,15 @@
+{% extends "base_main.html" %}
+{% load static %}
+
+{% block title %}404 page not found | PlanetTerp{% endblock %}
+{% block description %}View reviews and grade data for {{ professor.name }} at the University of Maryland &mdash; College Park.{% endblock %}
+
+{% block content %}
+<h1 class="text-center py-4">404 page not found</h1>
+
+<div class="mx-auto py-4" style="width: 30%;">
+	<img src="{% static 'images/404.png' %}" class="img-fluid">
+</div>
+
+<h5 class="text-center">Art by <a href="https://www.instagram.com/berkeley.poulsen/">Berkeley Poulsen</a></h5>
+{% endblock %}

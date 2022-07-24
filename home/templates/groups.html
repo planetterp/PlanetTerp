@@ -1,0 +1,102 @@
+{% extends "base_main.html" %}
+
+{% block title %}Schedule Groups | PlanetTerp{% endblock %}
+
+{% block head %}
+{% if auth_group_data %}
+	<link rel="stylesheet" type="text/css" href="../../static/css/groups.css">
+{% else %}
+	<link rel="stylesheet" type="text/css" href="../static/css/groups.css?v=1.0">
+{% endif %}
+
+<meta property="og:title" content="Schedule Groups | PlanetTerp">
+<meta property="og:description" name="description" content="View your friends' schedules for the Fall 2018 semester at the University of Maryland &mdash; College Park.">
+<meta property="og:type" content="website">
+<meta property="og:image" content="https://planetterp.com/static/images/schedule.png">
+<meta property="og:image:alt" content='An image of a schedule. The schedule has five days of the week, from Monday until Friday. The schedule goes from 8:00 am until 9:00 pm and has the courses "CMSC131", "ENGL101", "JOUR150", "PHYS121", and "UNIV100". There are at least two courses every day of the week.'>
+<meta property="og:url" content="https://planetterp.com/schedule/groups">
+{% endblock %}
+{% block content %}
+
+{% if auth_group_data %}
+	<div id="groupme-groups-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="modal-groupme-groups-header">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h4 id="modal-groupme-groups-header" class="modal-title">Select which GroupMe groups you want to share your schedule with</h4>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<div class="modal-body">
+					<form method="POST">
+					{% for group in auth_group_data %}
+						<input type="checkbox" id="{{ group[0] }}" name="{{ group[0] }}"><label class="group-label" for="{{ group[0] }}">{{ group[1] }}</label></option><br />
+					{% endfor %}
+					<div class="submit-button-wrapper">
+						<button id="groups-select-submit" class="btn btn-primary" type="submit">Submit</button>
+					</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<script type="text/javascript">
+		$('#groupme-groups-modal').modal('toggle');
+	</script>
+{% endif %}
+{% if args|length_is:"2" %}
+	<div class="alert alert-success text-center error-alert" style="margin-top: 10px; margin-bottom: 10px;">
+		<strong>Successfully joined {{ args[1] }} group{{ args[1]|pluralize }}!</strong>
+	</div>
+{% endif %}
+
+{% if not auth_group_data %}
+	<ul class="nav nav-tabs justify-content-center" role="tablist">
+		{% for group in groups %}
+			<li class="nav-item"><a class="nav-link" href="#group-{{ group.id }}" id="{{ group.id }}-tab" data-toggle="tab" role="tab" aria-controls="group-{{ group.id }}" aria-selected="false">$group['group_name']</a></li>
+		{% endfor %}
+	</ul>
+{% endif %}
+{% if auth_group_data %}
+	<h2 id="click-add-group" class="text-center" style="margin-top: 20px;"><a href="/schedule/groups/auth">Click here</a> to join a new group. <a href="/schedule/groups">Click here</a> to see your current groups.</h5>
+{% else %}
+	<h2 id="click-group" class="text-center" style="margin-top: 50px;">Click on a group name above to see the schedules of users in that group.</h2>
+	<h5 id="click-add-group" class="text-center" style="margin-top: 20px;"><a href="/schedule/groups/auth">Click here</a> to join a new group.</h5>
+{% endif %}
+{% if not auth_group_data %}
+	<div class="tab-content">
+	{% for group in groups %}
+		<div class="tab-pane" id="group-{{ group.id }}" role="tabpanel" aria-labelledby="{{ group.id }}-tab">
+			{% if group_users.group.id|length_is:"0" %}
+				<h4 class="text-center" style="color: #D18100; margin-top: 30px;">No one else in this GroupMe group has created a schedule on PlanetTerp.<br />If you want to see what courses your friends are taking, encourage them to create one!</h4>
+			{% else %}
+				<table class="table" style="width: 70%; margin: 0 auto;">
+					<tr>
+						<th style="width: 25%;">Person</th>
+						<th style="width: 40%;">Courses</th>
+						<th style="width: 15%;"># Credits</th>
+						<th style="width: 20%;">View schedule</th>
+					</tr>
+					{% for user in group_users.group.id %}
+						<tr>
+							<td>{{ user.groupme_username }}</td>
+							<td>{{ user.courses }}</td>
+							<td>{{ user.credits }}</td>
+							<td><a href="/schedule?sections={{ user.sections }}"><button class="btn btn-warning">View</button></a></td>
+						</tr>
+					{% endfor %}
+				</table>
+			{% endif %}
+		</div>
+	{% endfor %}
+	</div>
+{% endif %}
+<script>
+	$('a[data-toggle="tab"]').on('shown.bs.tab', function(e) {
+		$('#click-group').hide();
+		$('#click-add-group').hide();
+	});
+</script>
+{% endblock %}

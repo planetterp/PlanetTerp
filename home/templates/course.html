@@ -1,0 +1,84 @@
+{% extends "base_main.html" %}
+
+{% block title %}{{ course.name }} | PlanetTerp{% endblock %}
+{% block description %}View professor reviews and grade data for {{course.department}}{{ course.course_number }} at the University of Maryland &mdash; College Park{% endblock %}
+
+{% block head %}
+<script type="text/javascript" src="../static/js/chart.min.js"></script>
+{% endblock %}
+
+{% block content %}
+<br />
+
+<a href="/course/{{course.department}}{{ course.course_number }}/reviews" class="btn btn-primary" id="course-reviews-button">View reviews for professors for this course</a>
+
+<a href="https://app.testudo.umd.edu/soc/search?courseId={{course.department}}{{ course.course_number }}&sectionId=&termId=202101&_openSectionsOnly=on&creditCompare=&credits=&courseLevelFilter=ALL&instructor=&_facetoface=on&_blended=on&_online=on&courseStartCompare=&courseStartHour=&courseStartMin=&courseStartAM=&courseEndHour=&courseEndMin=&courseEndAM=&teachingCenter=ALL&_classDay1=on&_classDay2=on&_classDay3=on&_classDay4=on&_classDay5=on" target="_blank" class="btn btn-primary" id="testudo-button">View On Testudo</a>
+
+<div class="container">
+	<div class="row">
+		<div class="col">
+			<h1 class="text-center"><strong>{{course.department}}{{ course.course_number }}</strong></h1>
+			{% if course.title %}
+				<h2 class="text-center">{{ course.title }}</h2>
+			{% endif %}
+
+			{% if course.description %}
+				<div class="row">
+					<div class="col">
+						<p style="white-space: pre-line;">{{ course.description|safe }}</p>
+					</div>
+				</div>
+			{% endif %}
+
+			{% if sister_courses %}
+				<p>
+					<b>Sister Courses: </b>
+					{% for sister_course in sister_courses %}
+						<a href="/course/{{sister_course.department}}{{ sister_course.course_number }}">{{sister_course.department}}{{ sister_course.course_number }}</a>{% if not forloop.last %},{% endif %}
+					{% endfor %}
+				</p>
+			{% endif %}
+		</div>
+	</div>
+</div>
+
+<div id="information-container">
+	<div class="row">
+		<div class="col-md-6 course-professors">
+			{% for semester, professors in grouped_professors.items %}
+				<h3 class="text-center">{{ semester }}</h3>
+				<!--
+					conveniently, the `sm` breakpoint lines up almost exatly with our mobile styling breakpoint.
+					Since on mobile we put the graph above and the professors below, the professors suddenly have a
+					lot more space and can be put into 2 columns again.
+				-->
+				<div class="row row-cols-1 row-cols-sm-2 row-cols-md-1 row-cols-lg-2">
+					{% for professor in professors %}
+						<div class="col px-2 pb-3">
+							<div class="professor-card card h-100">
+								<div class="card-header text-center px-1 pb-0 pt-1">
+									<h4><a href="/professor/{{ professor.slug }}">{{ professor.name }}</a></h4>
+								</div>
+								<div class="card-body">
+									<p class="card-text">
+										{% if professor.review_set.count == 1 %}
+											{{ professor.review_set.count }} review
+										{% else %}
+											{{ professor.review_set.count }} reviews
+										{% endif %}
+										<br />
+										Average rating: {{ professor.average_rating }}
+									</p>
+								</div>
+							</div>
+						</div>
+					{% endfor %}
+				</div>
+			{% endfor %}
+		</div>
+		<div class="col-md-6" id="course-grades">
+			{% include "grade_graph.html" with course=course.name only %}
+		</div>
+	</div>
+</div>
+{% endblock %}

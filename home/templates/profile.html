@@ -1,0 +1,99 @@
+{% extends "base_main.html" %}
+{% load render_table from django_tables2 %}
+{% load crispy_forms_tags %}
+
+{% block title %}{{ user.username }} | PlanetTerp{% endblock %}
+{% block description %}View your profile.{% endblock %}
+
+{% block content %}
+<br />
+
+<ul class="nav nav-tabs" role="tablist">
+	<li class="nav-item">
+		{% if args|length_is:"1" %}
+			<a class="nav-link" data-toggle="tab" href="#reviews-noscroll" id="your-reviews-tab" role="tab" aria-controls="reviews-noscroll" aria-selected="false">Your Reviews</a>
+		{% else %}
+			<a class="nav-link active" data-toggle="tab" href="#reviews-noscroll" id="your-reviews-tab" role="tab" aria-controls="reviews-noscroll" aria-selected="true">Your Reviews</a>
+		{% endif %}
+	</li>
+	<li class="nav-item">
+		{% if args|length_is:"1" %}
+			<a class="nav-link active" data-toggle="tab" href="#settings-noscroll" id="settings-tab" role="tab" aria-controls="settings-noscroll" aria-selected="true">Settings</a>
+		{% else %}
+			<a class="nav-link" data-toggle="tab" href="#settings-noscroll" id="settings-tab" role="tab" aria-controls="settings-noscroll" aria-selected="false">Settings</a>
+		{% endif %}
+	</li>
+</ul>
+
+<div class="tab-content" id="profilePageContent">
+	{% if args|length_is:"1" %}
+		<div class="tab-pane fade" id="reviews-noscroll" role="tabpanel" aria-labelledby="your-reviews-tab">
+	{% else %}
+		<div class="tab-pane fade show active" id="reviews-noscroll" role="tabpanel" aria-labelledby="your-reviews-tab">
+	{% endif %}
+		<br />
+		<h1 class="text-center">Your Reviews</h1>
+		<br />
+
+		<div id="reviews-table-container" style="width: 80%; margin-left: auto; margin-right: auto; min-width: 600px; overflow-x: auto;">
+			{% render_table reviews_table %}
+		</div>
+	</div>
+
+	{% if args|length_is:"1" %}
+	<div class="tab-pane fade show active" id="settings-noscroll" role="tabpanel" aria-labelledby="settings-tab">
+	{% else %}
+	<div class="tab-pane fade" id="settings-noscroll" role="tabpanel" aria-labelledby="settings-tab">
+	{% endif %}
+		<br />
+		<h1 class="text-center">Settings</h1>
+		<br />
+
+		<div id="profile-form-container" class="w-50 ml-auto mr-auto">
+			{% crispy form %}
+		</div>
+	</div>
+</div>
+
+<script>
+	$(function() {
+		$("#div_id_email span.input-group-text").click(function(){
+			$("#email_hint_text").toggle();
+		});
+		var hash = window.location.hash;
+		// when we change `window.location.hash`, if there is an element with id equal to that hash,
+		// the browser will scroll to it automatically. We don't want this so we need to have our
+		// tabs have a different id than the hash. We accomplish this by appending "Tab" to the hash
+		// to get the corresponding tab element.
+		if (hash) {
+			$('.nav-tabs a[href="' + hash + '-noscroll"]').tab('show');
+		}
+
+	});
+
+	// when a user changes tabs, change url hash as well
+	$('.nav-tabs a').on('shown.bs.tab', function (e) {
+		window.location.hash = e.target.hash.replace("-noscroll", "");
+	});
+
+	function updateProfile() {
+		$.ajax({
+			type: "POST",
+			url: "{% url 'profile' %}",
+			data: $("#profile-form").serialize(),
+			success: function(data) {
+				if (data["success"]) {
+					if (data["message"]) {
+						$("#profile-form-success").html(data["message"]);
+					} else {
+						location.reload();
+					}
+				} else {
+					$("#profile-form").html(data['form']);
+					$("#profile-form div.invalid-feedback").show();
+				}
+			}
+		});
+	}
+</script>
+{% endblock %}

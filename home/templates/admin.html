@@ -1,0 +1,102 @@
+{% extends "base_main.html" %}
+{% load utils %}
+{% load render_table from django_tables2 %}
+{% load crispy_forms_tags %}
+
+{% block title %}Admin | PlanetTerp{% endblock %}
+{% block head %}
+{% endblock %}
+
+{% block content %}
+<div id="admin-tool-response" class="fixed-top hidden"></div>
+<br />
+
+<ul class="nav nav-tabs" role="tablist">
+	<li class="nav-item">
+		<a class="nav-link" data-toggle="tab" href="#reviews-noscroll" id="reviews-tab" role="tab" onclick="showReviews()">Unverified Reviews <span id="review-counter" class="badge badge-primary"></span></a>
+	</li>
+	<li class="nav-item">
+		<a class="nav-link" data-toggle="tab" href="#professors-noscroll" id="professors-tab" role="tab" onclick="hideReviews()">Unverified Professors <span id="professor-counter" class="badge badge-primary">{{ professors|length}}</span></a>
+	</li>
+	<li class="nav-item">
+		<a class="nav-link" data-toggle="tab" href="#merge-noscroll" id="merge-tab" role="tab" onclick="hideReviews()">Merge Professors</a>
+	</li>
+</ul>
+
+<div class="tab-content container admin-panel" id="adminPageContent">
+	<div class="tab-pane fade show" id="reviews-noscroll" role="tabpanel">
+		{% render_table reviews_table %}
+	</div>
+	<div class="tab-pane fade" id="professors-noscroll" role="tabpanel">
+		{% render_table professors_table %}
+		<div id="slug-modal-container"></div>
+	</div>
+
+	<div class="tab-pane fade" id="merge-noscroll" role="tabpanel">
+		<h1 class="text-center my-3">Professor Merge Tool</h1>
+		<div id="merge-professor-container">
+			{% crispy merge_professor_form %}
+		</div>
+	</div>
+</div>
+
+<script>
+	var prof_count = Number({{ professors|length }});
+	var num_reviews = Number({{ reviews|length }});
+
+	$(function() {
+		initalizeAutoComplete('{{ csrf_token }}');
+		$("#review-counter").html(`${num_reviews}`);
+
+		if (num_reviews == 0) {
+			$("table.reviews-table > thead").hide();
+		} else {
+			$("table.reviews-table > thead").show();
+		}
+	});
+
+	function showReviews() {
+		$("#reviews-table-container").show();
+		$("#unverified-professor-form").hide();
+	}
+
+	function hideReviews() {
+		$("#reviews-table-container").hide();
+		$("#unverified-professor-form").show();
+	}
+
+	function verifyReview(form) {
+		sendResponse($(form).serialize(), "review_verify", {"count" : --num_reviews});
+	}
+
+	function verifyProfessor(form) {
+		args = {"count" : --prof_count, "num_reviews" : num_reviews}
+		sendResponse($(form).serialize(), "professor_verify", args);
+	}
+
+	function verifySlug(form) {
+		sendResponse($(form).serialize(), "professor_slug", {"count" : --prof_count});
+	}
+
+	function deleteProfessor(form) {
+		var args = {"count" : --prof_count, "num_reviews" : num_reviews, "form": form};
+		sendResponse($(form).serialize(), "professor_verify", args);
+	}
+
+	$(function() {
+		var hash = window.location.hash;
+		// when we change `window.location.hash`, if there is an element with id equal to that hash,
+		// the browser will scroll to it automatically. We don't want this so we need to have our
+		// tabs have a different id than the hash. We accomplish this by appending "Tab" to the hash
+		// to get the corresponding tab element.
+		if (hash)
+			$('.nav-tabs a[href="' + hash + '-noscroll"]').tab('show');
+	});
+
+	// when a user changes tabs, change url hash as well
+	$('.nav-tabs a').on('shown.bs.tab', function (e) {
+		window.location.hash = e.target.hash.replace("-noscroll", "");
+	});
+
+</script>
+{% endblock %}

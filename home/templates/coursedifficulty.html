@@ -1,0 +1,122 @@
+{% extends "base_main.html" %}
+
+{% block title %}Course Difficulty | PlanetTerp{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" type="text/css" href="../static/css/datatables.min.css">
+<script type="text/javascript" charset="utf8" src="../static/js/datatables.min.js"></script>
+
+<meta property="og:title" content="Easiest &amp; Hardest Courses &amp; Departments at UMD | PlanetTerp">
+<meta property="og:description" name="description" content="A list of the easiest and hardest courses and departments by GPA at the University of Maryland &mdash; College Park.">
+<meta property="og:type" content="website">
+<meta property="og:image" content="https://planetterp.com/static/coursedifficulty.png">
+<meta property="og:image:alt" content="A screenshot of a page titled &quot;Easiest &amp; Hardest Courses &amp; Departments at UMD&quot;. UMD stands for University of Maryland. There are two tables with headers &quot;Difficulty by department&quot; and &quot;Difficulty by course&quot;. These list each department and course on PlanetTerp as well as their average GPA and the number of students in each.">
+<meta property="og:url" content="https://planetterp.com/tools/coursedifficulty">
+
+<style>
+	#header {
+		text-align: center;
+	}
+
+	.dataTables_filter {
+		float: left !important;
+	}
+
+	.table-container {
+		max-width: 800px;
+	}
+
+</style>
+{% endblock %}
+
+{% block content %}
+<br />
+
+<h1 id="header">Easiest &amp; Hardest Courses &amp; Departments at UMD</h1>
+
+<div class="tools-article">
+	<p>This page shows the easiest and hardest courses and departments by GPA at the University of Maryland &mdash; College Park. The data includes all courses taught at UMD in the Fall and Spring from 2012 onwards.</p>
+
+	<p>We feel it important to note that we believe students should not take a course based on which professor gives the highest grades. A professor who gives out the lowest grades may still be the best professor for you to take. Also, a course's difficulty cannot be judged solely by its GPA. Of course, it is up to you; we do our best to provide the data to help you make an informed decision.</p>
+
+	<p>GPA calculations are done according to <a href="https://registrar.umd.edu/current/Policies/acadregs.html#plusminus" target="_blank">UMD's grade to quality points rules</a>. All withdrawals (W) are considered to be 0.0 quality points. Only departments and courses with 100 or more students are included.</p>
+
+	<h2>Difficulty by department</h2>
+
+	<div class="table-container">
+		<table id="departments-table" class="table table-bordered">
+			<thead>
+				<tr>
+					<th>Department</th>
+					<th>Average GPA</th>
+					<th># Students</th>
+				</tr>
+			</thead>
+		</table>
+	</div>
+
+	<h2 class="pt-3">Difficulty by course</h2>
+
+	<div class="table-container">
+		<table id="courses-table" class="table table-bordered">
+			<thead>
+				<tr>
+					<th>Course</th>
+					<th>Average GPA</th>
+					<th># Students</th>
+				</tr>
+			</thead>
+		</table>
+	</div>
+
+</div>
+
+<br />
+
+<hr>
+
+<div class="tools-article">
+	<p>Courses and departments which can only be taken pass/fail are not included in this list.</p>
+
+	<p>Data is not guaranteed to be correct.</p>
+
+	<p style="padding-bottom: 10px;"><em>The source of the grade data can be found <a href="/about#credits">here</a>.</em></p>
+</div>
+
+<script>
+
+	// this is a horrible, horrible hack, but I had no choice. We want the datatable search bar to be to the left on these tables.
+	// We do `float: left` it above, but that doesn't fully work, because on larger screen sizes the table is layed out into
+	// two columns in the search bar's row, and the search bar is on the rightmost of those columns. So floating it to the left
+	// only floats it to the left *of that column*, not of the entire row.
+	// We don't actually need the leftmost column anyway since we've disabled some of the datatables display elements that used
+	// to take up that space. So we're overriding the styling to remove that column so our `float: left` trick works properly.
+	// Ideally datatables would have a way to define your own custom styling and then use that, but since we're (I think) locked
+	// into the bootstrap styling once we choose it at the download step, I can't find any way to do so. The workaround is to
+	// modify the styling locally here.
+	var DataTable = $.fn.dataTable;
+	$.extend(true, DataTable.defaults, {
+		dom:
+			"<'row'<'col-sm-12 col-md-6'f>>" +
+			"<'row'<'col-sm-12'tr>>" +
+			"<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
+		renderer: 'bootstrap'
+	});
+
+	$(function() {
+		function dataTable(id, url) {
+			const options = {
+				info: false,
+				deferRender: true,
+				ajax: {
+					url: url,
+				}
+			}
+			$(`#${id}`).dataTable(options);
+		}
+
+		dataTable("departments-table", "{% url 'course-difficulty-data' type_='departments' %}");
+		dataTable("courses-table", "{% url 'course-difficulty-data' type_='courses' %}");
+	});
+</script>
+{% endblock %}

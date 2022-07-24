@@ -1,0 +1,257 @@
+{% extends "base_main.html" %}
+
+{% block title %}Popular Courses | PlanetTerp{% endblock %}
+
+{% block head %}
+<script type="text/javascript" src="../static/js/chart.min.js"></script>
+<script type="text/javascript" src="../static/js/chart.piecelabel.min.js"></script>
+
+<meta property="og:title" content="Popular Courses at UMD | PlanetTerp">
+<meta property="og:description" name="description" content="A tool that lets you search for the most popular courses at the University of Maryland &mdash; College Park.">
+<meta property="og:type" content="website">
+<meta property="og:image" content="https://planetterp.com/static/images/popularcourses.png">
+<meta property="og:image:alt" content="A screenshot of a doughnut chart displaying the most popular 400-level Computer Science courses at the University of Maryland, College Park. The most popular course is CMSC131.">
+<meta property="og:url" content="https://planetterp.com/tools/popularcourses">
+
+<style>
+	#header {
+		text-align: center;
+	}
+
+	#popular-search {
+		width: 200px;
+	}
+
+	.course-search-button {
+		margin-left: 5px;
+	}
+
+	.alert {
+		width: 282px;
+	}
+
+	#courses-wrapper {
+		height: 100vh;
+		width: 100vw;
+		display: none;
+	}
+</style>
+{% endblock %}
+{% block content %}
+
+<br />
+
+<h1 id="header">Popular Courses at UMD</h1>
+
+<div class="tools-article">
+	<p>This tool lets you search for the most popular courses at the University of Maryland &mdash; College Park. You can search for an entire department &mdash; for example, searching for "MATH" will let you see the most popular courses that are taken in the math department. You can also search for the most popular xxx-level courses &mdash; for example, searching for "PHYS4" displays the most popular 400-level physics courses. Perhaps less useful, though still interesting, is searching for all courses that contain certain numbers &mdash; for example, searching for "101" shows all courses that have 101 in them. You can click on any course in the chart to see its page, which includes professor reviews and grade distributions.</p>
+
+	<form method="POST" id="popular-search-form" class="form-inline">
+		<input type="text" class="form-control" id="popular-search" placeholder="Search..." name="department">
+		<button type="submit" class="btn btn-primary course-search-button">Search</button>
+	</form>
+	<a id="popular-search"></a>
+	<div id="popular-search-form-error"></div>
+</div>
+
+<div id="courses-wrapper">
+	<canvas id="courses" alt="A doughnut chart that displays the most popular courses at the University of Maryland, College Park. A user can enter a search term to see the most popular courses containing that term."></canvas>
+</div>
+
+<hr>
+
+<div class="tools-article">
+	<p>Course popularity is determined by the number of students who have received a grade for each course.</p>
+
+	<p>Data is not guaranteed to be correct.</p>
+
+	<p style="padding-bottom: 10px;"><em>The source of the grade data can be found <a href="/about#credits">here</a>.</em></p>
+</div>
+
+<script>
+	$(document).ready(function() {
+		function sleep(ms) {
+			return new Promise(resolve => setTimeout(resolve, ms));
+		}
+
+
+		async function write (values) {
+			var search = document.getElementById("popular-search");
+
+			var last;
+
+			var typed = false;
+
+			while (!typed) {
+				shuffle(values);
+
+				// Make sure we don't get the same random value twice in a row
+				while (last == values[0]) {
+					shuffle(values);
+				}
+
+				for (var i = 0; i < values.length; i++) {
+					var s = values[i];
+
+					for (var j = 0; j <= s.length; j++) {
+						search.placeholder = s.substring(0, j);
+						await sleep(50);
+					}
+
+					for (var j = 1; j <= 3; j++) {
+						search.placeholder += "|";
+						await sleep(500);
+						search.placeholder = search.placeholder.substring(0, search.placeholder.length - 1);
+
+						if (j != 3) {
+							await sleep(500);
+						}
+
+					}
+
+					for (var j = search.placeholder.length; j >= 0; j--) {
+						search.placeholder = search.placeholder.substring(0, j);
+						await sleep(50);
+					}
+
+					if (search.value != "") {
+						search.placeholder = "";
+						typed = true;
+						break;
+					}
+				}
+
+				last = s;
+			}
+		}
+
+
+		// from https://stackoverflow.com/a/2450976/2150542
+		function shuffle(array) {
+			var currentIndex = array.length, temporaryValue, randomIndex;
+
+			// While there remain elements to shuffle...
+			while (0 !== currentIndex) {
+				// Pick a remaining element...
+				randomIndex = Math.floor(Math.random() * currentIndex);
+				currentIndex -= 1;
+
+				// And swap it with the current element.
+				temporaryValue = array[currentIndex];
+				array[currentIndex] = array[randomIndex];
+				array[randomIndex] = temporaryValue;
+			}
+
+			return array;
+		}
+
+		var values = ["CMSC4", "101", "ENGL", "GEOL1", "CPS", "NAVY", "400", "CLAS"];
+
+		write(values);
+
+
+		var coursesGraph;
+
+		$("#popular-search-form").submit(function(e) {
+			$("#courses-wrapper").hide();
+			$("#popular-search-form-error").html("");
+
+			if (typeof coursesGraph !== 'undefined') {
+				coursesGraph.destroy();
+			}
+
+			$.ajax({
+				type: "POST",
+				data: {"department": $("#popular-search").val()},
+				success: function(response) {
+					$("#courses-wrapper").show();
+					console.log("response", response)
+
+					var coursesCanvas = document.getElementById("courses");
+
+					var graph = coursesCanvas.getContext("2d");
+
+					colors = [];
+
+					var rand = Math.floor(Math.random() * 361); // Random number 0 -> 360
+					var increment;
+
+					for (var i = 0; i < response[0].length; i++) {
+						colors.push('hsl(' + rand + ', 100%, 50%)');
+
+						increment = Math.floor(Math.random() * 101) + 40; // Random number 40 -> 100
+
+						if (rand + increment > 44 && rand + increment < 73) { // Skip yellow
+							increment = Math.floor(Math.random() * 101) + 40; // Random number 40 -> 100
+						}
+
+						if (rand + increment > 360) {
+							rand = rand + increment - 360;
+						}
+						else {
+							rand = rand + increment;
+						}
+					}
+
+					var data = {
+						datasets: [
+							{
+								data: response[0],
+								backgroundColor: colors
+							}
+						],
+						labels: response[1]
+					};
+
+					var options = {
+						animation: {
+							easing: "easeOutBounce",
+							duration: 1500
+						},
+						legend:  {
+							display: false
+						},
+						pieceLabel: {
+							render: function(args) {
+								if (args['percentage'] > 2) {
+									return args['label'] + ": " + args['percentage'] + "%"
+								}
+							},
+							fontColor: "#ffffff",
+						},
+						responsive: true,
+						maintainAspectRatio: false
+					}
+
+					coursesGraph = new Chart(graph, {
+						type: 'doughnut',
+						data: data,
+						options: options
+					});
+
+					var location = $("a[id=\"popular-search\"]");
+					$('html, body').animate({scrollTop: location.offset().top}, 'slow');
+
+					coursesCanvas.onclick = function(e) {
+						var activePoint = coursesGraph.getElementAtEvent(e);
+						if (activePoint.length > 0) {
+							activePoint = activePoint[0];
+							window.open("/course/" + activePoint['_model']['label']);
+						}
+					}
+				},
+				error: function(response) {
+					var errorText = "<div class=\"alert alert-danger text-center\">";
+					errorText += "<strong>Error:</strong> ";
+					errorText += response.responseText;
+					errorText += "</div><br />";
+					$("#popular-search-form-error").html(errorText);
+				}
+			});
+
+			e.preventDefault();
+		});
+	});
+
+</script>
+{% endblock %}

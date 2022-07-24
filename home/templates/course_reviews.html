@@ -1,0 +1,77 @@
+{% extends "base_main.html" %}
+{% load static %}
+{% load render_table from django_tables2 %}
+
+{% block title %}{{ course.name }} | PlanetTerp{% endblock %}
+{% block description %}
+View reviews for professors for {{ course.department }}{{ course.course_number }} at the University of Maryland &mdash; College Park."
+{% endblock %}
+
+{% block content %}
+<script type="text/javascript" src="{% static 'js/jquery-toggle.js' %}"></script>
+
+<br />
+<div class="container">
+	<div class="row">
+		<div class="col">
+			<h1 class="text-center">Reviews for professors for <strong><a href="/course/{{ course.department }}{{ course.course_number }}">{{ course.department }}{{ course.course_number }}</a></strong></h1>
+		</div>
+	</div>
+</div>
+
+{% if num_reviews > 0 %}
+	<div>
+		<div class="input-group ml-3">
+			<div class="input-group-prepend">
+				<label class="input-group-text" for="course-select" style="border-bottom-left-radius: 0;">Sort By:</label>
+			</div>
+
+			<div id="rating-sort" class="input-group-append">
+				<select name="rating-select" id="rating-select" class="d-none">
+					<option value="normal">Rating</option>
+					<option value="desc">Rating</option>
+					<option value="asc">Rating</option>
+				</select>
+			</div>
+		</div>
+	</div>
+{% endif %}
+<div id="reviews-table-container" class="px-3">
+	{% render_table reviews_table %}
+</div>
+
+<script type="text/javascript">
+	$("#rating-sort").replaceInputsWithMultiStateButtons({
+		font_awesome: true,
+		icon_0: "fas fa-sort",
+		icon_1: "fas fa-sort-down",
+		icon_2: "fas fa-sort-up",
+		color_0: "secondary",
+		color_1: "secondary",
+		color_2: "secondary",
+	});
+
+	function sortReviews(direction) {
+		var data = {
+			"csrfmiddlewaretoken": "{{ csrf_token }}",
+			"direction": direction,
+			"type": "course",
+			"obj_id": "{{ course.pk }}"
+		}
+
+		$.ajax({
+			type: "POST",
+			url: "{% url 'table_sort' %}",
+			data: data,
+			success: function(data) {
+				$("#reviews-table-container").html(data["reviews_table"]);
+			}
+		});
+	}
+
+	$("#rating-select").on("change", function() {
+		var selectedRating = $(this).val();
+		sortReviews(selectedRating);
+	});
+</script>
+{% endblock %}

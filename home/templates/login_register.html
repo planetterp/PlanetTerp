@@ -1,0 +1,125 @@
+{% extends "base_main.html" %}
+
+{% block title %}Login / Register | PlanetTerp{% endblock %}
+{% block description %}Login or register for PlanetTerp.{% endblock %}
+
+{% block content %}
+<br />
+
+{% if error_msg %}
+<div class="alert alert-danger text-center error-alert">
+	<strong>Error: </strong> {{ error_msg }}
+</div>
+<br />
+{% endif %}
+
+<h4 class="text-center">Registering will allow you to keep track of the reviews you post and (optionally) show your username next to your reviews.</h4>
+
+<div class="container">
+	<div class="row">
+		<div class="col">
+			<h2>Login</h2>
+			<form method="POST" action="login">
+				{% csrf_token %}
+				<div class="form-group row">
+					<label class="col-sm-2 col-form-label" for="username"><strong>Username</strong></label>
+					<div class="col-sm-8">
+						<input class="form-control" type="text" name="username" id="username" placeholder="Username">
+					</div>
+				</div>
+				<div class="form-group row">
+					<label class="col-sm-2 col-form-label" for="password"><strong>Password</strong></label>
+					<div class="col-sm-8">
+						<input class="form-control" type="password" name="password" id="password" placeholder="Password">
+					</div>
+				</div>
+				<div class="form-group row" class="forgot-password-link">
+					<div class="col-sm-8">
+						<a href="javascript:void(0);" onclick="showForgotPassword()" style="color: blue;">Forgot password?</a>
+					</div>
+				</div>
+				<div class="form-group row">
+					<div class="col-sm-6">
+						<button class="btn btn-primary" type="submit">Login</button>
+					</div>
+				</div>
+			</form>
+			<form id="forgot-password-form" style="display: none;">
+				<h2>Reset Password</h2>
+				<div class="form-group row">
+					<div class="col-sm-10">
+						<label class="col-form-label" for="forgot-password-email"><strong>Enter your email for reset password instructions</strong></label>
+					</div>
+				</div>
+				<div class="form-group row">
+					<div class="col-sm-10">
+						<input class="form-control" type="email" name="email" id="forgot-password-email" placeholder="Email">
+					</div>
+				</div>
+				<div class="form-group row">
+					<div class="col-sm-10">
+						<button class="btn btn-primary" type="submit">Send Reset Email</button>
+					</div>
+				</div>
+			</form>
+			<div id="forgot-password-form-response" class="pt-2"></div>
+		</div>
+		<div class="col">
+			<h2>Register</h2>
+			<form method="POST" action="register">
+				{% csrf_token %}
+				<div class="form-group row">
+					<label class="col-sm-2 col-form-label" for="username"><strong>Username</strong></label>
+					<div class="col-sm-8">
+						<input class="form-control" type="text" name="username" id="username" placeholder="Username">
+					</div>
+				</div>
+				<div class="form-group row">
+					<label class="col-sm-2 col-form-label" for="email"><strong>Email</strong> <small>(optional)</small></label>
+					<div class="col-sm-8">
+						<input class="form-control" type="email" name="email" id="email" placeholder="Email">
+					</div>
+				</div>
+				<div class="form-group row">
+					<label class="col-sm-2 col-form-label" for="password"><strong>Password</strong></label>
+					<div class="col-sm-8">
+						<input class="form-control" type="password" name="password" id="password" placeholder="Password">
+					</div>
+				</div>
+				<div class="form-group row">
+					<div class="col-sm-6">
+						<button class="btn btn-primary" type="submit">Register</button>
+					</div>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+<script>
+	function showForgotPassword() {
+		if (document.getElementById('forgot-password-form').style.display == 'none') {
+			document.getElementById('forgot-password-form').style.display = 'block';
+		}
+	}
+
+	$("#forgot-password-form").submit(
+		function(e) {
+			var data = {"email": $("#forgot-password-email").val()};
+			$.post("/passwordreset", data)
+			.done(function(data) {
+				var successText = "<div class=\"alert alert-success text-center\" style=\"width: 100%;\">";
+				successText += "<strong>Password reset email sent.</strong> Check your email for further instructions."
+				successText += "</div><br />"
+				$("#forgot-password-form-response").html(successText);
+			})
+			.fail(function(xhr, textStatus, errorThrown) {
+				var errorText = "<div class=\"alert alert-danger text-center\" style=\"width: %100;\">"
+				errorText += "<strong>Error:</strong> ";
+				errorText += xhr.responseText;
+				errorText += "</div><br />";
+				$("#forgot-password-form-response").html(errorText);
+			});
+			e.preventDefault();
+		});
+</script>
+{% endblock %}

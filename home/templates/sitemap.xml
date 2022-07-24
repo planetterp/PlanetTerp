@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+	<url><loc>https://planetterp.com</loc></url>
+	<url><loc>https://planetterp.com/about</loc></url>
+	<url><loc>https://planetterp.com/grades</loc></url>
+	<url><loc>https://planetterp.com/tools</loc></url>
+	<url><loc>https://planetterp.com/tools/demographics</loc></url>
+	<url><loc>https://planetterp.com/tools/popularcourses</loc></url>
+	<url><loc>https://planetterp.com/tools/demographics</loc></url>
+	<url><loc>https://planetterp.com/tools/coursedifficulty</loc></url>
+	<url><loc>https://planetterp.com/tools/geneds</loc></url>
+	<url><loc>https://planetterp.com/login</loc></url>
+	<url><loc>https://planetterp.com/schedule/new</loc></url>
+	{% for course in courses %}
+		<url><loc>https://planetterp.com{{ course.get_absolute_url }}</loc></url>
+	{% endfor %}
+	{% for professor in professors %}
+		<url><loc>https://planetterp.com{{ professor.get_absolute_url }}</loc></url>
+	{% endfor %}
+</urlset>

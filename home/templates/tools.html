@@ -1,0 +1,85 @@
+{% extends "base_main.html" %}
+
+{% block title %}Tools | PlanetTerp{% endblock %}
+{% block description %}Various tools relating to the University of Maryland &mdash; College Park.{% endblock %}
+
+{% block head %}
+<style>
+#header {
+	text-align: center;
+}
+
+#graph-wrapper {
+	height: 100vh;
+	width: 100vw;
+}
+
+.fit-contain {
+	/* https://developer.mozilla.org/en-US/docs/Web/CSS/object-fit */
+	object-fit: contain;
+}
+
+.width-constrained {
+	min-width: 18rem;
+	max-width: 30rem;
+}
+
+/** Begin mobile **/
+
+@media (max-width: 800px) {
+	img {
+		width: 100%;
+		height: 300px;
+	}
+}
+
+/** End mobile **/
+</style>
+{% endblock %}
+{% block content %}
+
+<br />
+
+<h1 id="header">Tools</h1>
+
+<div class="tools-article">
+	<p style="text-align:center">This page contains all of the tools on PlanetTerp. It will be updated as we add more.</p>
+
+	<div class="card-deck">
+		<a href="/tools/demographics" class="width-constrained mb-4 card">
+			<img class="card-img-bottom fit-contain" src="static/images/tools/raceandethnicity.png" height="300px" alt="A screenshot of a graph showing the demographic breakdown by race and ethnicity of undergraduates at the University of Maryland, College Park from 1975 until 2016. Over time, the percentage of white students decreases.">
+			<div class="card-body">
+				<h5 class="card-title">40 Years of Race &amp; Ethnicity at UMD</h5>
+			</div>
+		</a>
+
+		<a href="/tools/popularcourses" class="width-constrained mb-4 card">
+			<img class="card-img-bottom fit-contain" src="static/images/tools/popularcourses.png" height="300px" alt="A screenshot of a doughnut chart that displays the most popular courses at the University of Maryland, College Park. A user can enter a search term to see the most popular courses containing that term.">
+			<div class="card-body">
+				<h5 class="card-title">Popular Courses</h5>
+			</div>
+		</a>
+
+		<a href="/tools/coursedifficulty" class="width-constrained mb-4 card">
+			<img class="card-img-bottom fit-contain" src="static/images/tools/coursedifficulty.png" height="300px" alt="A screenshot of a page titled &quot;Easiest &amp; Hardest Courses &amp; Departments at UMD&quot;. UMD stands for University of Maryland. There are two tables with headers &quot;Difficulty by department&quot; and &quot;Difficulty by course&quot;. These list each department and course on PlanetTerp as well as their average GPA and the number of students in each.">
+			<div class="card-body">
+				<h5 class="card-title">Easiest &amp; Hardest Courses &amp; Departments at UMD</h5>
+			</div>
+		</a>
+
+		<a href="/tools/geneds" class="width-constrained mb-4 card">
+			<img class="card-img-bottom fit-contain" src="static/images/tools/geneds.png" height="300px" alt="A screenshot of a page titled &quot;Search Courses By General Education Requirements&quot;. The page contains checkboxes of a list of general education requirements, such as DSHS (History and Social Sciences). Toward the bottom of the page a table can be seen listing courses, course titles, number of credits, and average GPAs. For example, the title of ANTH265 is Anthropology of Global Health, it is 3 credits, and it has an average GPA of 3.62.">
+			<div class="card-body">
+				<h5 class="card-title">Search Courses By General Education Requirement</h5>
+			</div>
+		</a>
+
+		<a href="/tools/gradeinflation" class="width-constrained mb-4 card">
+			<img class="card-img-bottom fit-contain" src="static/images/tools/gradeinflation.png" height="300px" alt="A screenshot of a page titled &quot;Grade Inflation at UMD&quot;. The page contains a chart that allows users to input a department or course. After the user searches, a chart appears that shows the average GPA for that department or course from 1998 until 2019.">
+			<div class="card-body">
+				<h5 class="card-title">Grade Inflation at UMD</h5>
+			</div>
+		</a>
+	</div>
+</div>
+{% endblock %}

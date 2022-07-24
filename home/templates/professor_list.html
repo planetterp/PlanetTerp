@@ -1,0 +1,11 @@
+{% extends "base_main.html" %}
+
+{% block title %}Professor List | PlanetTerp{% endblock %}
+
+{% block content %}
+{% for professor in object_list %}
+    <a href="{{ professor.get_absolute_url }}">{{ professor.name }}</a>
+    <br />
+{% endfor %}
+
+{% endblock %}

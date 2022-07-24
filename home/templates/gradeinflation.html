@@ -1,0 +1,244 @@
+{% extends "base_main.html" %}
+
+{% block title %}Grade Inflation | PlanetTerp{% endblock %}
+
+{% block head %}
+<script type="text/javascript" src="../../static/js/chart.min.js"></script>
+
+<meta property="og:title" content="Grade Inflation at UMD | PlanetTerp">
+<meta property="og:description" name="description" content="Visualize grade inflation at UMD for departments and courses over time.">
+<meta property="og:type" content="website">
+<meta property="og:image" content="https://planetterp.com/static/images/gradeinflation.png">
+<meta property="og:image:alt" content="A screenshot of a page titled &quot;Grade Inflation at UMD&quot;. The page contains a chart that allows users to input a department or course. After the user searches, a chart appears that shows the average GPA for that department or course from 1998 until 2019.">
+<meta property="og:url" content="https://planetterp.com/tools/geneds">
+
+<style>
+	#header {
+		text-align: center;
+		margin-top: 1%;
+	}
+
+	#distribution-search {
+		width: 200px;
+		margin-left: 15px;
+	}
+
+	.distribution-search-button {
+		margin-left: 5px;
+	}
+
+	#distribution-wrapper {
+		height: 100vh;
+		width: 95vw;
+		margin-left: auto;
+		margin-right: auto;
+		margin-top: 30px;
+	}
+
+	.alert {
+		width: 282px;
+	}
+
+	@media (min-width: 900px) {
+		#search-form {
+			position: absolute;
+		}
+	}
+
+	#all-courses {
+		margin: 0 auto;
+	}
+
+	#all-courses:focus {
+		box-shadow: none;
+	}
+
+	#chart-loading {
+		margin-left: auto;
+		margin-right: auto;
+		margin-top: 30px;
+		display: none;
+	}
+
+</style>
+{% endblock %}
+{% block content %}
+<h1 id="header">Grade Inflation at UMD</h1>
+
+<div class="tools-article">
+	<p>This tool visualizes how the average GPA has changed over the last 20 years at the University of Maryland &mdash; College Park. You can search for an entire department &mdash; for example, searching for "MATH" shows the GPA changes for the MATH department over time. You can also search for a course to see the average GPA changes in that course over time. Clicking the 'View All Courses' button shows the average GPA of every course over the last 20 years.</p>
+
+	<div class="row test">
+		<form method="POST" id="search-form" class="form-inline">
+			<input type="text" class="form-control" id="distribution-search" placeholder="Department or course" name="search">
+			<button type="submit" class="btn btn-primary distribution-search-button">Search</button>
+			&nbsp;
+			<i class="fas fa-question-circle" data-toggle="tooltip" data-placement="right" title="You can search for a department or course. For example, &quot;ENGL&quot; or &quot;ENGL101&quot;."></i>
+		</form>
+
+		<button type="button" id="all-courses" class="btn btn-primary">View All Courses</button>
+	</div>
+	<div id="search-form-error"></div>
+</div>
+
+<div id="chart-loading" class="alert alert-info text-center center-block">
+	Loading <i class="fas fa-spinner fa-pulse"></i>
+</div>
+
+<div id="distribution-wrapper">
+	<a id="distribution-search"></a>
+	<canvas id="distribution"></canvas>
+</div>
+
+<hr>
+
+<div class="tools-article">
+	<p>"1998 S" means "1998 Spring"; "1998 F" means "1998 Fall".</p>
+
+	<p>GPA calculations are done according to <a href="https://www.testudo.umd.edu/gpa/index.html" target="_blank">UMD's grade to quality points rules</a>. All withdrawals (W) are considered to be 0.0 quality points.</p>
+
+	<p>There is an error in which Fall 2008 and Spring 2008 have identical grade data. We are requesting the correct data and will update this chart when we receive it.</p>
+
+	<p>Data is not guaranteed to be correct.</p>
+
+	<p style="padding-bottom: 10px;"><em>The source of the grade data can be found <a href="/about#credits">here</a>.</em></p>
+</div>
+
+<script>
+	var semesters = [];
+	var fullSemesters = [];
+
+	for (var i = 1998; i <= 2018; i++) {
+		for (var j = 0; j <= 1; j++) {
+			if (j == 0) {
+				semesters.push(i + " S");
+				fullSemesters.push("Spring " + i);
+			}
+			else {
+				semesters.push(i + " F");
+				fullSemesters.push("Fall " + i);
+			}
+		}
+	}
+
+	semesters.push("2019 S");
+
+	var options = {
+		scales: {
+			xAxes: [{
+				scaleLabel: {
+					display: true,
+					labelString: 'Semester'
+				}
+			}],
+			yAxes: [{
+				scaleLabel: {
+					display: true,
+					labelString: 'Average GPA'
+				},
+				ticks: {
+					// beginAtZero: true,
+					// max: 4
+				}
+			}]
+		}
+	}
+
+	var data = {
+		labels: semesters,
+		datasets: [
+			{
+				label: "All courses",
+				data: ["2.81", "2.81", "2.84", "2.85", "2.89", "2.90", "2.95", "2.89", "2.95", "2.94", "3.01", "2.98", "3.02", "3.00", "3.05", "3.01", "3.06", "3.03", "3.06", "3.05", "3.08", "3.07", "3.10", "3.07", "3.11", "3.05", "3.13", "3.13", "3.08", "3.08", "3.11", "3.12", "3.14", "3.12", "3.13", "3.12", "3.15", "3.15", "3.18", "3.17", "3.20", "3.18", "3.21"],
+				fill: false,
+				backgroundColor: '#008D94',
+				borderColor: '#0DB537'
+			}
+		]
+	};
+
+	var distributionGraph;
+
+	$(document).ready(function() {
+		var distributionCanvas = document.getElementById("distribution");
+		var ctx = distributionCanvas.getContext("2d");
+		distributionGraph = new Chart(ctx, {
+			type: 'line',
+			data: data,
+			options: options
+		});
+
+		$('#all-courses').on('click', function(e) {
+			createChart("");
+		});
+
+		$("#search-form").submit(function(e) {
+			createChart($("#distribution-search").val());
+
+			e.preventDefault();
+		});
+	});
+
+	function createChart(searchQuery) {
+		$('#chart-loading').show();
+
+		$("#distribution-wrapper").hide();
+		$("#search-form-error").html("");
+
+		if (typeof distributionGraph !== 'undefined') {
+			distributionGraph.destroy();
+		}
+
+		$.ajax({
+			type: "POST",
+			data: {"search": searchQuery},
+			success: function(response) {
+				$('#chart-loading').hide();
+				$("#distribution-wrapper").show();
+
+				response = JSON.parse(response);
+
+
+				var distributionCanvas = document.getElementById("distribution");
+				var ctx = distributionCanvas.getContext("2d");
+
+				var label = $("#distribution-search").val().toUpperCase();
+
+				if (label === "") {
+					label = "All courses";
+				}
+
+				var data = {
+					labels: semesters,
+					datasets: [
+						{
+							label: label,
+							data: response,
+							fill: false,
+							backgroundColor: '#008D94',
+							borderColor: '#0DB537'
+						}
+					]
+				};
+
+				distributionGraph = new Chart(ctx, {
+					type: 'line',
+					data: data,
+					options: options
+				});
+
+				var location = $("a[id=\"distribution-search\"]");
+				$('html, body').animate({scrollTop: location.offset().top}, 'slow');
+			},
+			error: function(response) {
+				$('#chart-loading').hide();
+				var errorText = "<div class=\"alert alert-danger text-center\">";
+				errorText += "<strong>Error:</strong> ";
+				errorText += response.responseText;
+				errorText += "</div><br />";
+				$("#search-form-error").html(errorText);
+			}
+		});
+	}
+</script>
+{% endblock %}

@@ -1,0 +1,186 @@
+.schedule {
+	width: 80%;
+	height: 100%;
+	margin-left: 10%;
+	margin-right: 10%;
+	display: none;
+	margin-bottom: 30px;
+}
+
+.schedule td, .schedule th {
+	border: 1px solid #D9D9D9;
+	border-bottom: 0px;
+}
+
+.day {
+	width: 19.2%;
+	height: 20px;
+	font-size: 20px;
+	text-align: center;
+}
+
+.schedule .hour {
+	font-size: 17px;
+	text-align: right;
+	white-space: nowrap;
+}
+
+.hour, .half {
+	height: 19px;
+	border-bottom: 1px solid #F2F2F2;
+}
+
+.hour-half, .block {
+	height: 19px;
+	border-bottom: 1px solid #A1A1A1;
+}
+
+.course-position {
+	position: absolute;
+	width: 15.2%;
+	font-size: 14px;
+	text-align: center;
+	font-weight: bold;
+	border-radius: 10px;
+	color: #F2F2F2;
+	display: flex;
+	justify-content: center;
+	flex-direction: column;
+	line-height: 11px;
+}
+
+.course-info {
+	font-size: 10px;
+	font-weight: normal;
+	font-style: italic;
+}
+
+#schedule-information-button {
+	color: #FFFFFF;
+	background-color: #005AB4;
+}
+
+#register-button {
+	color: #FFFFFF;
+	background-color: #D10404;
+}
+
+.information-wrapper {
+	text-align: center;
+	margin-top: 10px;
+	margin-bottom: 10px;
+	width: 80%;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.modal-course-info {
+	border: 1px solid grey;
+	border-radius: 10px;
+	color: white;
+	margin-bottom: 20px;
+}
+
+.modal-course-info a {
+	color: black;
+}
+
+
+.next-schedule {
+	font-size: 80px;
+	position: absolute;
+	margin-top: 12%;
+}
+
+#loading-icon {
+	right: 0;
+	margin-right: 3.5%;
+	position: absolute;
+	font-size: 80px;
+	margin-top: 5%;
+}
+
+
+#next-schedule-right {
+	right: 0;
+	margin-right: 2%;
+}
+
+#next-schedule-left {
+	left: 2%;
+	display: none;
+}
+
+.schedule-number-text {
+	position: absolute;
+	left: 10%;
+	font-size: 20px;
+	margin-top: 5px;
+}
+
+.seats {
+	display: inline !important;
+	width: 40px !important;
+	height: 40px !important;
+}
+
+.seats-wrapper {
+	position: absolute;
+	margin-top: -4px;
+}
+
+.groupme-auth {
+	position: absolute;
+	right: 10%;
+	font-size: 20px;
+	margin-top: 5px;
+}
+
+.groupme-logo {
+	width: 100px;
+}
+
+#schedule-1 {
+	display: inline-table;
+}
+
+.fa-spinner {
+	font-size: 40px;
+}
+
+#edit-form {
+	display: inline;
+	margin-right: 10px;
+}
+
+#save-form {
+	display: inline;
+}
+
+#share-schedule {
+	display: inline;
+	margin-left: 10px;
+}
+
+
+#edit-schedule, #share-schedule {
+	color: #FFFFFF;
+	background-color: #3A214C;
+	margin-top: 10px;
+}
+
+#save-schedule, #login-button {
+	color: #FFFFFF;
+	background-color: #88044A;
+	margin-top: 10px;
+	margin-left: 10px;
+	margin-right: 10px;
+}
+
+.saved-schedule {
+	margin-top: 10px;
+	font-size: 18px;
+	background-color: rgb(255, 191, 0, 0);
+	background-color: rgba(255, 191, 0, 0.5);
+	border-radius: 10px;
+}

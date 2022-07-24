@@ -1,0 +1,210 @@
+{% load utils %}
+
+<script>
+	$(function () {
+		$('[data-toggle="tooltip"]').tooltip();
+	});
+</script>
+
+{% for schedule in schedules %}
+	{% with schedule_0=schedule|first %}
+		<span id="schedule-{{ schedule_0.schedule_index }}-ids" style="display: none;">
+			{% with sections=schedule.section_id|make_list %}
+				{{ sections|join:"," }}
+			{% endwith %}
+		</span>
+		<span id="register-link-schedule-{{ schedule_0.schedule_index }}" style="display: none;">
+			{% for section in schedule %}
+				{{ section.course }}_/{{ section.section }}|
+			{% endfor %}
+		</span>
+
+		<table id="schedule-{{ schedule_0.schedule_index }}" class="schedule">
+			<tr>
+				<td></td>
+				<th class="day">Monday</th>
+				<th class="day">Tuesday</th>
+				<th class="day">Wednesday</th>
+				<th class="day">Thursday</th>
+				<th class="day">Friday</th>
+			</tr>
+			<tr>
+				<td>
+					<div class="hour">8am</div>
+					<div class="hour-half"></div>
+					<div class="hour">9am</div>
+					<div class="hour-half"></div>
+					<div class="hour">10am</div>
+					<div class="hour-half"></div>
+					<div class="hour">11am</div>
+					<div class="hour-half"></div>
+					<div class="hour">12pm</div>
+					<div class="hour-half"></div>
+					<div class="hour">1pm</div>
+					<div class="hour-half"></div>
+					<div class="hour">2pm</div>
+					<div class="hour-half"></div>
+					<div class="hour">3pm</div>
+					<div class="hour-half"></div>
+					<div class="hour">4pm</div>
+					<div class="hour-half"></div>
+					<div class="hour">5pm</div>
+					<div class="hour-half"></div>
+					<div class="hour">6pm</div>
+					<div class="hour-half"></div>
+					<div class="hour">7pm</div>
+					<div class="hour-half"></div>
+					<div class="hour">8pm</div>
+					<div class="hour-half"></div>
+					<div class="hour">9pm</div>
+					<div class="hour-half"></div>
+				</td>
+				<td>
+					{% for section in schedule %}
+						{% for meeting in section.meetings %}
+							{% if 'M' in meeting.days %}
+								<div class="course-position" style="height: {{ meeting.num_minutes }}*0.63333px; margin-top: {{ meeting.num_minutes_since_8 }}*0.63333px; background-color: hsl({{ colors.section.index[0] }}, {{ colors.section.index[1] }}%, {{ colors.section.index[2] }}%; border: 2px solid hsl({{ colors.section.index[0] }}, 100%, 30%);" data-toggle="tooltip" data-placement="top" data-html="true" title="<b>{{ section.title }}</b><br /><i>{{ meeting.type }}</i>">
+									<div class="course">{{ section.course }}<br /><span class="course-info">({{ section.section }}) &ndash; {{ meeting.location }}</span>
+									</div>
+								</div>
+							{% endif %}
+						{% endfor %}
+					{% endfor %}
+
+					{% for i in 0|range:14 %}
+						<div class="half"></div>
+						<div class="block"></div>
+					{% endfor %}
+				</td>
+				<td>
+					{% for section in schedule %}
+						{% for meeting in section.meetings %}
+							{% if 'Tu' in meeting.days %}
+								<div class="course-position" style="height:{{ meeting.num_minutes }}*0.63333px; margin-top: {{ meeting.num_minutes_since_8 }}*0.63333px; background-color: hsl({{ colors.section.index[0] }}, {{ colors.section.index[1] }}%, {{ colors.section.index[1] }}%); border: 2px solid hsl({{ colors.section.index[0] }}, 100%, 30%);" data-toggle="tooltip" data-placement="top" data-html="true" title="<b>{{ section.title }}</b><br /><i>{{ meeting.type }}</i>">
+									<div class="course">{{ section.course }}<br /><span class="course-info">({{ section.section }}) &ndash; {{ meeting.location }}</span>
+									</div>
+								</div>
+							{% endif %}
+						{% endfor %}
+					{% endfor %}
+
+					{% for i in 0|range:14 %}
+						<div class="half"></div>
+						<div class="block"></div>
+					{% endfor %}
+				</td>
+				<td>
+					{% for section in schedule %}
+						{% for meeting in section.meetings %}
+							{% if 'W' in meeting.days %}
+								<div class="course-position" style="height:{{ meeting.num_minutes }}*0.63333px; margin-top: {{ meeting.num_minutes_since_8 }}*0.63333px; background-color: hsl({{ colors.section.index[0] }}, {{ colors.section.index[1] }}%, {{ colors.section.index[1] }}%); border: 2px solid hsl({{ colors.section.index[0] }}, 100%, 30%);" data-toggle="tooltip" data-placement="top" data-html="true" title="<b>{{ section.title }}</b><br /><i>{{ meeting.type }}</i>">
+									<div class="course">{{ section.course }}<br /><span class="course-info">({{ section.section }}) &ndash; {{ meeting.location }}</span>
+									</div>
+								</div>
+							{% endif %}
+						{% endfor %}
+					{% endfor %}
+
+					{% for i in 0|range:14 %}
+						<div class="half"></div>
+						<div class="block"></div>
+					{% endfor %}
+				</td>
+				<td>
+					{% for section in schedule %}
+						{% for meeting in section.meetings %}
+							{% if 'Th' in meeting.days %}
+								<div class="course-position" style="height:{{ meeting.num_minutes }}*0.63333px; margin-top: {{ meeting.num_minutes_since_8 }}*0.63333px; background-color: hsl({{ colors.section.index[0] }}, {{ colors.section.index[1] }}%, {{ colors.section.index[1] }}%); border: 2px solid hsl({{ colors.section.index[0] }}, 100%, 30%);" data-toggle="tooltip" data-placement="top" data-html="true" title="<b>{{ section.title }}</b><br /><i>{{ meeting.type }}</i>">
+									<div class="course">{{ section.course }}<br /><span class="course-info">({{ section.section }}) &ndash; {{ meeting.location }}</span>
+									</div>
+								</div>
+							{% endif %}
+						{% endfor %}
+					{% endfor %}
+
+					{% for i in 0|range:14 %}
+						<div class="half"></div>
+						<div class="block"></div>
+					{% endfor %}
+				</td>
+				<td>
+					{% for section in schedule %}
+						{% for meeting in section.meetings %}
+							{% if 'F' in meeting.days %}
+								<div class="course-position" style="height:{{ meeting.num_minutes }}*0.63333px; margin-top: {{ meeting.num_minutes_since_8 }}*0.63333px; background-color: hsl({{ colors.section.index[0] }}, {{ colors.section.index[1] }}%, {{ colors.section.index[1] }}%); border: 2px solid hsl({{ colors.section.index[0] }}, 100%, 30%);" data-toggle="tooltip" data-placement="top" data-html="true" title="<b>{{ section.title }}</b><br /><i>{{ meeting.type }}</i>">
+									<div class="course">{{ section.course }}<br /><span class="course-info">({{ section.section }}) &ndash; {{ meeting.location }}</span>
+									</div>
+								</div>
+							{% endif %}
+						{% endfor %}
+					{% endfor %}
+
+					{% for i in 0|range:14 %}
+						<div class="half"></div>
+						<div class="block"></div>
+					{% endfor %}
+				</td>
+			</tr>
+		</table>
+
+		<div id="schedule-information-{{ schedule_0.schedule_index }}" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="modal-information-header-{{ schedule_0.schedule_index }}">
+			<div class="modal-dialog" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 id="modal-information-header-{{ schedule_0.schedule_index }}" class="modal-title">Schedule information</h5>
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+					<div class="modal-body">
+						{% for section in schedule %}
+							<div class="modal-course-info" style="background-color: hsla({{ colors.section.index[0] }}, {{ colors.section.index[1] }}%, {{ colors.section.index[1] }}%, 0.8);">
+								<p style="text-align: center; font-size: 20px; margin-top: 5px;"><b><a href="{% url 'course' section.course %}" target="_blank">{{ section.course }}</a>: {{ section.title }}</b><br />
+									<span style="font-size: 17px;"><i>Section: {{ section.section }} • Credits: $section['credits']</i> • <span class="seats-wrapper"><canvas id="{{ schedule_0.schedule_index }}-$section['section_id']-seats" class="seats" data-toggle="tooltip" data-placement="top" data-html="true" title="Open seats: $section['available_seats']<br />Available seats: $section['seats']<br />Waitlist: $section['waitlist']"></canvas></span></span><br />
+									{% if section.geneds %}
+										<span data-toggle="tooltip" data-placement="top" data-html="true" title='<strong>Geneds</strong><br />Note that geneds are not exact. For example, if a gened for a course is "DSHS or DSSP" it will appear here as "DSHS, DSSP".'>$section['geneds']</span><br />
+									{% endif %}
+									{% for professor in section.professors %}
+										<span style="font-size: 16px;">("<a href="{% url 'professors' professor.slug %}" target="_blank">" + {{ professor.name }} + "</a>" if {{ professor['name'] }} else "TBA"): <span data-toggle="tooltip" data-placement="top" title="Average GPA for this professor for this course"><i class="fas fa-graduation-cap" style="margin-left: 5px;"></i> $("{0:.2f}".format(float(professor['average_gpa'])) if professor['average_gpa'] else "No grade data")</span> • <span data-toggle="tooltip" data-placement="top" title="Average rating for this professor"><i class="fas fa-star"></i> $("{0:.2f}".format(float(professor['average_rating'])) if professor['average_rating'] else "No reviews")</span><br /></span>
+									{% endfor %}
+								</p>
+							</div>
+
+							<script type="text/javascript">
+								var graph = document.getElementById("{{ schedule_0.schedule_index }}-$section['section_id']-seats").getContext("2d");
+
+								var data = {
+									datasets: [{
+										data: [$section['available_seats'], $(section['seats']-section['available_seats'])],
+										backgroundColor: ["hsl(104, 44%, 50%)", "hsl(0, 100%, 50%)"]
+									}],
+									labels: [
+										'Total Seats',
+										'Open seats'
+									],
+								};
+
+								var options = {
+									responsive: true,
+									maintainAspectRatio: false,
+									legend: {
+										display: false
+									},
+									tooltips: {
+										enabled: false
+									}
+								}
+
+								new Chart(graph, {
+									type: 'pie',
+									data: data,
+									options: options
+								});
+							</script>
+						{% endfor %}
+					</div>
+				</div>
+			</div>
+		</div>
+	{% endwith %}
+{% endfor %}

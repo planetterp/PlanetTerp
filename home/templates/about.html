@@ -1,0 +1,67 @@
+{% extends "base_main.html" %}
+
+{% block title %}About | PlanetTerp{% endblock %}
+
+{% block content %}
+<div class="info-page">
+	<h1>About</h1>
+	<p>PlanetTerp is a website designed to help students at the University of Maryland &mdash; College Park (UMD) make informed decisions. It offers a professor review system, grades for each course and professor, and tools to provide information related to UMD. We hope that you find these features useful!</p>
+
+	<h2>Goal &amp; Motivation</h2>
+	<p>Our goal is to provide information that will help all students at UMD make informed decisions.</p>
+
+	<p>One common concern with professor review websites is that they are not accurate, largely because students who dislike a professor are more likely to complain than students who like a professor. This may be true and should be considered when viewing professor reviews on this website.</p>
+
+	<p>Grade data is provided on this site. We feel it important to note that we believe students should not take a course based on which professor gives the highest grades. A professor who gives out the lowest grades may still be the best professor for you to take. Of course, it is up to you; we do our best to provide the data to help you make an informed decision.</p>
+
+	<h3>Review criteria</h3>
+	<p>PlanetTerp believes in freedom of speech, but maintains standards to ensure the reviews on the website are quality. To prevent low-quality reviews, all reviews are subject to a verification process. The only reviews that are not accepted are personal attacks on professors or teaching assistants that provide no meaningful information, or any reviews that are illegal.</p>
+
+
+	<a id="credits"></a><h2>Credits</h2>
+	<p>Initial reviews from <a href="http://www.ourumd.com" target="_blank">OurUMD.com</a>. UMD professor &amp; course information from <a href="http://umd.io" target="_blank">umd.io</a>. Grade data from the <a href="https://www.irpa.umd.edu" target="_blank">UMD Office of Institutional Research, Planning &amp; Assessment</a> (IRPA) and obtained through <a href="https://www.umd.edu/administration/public-information-request" target="_blank">a request</a> under <a href="http://www.marylandattorneygeneral.gov/OpenGov%20Documents/PIA_manual_printable.pdf" target="_blank">the state of Maryland's Public Information Act</a> (PIA) (grade data initially from <a href="https://vagrades.com" target="_blank">VAgrades.com</a>).</p>
+
+	<h2>Contact us</h2>
+	<p>We can be emailed at <a href="mailto:admin@planetterp.com">admin@planetterp.com</a></p>
+
+	<a id="organizations"></a><h2>Organizations we support</h2>
+	<p>Want your organization on our homepage and listed below? Please contact us for more information.</p>
+
+	<p>PlanetTerp is proud to support the following organizations:</p>
+
+	<ul>
+		{% for organization in organizations %}
+		<li><a href="{{ organization.url }}" target="_blank">{{ organization.name }}</a></li>
+		{% endfor %}
+	</ul>
+
+	<br />
+
+	<h1 class="text-center">PlanetTerp Team</h1>
+	<div class="member-info">
+		<div class="member-pic">
+			<p class="member-name"><strong>Liam DeVoe</strong></p>
+			<img src='/static/images/team/liam.png'>
+		</div>
+
+		<div class="member-pic">
+			<p class="member-name"><strong>Nihar Majmudar</strong></p>
+			<img src='/static/images/team/nihar.png'>
+		</div>
+		<div class="member-pic">
+			<p class="member-name"><strong>Jonathan Saewitz</strong></p>
+			<img src='/static/images/team/jonathan.png'>
+		</div>
+
+		<div class="member-pic">
+			<p class="member-name"><strong>Noah Sandler</strong></p>
+			<img src='/static/images/team/noah.png'>
+		</div>
+
+		<div class="member-pic">
+			<p class="member-name"><strong>Ethan Schaffer</strong></p>
+			<img src='/static/images/team/ethan.png'>
+		</div>
+	</div>
+</div>
+{% endblock %}

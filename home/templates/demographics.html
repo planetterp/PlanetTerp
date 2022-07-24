@@ -1,0 +1,274 @@
+{% extends "base_main.html" %}
+
+{% block title %}Demographics | PlanetTerp{% endblock %}
+
+{% block head %}
+<script type="text/javascript" src="../static/js/chart.min.js"></script>
+
+<meta property="og:title" content="40 Years of Race &amp; Ethnicity at UMD | PlanetTerp">
+<meta property="og:description" name="description" content="The demographic breakdown by race and ethnicity of undergraduates at the University of Maryland &mdash; College Park from 1975 &ndash; 2016.">
+<meta property="og:type" content="website">
+<meta property="og:image" content="https://planetterp.com/static/images/raceandethnicity.png">
+<meta property="og:image:alt" content="A screenshot of a graph showing the demographic breakdown by race and ethnicity of undergraduates at the University of Maryland, College Park from 1975 until 2016. Over time, the percentage of white students decreases.">
+<meta property="og:url" content="https://planetterp.com/tools/demographics">
+
+<style>
+	#header {
+		text-align: center;
+	}
+
+	#graph-wrapper {
+		height: 100vh;
+		width: 100vw;
+	}
+</style>
+{% endblock %}
+
+{% block content %}
+<br />
+
+<h1 id="header">40 Years of Race &amp; Ethnicity at UMD</h1>
+
+<div class="tools-article">
+	<p>The graph below shows the demographic breakdown by race and ethnicity of undergraduates at the University of Maryland &mdash; College Park from 1975 &ndash; 2016 for Fall enrollment.</p>
+
+	<p>The graph appears as a percentage, but can be viewed as the total undergraduate student population by clicking the "View as total" button below.</p>
+</div>
+
+<div class="text-center">
+	<button type="button" class="btn btn-primary" id="change-view">View as total</button>
+</div>
+
+<br />
+
+<div id="graph-wrapper">
+	<canvas id="graph" alt="A graph showing the demographic breakdown by race and ethnicity of undergraduates at the University of Maryland, College Park from 1975 until 2016. Over time, the percentage of white students decreases."></canvas>
+</div>
+
+<hr>
+
+<div class="tools-article">
+	<p>The groups "Native Hawaiian or Other Pacific Islander" and "Two or more" were not tracked until 2010.</p>
+
+	<p>The full name of "Black" is "Black or African American". The full name of "American Indian" is "American Indian or Alaska Native". The full name of "Native Hawaiian" is "Native Hawaiian or Other Pacific Islander". These names are shortened on the key.</p>
+
+	<p>Data is not guaranteed to be correct.</p>
+
+	<p style="padding-bottom: 10px;"><em>Data source: <a href="https://www.irpa.umd.edu/Publications/pub_enroll.html" target="_blank">UMD Office of Institutional Research, Planning &amp; Assessment</a></em>.</p>
+</div>
+
+<script>
+	$(document).ready(function() {
+		// From https://stackoverflow.com/a/2901298/2150542
+		const numberWithCommas = (x) => {
+			return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+		}
+
+		var coursesCanvas = document.getElementById("graph");
+
+		var canvas = coursesCanvas.getContext("2d");
+
+		var num_datasets = [
+			{
+				label: "White",
+				data: [21948,22630,23508,22634,22704,23610,24303,23822,23630,23755,23993,23651,22708,21134,19888,18513,17835,16214,15342,15228,15351,15142,14745,14803,14727,14596,14904,15036,15026,14619,14442,14110,14617,15091,15372,15468,15055,14684,14226,14086,14175,14324],
+				backgroundColor: "hsl(181, 100%, 50%)"
+			},
+			{
+				label: "Unknown",
+				data: [2972,2626,2373,2407,2338,2059,676,603,283,369,202,132,91,85,101,93,136,155,238,362,411,567,788,971,1089,1195,1392,1493,1694,1959,2233,2127,2039,1869,1523,858,900,863,785,582,466,484],
+				backgroundColor: "hsl(264, 100%, 50%)"
+			},
+			{
+				label: "Black",
+				data: [1896,2074,2247,2165,2206,2307,2342,2278,2373,2551,2633,2696,2735,2700,2750,2795,2821,2625,2773,2925,3218,3401,3545,3527,3509,3403,3286,3126,3131,3047,3183,3255,3370,3470,3299,3195,3256,3220,3326,3447,3499,3669],
+				backgroundColor: "hsl(87, 100%, 50%)"
+			},
+			{
+				label: "Foreign",
+				data: [795,877,1119,1360,1645,569,622,632,670,721,714,736,716,719,687,654,677,683,823,799,802,808,817,765,716,753,719,710,619,602,567,574,572,548,598,633,727,799,859,1022,1119,1311],
+				backgroundColor: "hsl(40, 100%, 50%)"
+			},
+			{
+				label: "Asian",
+				data: [345,395,420,438,488,1097,1352,1472,1723,2016,2215,2318,2453,2423,2535,2672,2899,3024,3191,3425,3497,3446,3365,3433,3356,3390,3461,3473,3502,3447,3477,3546,3645,3857,4041,4012,3978,3957,4117,4299,4452,4655],
+				backgroundColor: "hsl(325, 100%, 50%)"
+			},
+			{
+				label: "Hispanic",
+				data: [268,277,286,314,344,555,604,638,704,702,701,736,751,770,828,870,915,856,893,926,1025,1105,1133,1218,1251,1234,1274,1333,1400,1390,1447,1445,1517,1558,1637,1927,2022,2102,2335,2490,2562,2775],
+				backgroundColor: "hsl(237, 100%, 50%)"
+			},
+			{
+				label: "American Indian",
+				data: [337,233,155,104,110,117,103,119,127,117,98,93,95,71,74,74,78,73,71,59,69,60,61,59,69,67,63,69,74,76,93,97,97,82,72,47,40,35,33,36,36,30],
+				backgroundColor: "hsl(137, 100%, 50%)"
+			},
+			{
+				label: "Two or more",
+				data: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,745,813,851,956,1073,1114,1205],
+				backgroundColor: "hsl(36, 100%, 50%)"
+			},
+			{
+				label: "Native Hawaiian",
+				data: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,37,35,27,21,21,20,19],
+				backgroundColor: "hsl(4, 100%, 50%)"
+			}
+		];
+
+		var percent_datasets = [
+			{
+				label: "White",
+				data: [76.85,77.73,78.08,76.93,76.10,77.88,81.00,80.58,80.07,78.58,78.52,77.90,76.85,75.74,74.03,72.12,70.32,68.62,65.76,64.19,62.98,61.73,60.30,59.75,59.58,59.24,59.38,59.57,59.05,58.15,56.76,56.09,56.53,57.00,57.92,57.45,56.12,55.33,53.36,52.06,51.65,50.31],
+				backgroundColor: "hsl(181, 100%, 50%)"
+			},
+			{
+				label: "Unknown",
+				data: [10.41,9.02,7.88,8.18,7.84,6.79,2.25,2.04,0.96,1.22,0.66,0.43,0.31,0.30,0.38,0.36,0.54,0.66,1.02,1.53,1.69,2.31,3.22,3.92,4.41,4.85,5.55,5.92,6.66,7.79,8.78,8.46,7.89,7.06,5.74,3.19,3.35,3.25,2.94,2.15,1.70,1.70],
+				backgroundColor: "hsl(264, 100%, 50%)"
+			},
+			{
+				label: "Black",
+				data: [6.64,7.12,7.46,7.36,7.39,7.61,7.81,7.71,8.04,8.44,8.62,8.88,9.26,9.68,10.24,10.89,11.12,11.11,11.89,12.33,13.20,13.87,14.50,14.24,14.20,13.81,13.09,12.39,12.30,12.12,12.51,12.94,13.03,13.11,12.43,11.87,12.14,12.13,12.48,12.74,12.75,12.89],
+				backgroundColor: "hsl(87, 100%, 50%)"
+			},
+			{
+				label: "Foreign",
+				data: [2.78,3.01,3.72,4.62,5.51,1.88,2.07,2.14,2.27,2.38,2.34,2.42,2.42,2.58,2.56,2.55,2.67,2.89,3.53,3.37,3.29,3.29,3.34,3.09,2.90,3.06,2.86,2.81,2.43,2.39,2.23,2.28,2.21,2.07,2.25,2.35,2.71,3.01,3.22,3.78,4.08,4.60],
+				backgroundColor: "hsl(40, 100%, 50%)"
+			},
+			{
+				label: "Asian",
+				data: [1.21,1.36,1.39,1.49,1.64,3.62,4.51,4.98,5.84,6.67,7.25,7.63,8.30,8.68,9.44,10.41,11.43,12.80,13.68,14.44,14.35,14.05,13.76,13.86,13.58,13.76,13.79,13.76,13.76,13.71,13.67,14.10,14.10,14.57,15.22,14.90,14.83,14.91,15.44,15.89,16.22,16.35],
+				backgroundColor: "hsl(325, 100%, 50%)"
+			},
+			{
+				label: "Hispanic",
+				data: [0.94,0.95,0.95,1.07,1.15,1.83,2.01,2.16,2.39,2.32,2.29,2.42,2.54,2.76,3.08,3.39,3.61,3.62,3.83,3.90,4.21,4.50,4.63,4.92,5.06,5.01,5.08,5.28,5.50,5.53,5.69,5.74,5.87,5.88,6.17,7.16,7.54,7.92,8.76,9.20,9.34,9.75],
+				backgroundColor: "hsl(237, 100%, 50%)"
+			},
+			{
+				label: "American Indian",
+				data: [1.18,0.80,0.51,0.35,0.37,0.39,0.34,0.40,0.43,0.39,0.32,0.31,0.32,0.25,0.28,0.29,0.31,0.31,0.30,0.25,0.28,0.24,0.25,0.24,0.28,0.27,0.25,0.27,0.29,0.30,0.37,0.39,0.38,0.31,0.27,0.17,0.15,0.13,0.12,0.13,0.13,0.11],
+				backgroundColor: "hsl(137, 100%, 50%)"
+			},
+			{
+				label: "Two or more",
+				data: [0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,2.77,3.03,3.21,3.59,3.97,4.06,4.23],
+				backgroundColor: "hsl(36, 100%, 50%)"
+			},
+			{
+				label: "Native Hawaiian",
+				data: [0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.14,0.13,0.10,0.08,0.08,0.07,0.07],
+				backgroundColor: "hsl(4, 100%, 50%)"
+			}
+		];
+
+
+		var data = {
+			labels: ["1975", "1976", "1977", "1978", "1979", "1980", "1981", "1982", "1983", "1984", "1985", "1986", "1987", "1988", "1989", "1990", "1991", "1992", "1993", "1994", "1995", "1996", "1997", "1998", "1999", "2000", "2001", "2002", "2003", "2004", "2005", "2006", "2007", "2008", "2009", "2010", "2011", "2012", "2013", "2014", "2015", "2016"]
+		};
+
+
+		var options = {
+			responsive: true,
+			maintainAspectRatio: false,
+			scales: {
+				xAxes: [{
+					scaleLabel: {
+						display: true,
+						labelString: "Year"
+					}
+				}],
+				yAxes: [{
+					stacked: true,
+					ticks: {
+						min: 0,
+						callback: function(value) {return value + "%";}
+					},
+					scaleLabel: {
+						display: true,
+						labelString: "% of Undergraduate Population"
+					}
+				}]
+			},
+			tooltips: {
+				callbacks: {
+					// Modified from https://github.com/chartjs/Chart.js/blob/master/src/core/core.tooltip.js#L65-L73
+					label: function(tooltipItem, data) {
+						var label = data.datasets[tooltipItem.datasetIndex].label || '';
+
+						if (label) {
+							label += ': ';
+						}
+
+						label += tooltipItem.yLabel;
+						label += "%";
+						return label;
+					}
+				}
+			}
+		};
+
+		var changeViewButton = $("#change-view");
+
+		changeViewButton.on('click', function() {
+			if (typeof graph !== 'undefined') {
+				graph.destroy();
+			}
+
+			if (changeViewButton.html() === "View as total") {
+				data['datasets'] = num_datasets;
+				options['scales']['yAxes'][0]['ticks']['max'] = 35000;
+				options['scales']['yAxes'][0]['ticks']['callback'] = function(value) {return numberWithCommas(value);};
+				options['scales']['yAxes'][0]['scaleLabel']['labelString'] = "Number of Undergraduates";
+				options['tooltips']['callbacks']['label'] = function(tooltipItem, data) {
+					var label = data.datasets[tooltipItem.datasetIndex].label || '';
+
+					if (label) {
+						label += ': ';
+					}
+
+					label += numberWithCommas(tooltipItem.yLabel);
+					return label;
+				};
+
+				changeViewButton.html("View as percentage");
+			}
+			else {
+				data['datasets'] = percent_datasets;
+				options['scales']['yAxes'][0]['ticks']['max'] = 100;
+				options['scales']['yAxes'][0]['ticks']['callback'] = function(value) {return value + "%";};
+				options['scales']['yAxes'][0]['scaleLabel']['labelString'] = "% of Undergraduate Population";
+				options['tooltips']['callbacks']['label'] = function(tooltipItem, data) {
+					var label = data.datasets[tooltipItem.datasetIndex].label || '';
+
+					if (label) {
+						label += ': ';
+					}
+
+					label += tooltipItem.yLabel;
+					label += "%";
+					return label;
+				};
+				changeViewButton.html("View as total");
+			}
+
+			graph = new Chart(canvas, {
+				type: 'line',
+				data: data,
+				options: options
+			});
+		});
+
+		data['datasets'] = percent_datasets;
+		options['scales']['yAxes'][0]['ticks']['max'] = 100;
+
+		graph = new Chart(canvas, {
+			type: 'line',
+			data: data,
+			options: options
+		});
+	});
+</script>
+{% endblock %}
