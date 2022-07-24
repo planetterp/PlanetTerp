@@ -140,7 +140,7 @@ def slug_in_use_err(slug: str, name: str):
 _ttl_cache = {}
 def ttl_cache(max_age):
     """
-    An @cache, instead of caching indefinitely, only caches for `max_age`
+    An @cache, but instead of caching indefinitely, only caches for `max_age`
     seconds.
 
     That is, at the first function call with certain arguments, the result is
