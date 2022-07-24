@@ -9,7 +9,7 @@ from django.core import validators
 from django.db.models import (Model, CharField, DateTimeField, TextField,
     IntegerField, BooleanField, ForeignKey, PositiveIntegerField, EmailField,
     CASCADE, ManyToManyField, SlugField, TextChoices, FloatField, Manager,
-    QuerySet, Sum, UniqueConstraint, Index, Count, Max)
+    QuerySet, Sum, UniqueConstraint, Index, Count, Max, Q)
 
 class GradeQuerySet(QuerySet):
 
@@ -80,11 +80,33 @@ class RecentCourseManager(Manager):
     def get_queryset(self):
         from home.utils import Semester
         # a course is "recent" if we have a grade record for it since
-        # Semester(201201).
+        # `Semester(201201)`, or if it was taught at all since
+        # `Semester(201201)`.
+        #
+        # A course could be matched by the second, but not the first, condition
+        # if the course will be taught next semester but we don't have grade
+        # data for it yet.
+        #
+        # A course could be matched by the first, but not the second, condition
+        # if the course has grade data more recent than 201201, but hasn't been
+        # taught in the past ~1 year, which would cause it to appear in
+        # professorcourse_recent_semester, which tracks which professors to
+        # display on course pages as "previously taught this course".
+        #
+        # The reason these two are not identical conditions is because the time
+        # frame for a course to be considered recently taught (~10 years) and
+        # the time frame for a professor to be considered having recently taught
+        # a course may not be the same.
         return (
             super().get_queryset()
             .annotate(max_semester=Max("grade__semester"))
-            .filter(max_semester__gte=Semester(201201))
+            .annotate(most_recent_semester=Max(
+                "professorcourse__recent_semester")
+            )
+            .filter(
+                Q(max_semester__gte=Semester(201201)) |
+                Q(most_recent_semester__gte=Semester(201201))
+            )
         )
 
 class UserManager(DjangoUserManager):
@@ -486,6 +508,11 @@ class Organization(Model):
 class ProfessorCourse(Model):
     class Meta:
         db_table = "home_professor_course"
+        # we need fast lookups on recent_semester, eg for our
+        # `RecentCourseManager`
+        indexes = [
+            Index(fields=["recent_semester"])
+        ]
 
     professor = ForeignKey(Professor, CASCADE)
     course = ForeignKey(Course, CASCADE)
