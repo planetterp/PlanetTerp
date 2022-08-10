@@ -135,9 +135,10 @@ class HistoricCourseGradeForm(Form):
         self.field_errors = self.create_field_errors()
 
         self.helper = FormHelper()
-        self.helper.field_class = 'col-sm-4'
+        self.helper.field_class = 'col-md-5'
         self.helper.label_class = 'col-form-label'
         self.helper.form_id = "course-lookup-form"
+        self.helper.form_show_labels = False
         self.helper.form_show_errors = False
         self.helper.layout = self.generate_layout()
 
@@ -246,9 +247,10 @@ class HistoricProfessorGradeForm(Form):
 
         self.helper = FormHelper()
         self.helper.form_class = 'justify-content-right'
-        self.helper.field_class = 'col-sm-5'
+        self.helper.field_class = 'col-md-5'
         self.helper.label_class = 'col-form-label'
         self.helper.form_id = "professor-lookup-form"
+        self.helper.form_show_labels = False
         self.helper.form_show_errors = False
         self.helper.layout = self.generate_layout()
 
