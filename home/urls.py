@@ -9,7 +9,6 @@ from home.views.basic import (About, Contact, PrivacyPolicy, TermsOfUse,
     Courses, Professors, Documents, SetColorScheme, Robots, CourseReviews,
     Index, SortReviewsTable, RecomputeTTLCache, UserProfile, Ads)
 from home.views.grades import Grades
-from home.views.statistics import Statistics
 from home.views.course import Course
 from home.views.data_sources import GradeData, CourseDifficultyData, GenedData
 from home.views.endpoints import Autocomplete
@@ -17,7 +16,7 @@ from home.views.professor import Professor
 from home.views.profile import Profile, ResetPassword
 from home.views.search import Search
 from home.views.tools import (Tools, ToolDemographics, ToolPopularCourses,
-    ToolGradeInflation, ToolGeneds, ToolCourseDifficulty)
+    ToolGradeInflation, ToolGeneds, ToolCourseDifficulty, ToolStatistics)
 from home.models import Course as CourseModel, Professor as ProfessorModel
 
 
@@ -131,7 +130,6 @@ urlpatterns = [
     path('course/<course:name>/reviews', CourseReviews.as_view(), name='course-reviews'),
     path('admin', Admin.as_view(), name='admin'),
     path('add_professor', AddProfessor.as_view(), name='add-professor'),
-    path("statistics", Statistics.as_view(), name="statistics"),
     path('grades', Grades.as_view(), name='grades'),
 
     # profile
@@ -146,4 +144,5 @@ urlpatterns = [
     path('tools/geneds', ToolGeneds.as_view(), name='tools-geneds'),
     path('tools/gradeinflation', ToolGradeInflation.as_view(), name='tools-grade-inflation'),
     path('tools/popularcourses', ToolPopularCourses.as_view(), name='tools-popular-courses'),
+    path('tools/statistics', ToolStatistics.as_view(), name='tools-statistics'),
 ]
