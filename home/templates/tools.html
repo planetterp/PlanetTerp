@@ -1,4 +1,5 @@
 {% extends "base_main.html" %}
+{% load static %}
 
 {% block title %}Tools | PlanetTerp{% endblock %}
 {% block description %}Various tools relating to the University of Maryland &mdash; College Park.{% endblock %}
@@ -47,37 +48,37 @@
 
 	<div class="row mb-4">
 		<div class="col-3">
-			<a href="/tools/demographics" class="card">
-				<img class="card-img-bottom fit-contain" src="static/images/tools/raceandethnicity.png" height="300px" alt="A screenshot of a graph showing the demographic breakdown by race and ethnicity of undergraduates at the University of Maryland, College Park from 1975 until 2016. Over time, the percentage of white students decreases.">
+			<a href="{% url 'tools-demographics' %}" class="card">
+				<img class="card-img-bottom fit-contain" src="{% static 'images/tools/raceandethnicity.png' %}" height="300px" alt="A screenshot of a graph showing the demographic breakdown by race and ethnicity of undergraduates at the University of Maryland, College Park from 1975 until 2016. Over time, the percentage of white students decreases.">
 				<div class="card-body">
-					<h5 class="card-title text-center">40 Years of Race & Ethnicity</h5>
+					<h5 class="card-title text-center mb-0">40 Years of Race & Ethnicity</h5>
 				</div>
 			</a>
 		</div>
 
 		<div class="col-3">
-			<a href="/tools/popularcourses" class="card">
-				<img class="card-img-bottom fit-contain" src="static/images/tools/popularcourses.png" height="300px" alt="A screenshot of a doughnut chart that displays the most popular courses at the University of Maryland, College Park. A user can enter a search term to see the most popular courses containing that term.">
+			<a href="{% url 'tools-popular-courses' %}" class="card">
+				<img class="card-img-bottom fit-contain" src="{% static 'images/tools/popularcourses.png' %}" height="300px" alt="A screenshot of a doughnut chart that displays the most popular courses at the University of Maryland, College Park. A user can enter a search term to see the most popular courses containing that term.">
 				<div class="card-body">
-					<h5 class="card-title text-center">Popular Courses</h5>
+					<h5 class="card-title text-center mb-0">Popular Courses</h5>
 				</div>
 			</a>
 		</div>
 
 		<div class="col-3">
-			<a href="/tools/coursedifficulty" class="card">
-				<img class="card-img-bottom fit-contain" src="static/images/tools/coursedifficulty.png" height="300px" alt="A screenshot of a page titled &quot;Easiest &amp; Hardest Courses &amp; Departments at UMD&quot;. UMD stands for University of Maryland. There are two tables with headers &quot;Difficulty by department&quot; and &quot;Difficulty by course&quot;. These list each department and course on PlanetTerp as well as their average GPA and the number of students in each.">
+			<a href="{% url 'tools-course-difficulty' %}" class="card">
+				<img class="card-img-bottom fit-contain" src="{% static 'images/tools/coursedifficulty.png' %}" height="300px" alt="A screenshot of a page titled &quot;Easiest &amp; Hardest Courses &amp; Departments at UMD&quot;. UMD stands for University of Maryland. There are two tables with headers &quot;Difficulty by department&quot; and &quot;Difficulty by course&quot;. These list each department and course on PlanetTerp as well as their average GPA and the number of students in each.">
 				<div class="card-body">
-					<h5 class="card-title text-center">Course Difficulty</h5>
+					<h5 class="card-title text-center mb-0">Course Difficulty</h5>
 				</div>
 			</a>
 		</div>
 
 		<div class="col-3">
-			<a href="/tools/geneds" class="card">
-				<img class="card-img-bottom fit-contain" src="static/images/tools/geneds.png" height="300px" alt="A screenshot of a page titled &quot;Search Courses By General Education Requirements&quot;. The page contains checkboxes of a list of general education requirements, such as DSHS (History and Social Sciences). Toward the bottom of the page a table can be seen listing courses, course titles, number of credits, and average GPAs. For example, the title of ANTH265 is Anthropology of Global Health, it is 3 credits, and it has an average GPA of 3.62.">
+			<a href="{% url 'tools-geneds' %}" class="card">
+				<img class="card-img-bottom fit-contain" src="{% static 'images/tools/geneds.png' %}" height="300px" alt="A screenshot of a page titled &quot;Search Courses By General Education Requirements&quot;. The page contains checkboxes of a list of general education requirements, such as DSHS (History and Social Sciences). Toward the bottom of the page a table can be seen listing courses, course titles, number of credits, and average GPAs. For example, the title of ANTH265 is Anthropology of Global Health, it is 3 credits, and it has an average GPA of 3.62.">
 				<div class="card-body">
-					<h5 class="card-title text-center">Search Courses By Geneds</h5>
+					<h5 class="card-title text-center mb-0">Search Courses By Geneds</h5>
 				</div>
 			</a>
 		</div>
@@ -85,22 +86,23 @@
 
 	<div class="row mb-4">
 		<div class="col-6">
-			<a href="/tools/gradeinflation" class="card">
-				<img class="card-img-bottom fit-contain" src="static/images/tools/gradeinflation.png" height="300px" alt="A screenshot of a page titled &quot;Grade Inflation at UMD&quot;. The page contains a chart that allows users to input a department or course. After the user searches, a chart appears that shows the average GPA for that department or course from 1998 until 2019.">
+			<a href="{% url 'tools-grade-inflation' %}" class="card">
+				<img class="card-img-bottom fit-contain" src="{% static 'images/tools/gradeinflation.png' %}" height="300px" alt="A screenshot of a page titled &quot;Grade Inflation at UMD&quot;. The page contains a chart that allows users to input a department or course. After the user searches, a chart appears that shows the average GPA for that department or course from 1998 until 2019.">
 				<div class="card-body">
-					<h5 class="card-title text-center">Grade Inflation</h5>
+					<h5 class="card-title text-center mb-0">Grade Inflation</h5>
 				</div>
 			</a>
 		</div>
 
 		<div class="col-6">
-			<a href="/tools/statistics" class="card">
-				<img class="card-img-bottom fit-contain" src="static/images/tools/stats.png" height="300px" alt="A screenshot of a page titled &quot;PlanetTerp Statistics&quot;. The page ...">
+			<a href="{% url 'tools-statistics' %}" class="card">
+				<img class="card-img-bottom fit-contain" src="{% static 'images/tools/stats.png' %}" height="300px" alt="A screenshot of a page titled &quot;PlanetTerp Statistics&quot;. The page ...">
 				<div class="card-body">
-					<h5 class="card-title text-center">PlanetTerp Statistics</h5>
+					<h5 class="card-title text-center mb-0">PlanetTerp Statistics</h5>
 				</div>
 			</a>
 		</div>
 	</div>
+	<br>
 </div>
 {% endblock %}
