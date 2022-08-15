@@ -3,7 +3,6 @@ from datetime import timedelta
 
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.template.context_processors import csrf
-from django.utils.safestring import mark_safe
 from django.shortcuts import redirect, render
 from django.contrib.auth import login, logout
 from django.http.response import JsonResponse
@@ -15,6 +14,7 @@ from crispy_forms.utils import render_crispy_form
 
 from home.models import User, ResetCode
 from home.forms.auth_forms import LoginForm, RegisterForm, ForgotPasswordForm
+from home.utils import send_email
 
 class Login(View):
     template = "login_register.html"
@@ -75,24 +75,13 @@ class ForgotPassword(View):
             # token_hex generates two hex digits per number, so halve our length
             reset_code = secrets.token_hex(int(self.RESET_LINK_LENGTH / 2))
             email_url = request.build_absolute_uri(reverse('reset-password', args=[reset_code]))
-            message = (
-                f"Dear {user.username},\n\nA request has been made to reset your password. To do "
-                f"so, please follow this link: \n{email_url}\n\n If you did not "
-                "request a password reset, you can safely disregard this email."
-            )
-            html_message = mark_safe(
-                f"Dear {user.username},<br />A request has been made to reset your password. To do "
+            message = (f"Dear {user.username},<br /><br />A request has been made to "
+                "reset your password. To do "
                 f'so, please follow <a href="{email_url}">this</a> link. '
                 "<br /><br /> If you did not request a password reset, you may "
-                "safely disregard this email."
+                "safely disregard this email.")
 
-            )
-
-            user.email_user(
-                subject="Planetterp Password Reset",
-                message=message,
-                html_message=html_message
-            )
+            send_email(user, "Planetterp Password Reset", message)
 
             expires_at = now() + timedelta(days=1)
             reset_code = ResetCode(user_id=user.id, reset_code=reset_code,
