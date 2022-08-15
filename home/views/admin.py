@@ -65,7 +65,7 @@ class Admin(UserPassesTestMixin, View):
 
         if action_type is AdminAction.REVIEW_VERIFY:
             verified_status = Review.Status(data["verified"])
-            review_id = int(data["review_id"])
+            review_id = int(data["id_"])
             return self.verify_review(review_id, verified_status, user)
 
         if action_type is AdminAction.REVIEW_HELP:
