@@ -176,7 +176,7 @@ class Admin(UserPassesTestMixin, View):
 
         elif action_type is AdminAction.PROFESSOR_DELETE:
             professor_id = int(data["id_"])
-            professor_type = str(data["professor_type"])
+            professor_type = Professor.unfiltered.get(pk=professor_id).type
             has_reviews = Review.unfiltered.filter(professor__id=professor_id).exists()
             has_grades = Grade.unfiltered.filter(professor__id=professor_id).exists()
             has_courses = ProfessorCourse.objects.filter(professor__id=professor_id).exists()
@@ -194,11 +194,16 @@ class Admin(UserPassesTestMixin, View):
                 professor_data.append("course")
 
             if any(professor_data):
-                if len(professor_data) > 1:
-                    professor_data[-1] = "and" + professor_data[-1]
+                lst_str = professor_data[0]
+
+                if len(professor_data) == 2:
+                    lst_str = f"{professor_data[0]} and {professor_data[1]}"
+                elif len(professor_data) == 3:
+                    professor_data[-1] = "and " + professor_data[-1]
+                    lst_str = ', '.join(professor_data)
 
                 response["error_msg"] = (
-                    f"This {professor_type} still has {', '.join(professor_data)} data and cannot be "
+                    f"This {professor_type} still has {lst_str} data and cannot be "
                     f"deleted! Please merge this {professor_type} then try again."
                 )
             else:
