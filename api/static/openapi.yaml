@@ -3,7 +3,7 @@ servers:
   - description: "PlanetTerp API"
     url: https://api.planetterp.com/v1
 info:
-  description: >-
+  description: |
     Welcome to [PlanetTerp](https://planetterp.com)'s API. This API provides access to data relating to courses, professors, and grade data at UMD.
 
     Base URL: https://planetterp.com/api/v1
@@ -281,6 +281,9 @@ components:
         credits:
           type: integer
           example: 3
+        average_gpa:
+          type: number
+          example: 3.127
         professors:
           type: array
           items:
