@@ -288,7 +288,7 @@ components:
           type: array
           items:
             type: string
-            example: ["Jon Snow", "Tyrion Lannister"]
+          example: ["Jon Snow", "Tyrion Lannister"]
     Professor:
       required:
         - name
