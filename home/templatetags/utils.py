@@ -3,6 +3,7 @@ from django.urls import reverse
 from django.templatetags.static import static
 
 from home import utils
+from planetterp import config
 
 
 register = template.Library()
@@ -26,3 +27,8 @@ def full_static(context, name):
 @register.simple_tag
 def current_semester():
     return utils.Semester.current().number()
+
+# https://stackoverflow.com/a/7716141
+@register.simple_tag
+def config_value(name):
+    return getattr(config, name, "")
