@@ -40,7 +40,7 @@
 			<div>
 				<span style="font-size: 18px;">Other Student-run Organizations</span>
 			</div>
-			<a href="{{ random_organization.url }}" target="_blank"><img src="{% get_static_prefix %}images/organizations/{{ random_organization.image_file_name }}" style="width: {{ random_organization.width }}px; height: {{ random_organization.height }}px;" alt='{{ random_organization.alt }}'></a>
+			<a href="{{ random_organization.url }}" target="_blank"><img src="{% get_static_prefix %}images/organizations/{{ random_organization.image_file_name }}" style="width: {{ random_organization.width }}px; height: {{ random_organization.height }}px;" alt='{{ random_organization.alt_text }}'></a>
 			<br><a href="{% url 'about' %}#organizations"><small>Want to add your organization?</small></a>
 		</div>
 
