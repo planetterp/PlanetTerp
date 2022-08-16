@@ -29,7 +29,7 @@
 </div>
 
 <script>
-	$("#login-form").submit(function(e) {
+	function submitLoginForm(e) {
 		$.ajax({
 			type: "POST",
 			url: "{% url 'login' %}",
@@ -44,9 +44,9 @@
 			}
 		});
 		e.preventDefault();
-	});
+	}
 
-	$("#register-form").submit(function(e) {
+	function submitRegisterForm(e) {
 		$.ajax({
 			type: "POST",
 			url: "{% url 'register' %}",
@@ -61,9 +61,9 @@
 			}
 		});
 		e.preventDefault();
-	});
+	}
 
-	$("#reset-password-form").submit(function(e) {
+	function submitPasswordResetForm(e) {
 		$.ajax({
 			type: "POST",
 			url: "{% url 'password-reset' %}",
@@ -77,7 +77,7 @@
 			}
 		});
 		e.preventDefault();
-	});
+	}
 
 </script>
 {% endblock %}
