@@ -1,6 +1,6 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http.response import HttpResponseBadRequest, JsonResponse
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 from django.views import View
 from django.contrib.auth import login
 from django.template.context_processors import csrf
@@ -87,8 +87,8 @@ class ResetPassword(View):
         ctx.update(csrf(request))
         form_html = render_crispy_form(form, form.helper, context=ctx)
         context = {
-            "success": False,
-            "form": form_html
+            "form" : form_html,
+            "success": False
         }
 
         if form.is_valid():
@@ -99,8 +99,9 @@ class ResetPassword(View):
 
             cleaned_reset_code.invalid = True
             cleaned_reset_code.save()
+            context["success"] = True
 
             login(request, user)
-            context['success'] = True
+
 
         return JsonResponse(context)
