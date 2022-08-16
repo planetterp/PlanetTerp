@@ -1,3 +1,4 @@
+from turtle import onclick
 from django.forms import CharField, EmailField, PasswordInput
 from django.forms.widgets import HiddenInput
 from django.core.exceptions import ValidationError
@@ -5,7 +6,7 @@ from django.utils.safestring import mark_safe
 from django.contrib.auth import authenticate
 from django.forms import ModelForm, Form
 
-from crispy_forms.layout import Layout, Div, Field, HTML, Submit
+from crispy_forms.layout import Layout, Div, Field, HTML, Button, Submit
 from crispy_forms.helper import FormHelper
 from crispy_forms.bootstrap import Modal
 
@@ -57,10 +58,11 @@ class LoginForm(ModelForm):
                 ),
                 css_class="pb-2"
             ),
-            Submit(
+            Button(
                 "submit",
-                'Login',
-                css_class="btn-primary"
+                "Login",
+                css_class="btn-primary",
+                onclick="submitLoginForm()"
             )
         )
 
@@ -161,10 +163,11 @@ class RegisterForm(ModelForm):
                 self.field_errors['password'],
                 css_class="password-container mb-1"
             ),
-            Submit(
-                'submit',
-                'Register',
-                css_class="btn-primary mt-2"
+            Button(
+                "submit",
+                "Register",
+                css_class="btn-primary mt-2",
+                onclick="submitRegisterForm()"
             )
         )
 
@@ -201,10 +204,11 @@ class ForgotPasswordForm(Form):
                         </div>
                     {% endif %}
                 '''),
-                Submit(
+                Button(
                     "submit",
                     "Send Reset Email",
                     css_class="btn-primary mt-3",
+                    onclick="submitPasswordResetForm()"
                 ),
                 css_id="password-reset-modal",
                 title_id="password-reset-title",
@@ -269,10 +273,11 @@ class ResetPasswordForm(ModelForm):
                     </div>
                 {% endif %}
             '''),
-            Submit(
+            Button(
                 "submit",
                 "Reset Password",
-                css_class="btn-primary mt-3"
+                css_class="btn-primary mt-3",
+                onClick="submitResetPasswordForm()"
             )
         )
 
