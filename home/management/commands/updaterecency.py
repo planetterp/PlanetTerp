@@ -25,9 +25,13 @@ class Command(BaseCommand):
         # the time frame for a professor to be considered having recently taught
         # a course may not be the same.
 
-        # recent recency
+        print("updating recency")
+
+        print("setting all courses is_recent to false")
+        # reset recency
         Course.unfiltered.update(is_recent=False)
 
+        print("setting is_recent to true for recent courses")
         # actually update recency
         (
             Course.unfiltered
@@ -41,3 +45,4 @@ class Command(BaseCommand):
             )
             .update(is_recent=True)
         )
+        print("finished updating recency")
