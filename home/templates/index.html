@@ -86,10 +86,16 @@
 				{% endif %}
 				<footer class="blockquote-footer">
 					<em>
-						{% if not review.anonymous or user and user.is_staff %}
-						{{ review.user.username }}
+						<!--
+							django can't handle parenthesis in if statements for order of operations :/ so
+							split into multiple cases
+						 -->
+						{% if user.is_staff and review.user %}
+							{{ review.user.username }}
+						{% elif review.user and not review.anonymous %}
+							{{ review.user.username }}
 						{% else %}
-						Anonymous
+							Anonymous
 						{% endif %}
 					</em>
 				</footer>
