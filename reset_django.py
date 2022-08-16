@@ -7,7 +7,7 @@ db_name = os.environ.get("PLANETTERP_MYSQL_DB_NAME", "planetterp")
 db = web.database(dbn='mysql', db=db_name, user=USER, pw=PASSWORD, charset='utf8mb4')
 
 
-os.system("python3 manage.py makemigrations")
+os.system("sudo python3.9 manage.py makemigrations")
 # django_site needs to be dropped before migrating for the first time or we
 # might try to create it again.
 #
@@ -19,7 +19,7 @@ DROP TABLE IF EXISTS
 ''')
 """
 
-os.system("python3 manage.py migrate")
+os.system("sudo python3.9 manage.py migrate")
 db.query('''
     DROP TABLE IF EXISTS
     `planetterp`.`auth_group`,
@@ -47,5 +47,5 @@ db.query('''
     `planetterp`.`home_user_user_permissions`,
     `planetterp`.`home_user`
 ''')
-os.system("python3 manage.py migrate home zero --fake")
-os.system("python3 manage.py migrate")
+os.system("sudo python3.9 manage.py migrate home zero --fake")
+os.system("sudo python3.9 manage.py migrate")
