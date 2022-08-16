@@ -28,7 +28,6 @@ def full_static(context, name):
 def current_semester():
     return utils.Semester.current().number()
 
-# https://stackoverflow.com/a/7716141
 @register.simple_tag
 def config_value(name):
     return getattr(config, name, "")
