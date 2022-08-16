@@ -14,7 +14,6 @@ from discord_webhook.webhook import DiscordEmbed
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
 
-from home.models import Professor, Review
 from planetterp.config import (WEBHOOK_URL_UPDATE, EMAIL_HOST_USER,
     EMAIL_SERVICE_ACCOUNT_CREDENTIALS)
 
@@ -200,6 +199,8 @@ def recompute_ttl_cache():
         _ttl_cache[key] = value
 
 def send_updates_webhook(request, *, include_professors=True, include_reviews=True):
+    # avoid circular imports
+    from home.models import Professor, Review
     if not WEBHOOK_URL_UPDATE:
         return
 
