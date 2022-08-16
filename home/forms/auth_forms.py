@@ -61,7 +61,7 @@ class LoginForm(ModelForm):
                 "submit",
                 "Login",
                 css_class="btn-primary",
-                onclick="submitLoginForm()"
+                onclick="submitLoginForm(event)"
             )
         )
 
@@ -165,7 +165,8 @@ class RegisterForm(ModelForm):
             Submit(
                 "submit",
                 "Register",
-                css_class="btn-primary mt-2"
+                css_class="btn-primary mt-2",
+                onclick="submitRegisterForm(event)"
             )
         )
 
@@ -273,7 +274,8 @@ class ResetPasswordForm(ModelForm):
             Submit(
                 "submit",
                 "Reset Password",
-                css_class="btn-primary mt-3"
+                css_class="btn-primary mt-3",
+                onclick="submitPasswordResetForm(event)"
             )
         )
 
