@@ -59,6 +59,14 @@ python manage.py migrate
 # planetterp.
 # This command will take a while (about 15 minutes) to run.
 python manage.py loaddata home/fixtures/initial
+# courses which have been taught in the past 10 years are considered "recent".
+# courses which are not recent are hidden from some displays like search
+# and courses taught. Calculating whether a course is recent can be very
+# expensive if done on the fly, so we cache it in a database column and require
+# manual updates.
+# If you skip this step, you site will appear as if it has no courses loaded,
+# since recency defaults to false.
+python manage.py updaterecency
 ```
 
 To start the server:
