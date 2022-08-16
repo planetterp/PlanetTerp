@@ -206,7 +206,8 @@ class ForgotPasswordForm(Form):
                 Submit(
                     "submit",
                     "Send Reset Email",
-                    css_class="btn-primary mt-3"
+                    css_class="btn-primary mt-3",
+                    onclick="submitPasswordResetForm(event)"
                 ),
                 css_id="password-reset-modal",
                 title_id="password-reset-title",
