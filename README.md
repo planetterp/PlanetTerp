@@ -61,7 +61,7 @@ python manage.py migrate
 python manage.py loaddata home/fixtures/initial
 ```
 
-Now simply run the following to start the server:
+To start the server:
 
 ```bash
 python manage.py runserver
