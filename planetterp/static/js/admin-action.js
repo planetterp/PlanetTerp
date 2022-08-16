@@ -10,6 +10,10 @@ const responses = {
         SUCCESS: verifyProfessorSuccess,
         ERROR: verifyProfessorError
     },
+    "professor_delete": {
+        SUCCESS: verifyProfessorSuccess,
+        ERROR: verifyProfessorError
+    },
     "professor_edit": {
         SUCCESS: editProfessorSuccess,
         ERROR: editProfessorError
@@ -85,7 +89,9 @@ function verifyProfessorSuccess(data, args) {
         $(`#slug-modal-${data['id']}`).modal('show');
     } else {
         var unverified_count;
-        if (data['success_msg'] != "unverified") {
+        if (data['success_msg'] == "unverified") {
+            window.location.href = "/";
+        } else {
             var msg = data['success_msg'];
 
             $("#professor-counter").html(args["count"]);
@@ -107,8 +113,7 @@ function verifyProfessorSuccess(data, args) {
             $(`#professor-${data['id']}`).remove();
             unverified_count = Number($("#unverified_count").html());
             $("#unverified_count").html(unverified_count - 1);
-        } else
-            window.location.href = "/";
+        }
     }
 }
 function verifyProfessorError(data, args) {

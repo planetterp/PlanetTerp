@@ -1,6 +1,7 @@
 {% load static %}
 {% load professor_form_add %}
 {% load unverified_count %}
+{% load utils %}
 
 <!DOCTYPE html>
 <html lang="en">
@@ -8,7 +9,11 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
         <link rel="shortcut icon" type="image/x-icon" href="{% static 'favicon.ico' %}">
 
-        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8981508768288124" crossorigin="anonymous"></script>
+        {% config_value 'ADS_ENABLED' as ads_enabled %}
+        {% if ads_enabled %}
+            <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8981508768288124" crossorigin="anonymous"></script>
+        {% endif %}
+
 
         <script type="text/javascript" src="{% static 'js/jquery-3.5.1.min.js' %}"></script>
         <script type="text/javascript" src="{% static 'js/jquery-ui-1.12.1.min.js' %}"></script>
@@ -59,15 +64,6 @@
             gtag('js', new Date());
 
             gtag('config', 'UA-109898068-1');
-
-            // (function(d, s, id) {
-            // var js, fjs = d.getElementsByTagName(s)[0];
-            // 	if (d.getElementById(id)) return;
-            // 	js = d.createElement(s); js.id = id;
-            // 	js.src = 'https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.11&appId=396580890766412';
-            // 	fjs.parentNode.insertBefore(js, fjs);
-            // }(document, 'script', 'facebook-jssdk'));
-
 
             /* Track outbound clicks */
             /* from: https://support.google.com/analytics/answer/7478520 */
@@ -139,8 +135,8 @@
                             <li class="nav-item" title="API">
                                 <a class="nav-link" href="{% url 'api-docs' %}">API</a>
                             </li>
-                            <li class="nav-item" title="Stats">
-                                <a class="nav-link" href="{% url 'statistics' %}">Stats</a>
+                            <li class="nav-item" title="GitHub">
+                                <a class="nav-link" href="https://github.com/planetterp/planetterp">GitHub</a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link" href="#" title="Add Professor/TA" data-toggle="modal" data-target="#add-professor-modal" style="color: #9af99a;">Add Professor/TA</a>
@@ -186,8 +182,8 @@
 
             {% comment %} TODO rewrite star generation so this isn't necessary {% endcomment %}
             {% if request.session.color_scheme == "dark" %}
-                <canvas id="navbar-canvas"></canvas>
-                <div id="filler-div"></div>
+                <!-- make sure we're above bootstrap's navbar -->
+                <canvas id="navbar-canvas" style="z-index: 1100"></canvas>
             {% endif %}
         </div>
 
@@ -276,9 +272,6 @@
             function setUpDarkScheme() {
                 // "Stars" in navbar:
                 var navbar = document.getElementById('navbar-wrapper');
-
-                var fillerDiv = document.getElementById('filler-div');
-                fillerDiv.setAttribute('style', 'width:' + navbar.offsetWidth + 'px;height:' + navbar.offsetHeight + 'px;');
 
                 var canvas = document.getElementById('navbar-canvas');
                 canvas.width = navbar.offsetWidth;

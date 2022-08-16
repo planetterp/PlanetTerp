@@ -140,8 +140,7 @@ class ReviewColumn(tables.Column):
         super().__init__(verbose_name="Review", orderable=False, attrs=attrs, *args, **kwargs)
 
     def render(self, value: dict):
-        review = value.pop("review")
-        return mark_safe(review.content)
+        return value.pop("review").content
 
 class StatusColumn(tables.Column):
     def __init__(self, *args, **kwargs):

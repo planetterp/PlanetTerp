@@ -4,9 +4,11 @@ DB_HOST = "127.0.0.1"
 USER = 'root'
 PASSWORD = ''
 SECRET_KEY = 'django-insecure-zt7yxn++)bh)j#wzb)ofgd0^scu9rwr85%=3l%6g1zt(cx!t)_'
+STATIC_ROOT = None
+ADS_ENABLED = False
 
-EMAIL_HOST_USER = "planetterp.test@gmail.com"
-EMAIL_HOST_PASSWORD = "cqgkqrmnagasofuk" # app password
+EMAIL_HOST_USER = None
+EMAIL_HOST_PASSWORD = None # app password
 EMAIL_SERVICE_ACCOUNT_CREDENTIALS = None
 
 WEBHOOK_URL_HELP = None

@@ -10,7 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
-from pathlib import Path, PurePath
+from pathlib import Path
 from planetterp import config
 
 
@@ -192,16 +192,13 @@ DATE_FORMAT = '%m/%d/%Y'
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
-STATIC_URL = '/static/'
+STATIC_URL = 'static/'
 STATICFILES_DIRS = [
     BASE_DIR / "planetterp/static",
     BASE_DIR / "api/static",
 ]
 
-# Allows us to use the collectstatic command.
-# Helpful if we decide to use webservers to serve our static files in the future
-STATIC_ROOT = str(PurePath(BASE_DIR, 'planetterp/static_root'))
-
+STATIC_ROOT = config.STATIC_ROOT
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

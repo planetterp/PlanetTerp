@@ -4,9 +4,9 @@
 
 PlanetTerp is a website designed to help students at the University of Maryland — College Park (UMD) make informed decisions. We have a professor review system, grades for each course and professor, and tools to provide information related to UMD.
 
-This is the second version of PlanetTerp. The first version was written in [webpy](https://github.com/webpy/webpy), and was closed source. It was rewritten in [django](https://github.com/django/django) at the beginning of 2022, which is the version you see here.
+This is the second version of PlanetTerp. The first version was written in [web.py](https://github.com/webpy/webpy), and was closed source. It was rewritten in [django](https://github.com/django/django) at the beginning of 2022, which is the version you see here.
 
-All contributions are welcome, whether that be opening an issue with a bug or feature request, or opening a pull requets. See below for how to set up PlanetTerp locally.
+All contributions are welcome, whether that be opening an issue with a bug or feature request, or opening a pull request. See below for how to set up PlanetTerp locally.
 
 ### Setup
 
@@ -44,7 +44,7 @@ EMAIL_HOST_USER = None
 EMAIL_HOST_PASSWORD = None
 ```
 
-If you named your database something other than `planetterp`, you'll need to edit `DB_NAME`. If you would like to use a different user than `root` to acces mysql, you'll need to edit `USER`, and if your password for your user is not the empty string, you'll need to edit `PASSWORD`.
+If you named your database something other than `planetterp`, you'll need to edit `DB_NAME`. If you would like to use a different user than `root` to access mysql, you'll need to edit `USER`, and if your password for your user is not the empty string, you'll need to edit `PASSWORD`.
 
 The other fields can be left alone for now. We'll discuss the `WEBHOOK_*` and `EMAIL_*` settings in a bit, but they aren't necessary for an initial setup and can be left as `None`.
 

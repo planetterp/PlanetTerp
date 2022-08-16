@@ -36,13 +36,13 @@ class ActionForm(Form):
 
 # For unverifying a verified review. Currently used on /professor
 class ReviewUnverifyForm(Form):
-    review_id = IntegerField(required=True, widget=HiddenInput)
+    id_ = IntegerField(required=True, widget=HiddenInput)
     verified = CharField(required=True, widget=HiddenInput, initial=Review.Status.PENDING.value)
     action_type = CharField(required=True, widget=HiddenInput, initial=AdminAction.REVIEW_VERIFY.value)
 
     def __init__(self, review_id, **kwargs):
         super().__init__(**kwargs)
-        self.fields['review_id'].initial = review_id
+        self.fields['id_'].initial = review_id
 
         self.helper = FormHelper()
         self.helper.form_id = f"unverify_review_{review_id}"
@@ -58,7 +58,7 @@ class ReviewUnverifyForm(Form):
             onClick=f"unverifyReview('#{self.helper.form_id}')"
         )
         return Layout(
-            'review_id',
+            'id_',
             'verified',
             'action_type',
             FormActions(submit_button)
@@ -331,13 +331,13 @@ class ProfessorUpdateForm(ModelForm):
 # For unverifying a professor in the edit professor modal
 # on /professor
 class ProfessorUnverifyForm(Form):
-    professor_id = IntegerField(required=True, widget=HiddenInput)
+    id_ = IntegerField(required=True, widget=HiddenInput)
     action_type = CharField(required=True, widget=HiddenInput, initial=AdminAction.PROFESSOR_VERIFY.value)
     verified = CharField(required=True, widget=HiddenInput, initial=Professor.Status.PENDING.value)
 
     def __init__(self, professor_id, **kwargs):
         super().__init__(**kwargs)
-        self.fields['professor_id'].initial = professor_id
+        self.fields['id_'].initial = professor_id
         self.helper = FormHelper()
         self.helper.form_id = "unverify-professor-form"
         self.helper.form_show_errors = False
@@ -345,7 +345,7 @@ class ProfessorUnverifyForm(Form):
 
     def generate_layout(self):
         return Layout(
-            'professor_id',
+            'id_',
             'action_type',
             'verified'
         )
