@@ -9,7 +9,7 @@ from django.core import validators
 from django.db.models import (Model, CharField, DateTimeField, TextField,
     IntegerField, BooleanField, ForeignKey, PositiveIntegerField, EmailField,
     CASCADE, ManyToManyField, SlugField, TextChoices, FloatField, Manager,
-    QuerySet, Sum, UniqueConstraint, Index, Count, Max, Q)
+    QuerySet, Sum, UniqueConstraint, Index, Count)
 
 class GradeQuerySet(QuerySet):
 
@@ -78,7 +78,6 @@ class RecentGradeManager(Manager):
 
 class RecentCourseManager(Manager):
     def get_queryset(self):
-        from home.utils import Semester
         # a course is "recent" if we have a grade record for it since
         # `Semester(201201)`, or if it was taught at all since
         # `Semester(201201)`.
@@ -97,17 +96,7 @@ class RecentCourseManager(Manager):
         # frame for a course to be considered recently taught (~10 years) and
         # the time frame for a professor to be considered having recently taught
         # a course may not be the same.
-        return (
-            super().get_queryset()
-            .annotate(max_semester=Max("grade__semester"))
-            .annotate(most_recent_semester=Max(
-                "professorcourse__recent_semester")
-            )
-            .filter(
-                Q(max_semester__gte=Semester(201201)) |
-                Q(most_recent_semester__gte=Semester(201201))
-            )
-        )
+        return super().get_queryset().filter(is_recent=True)
 
 class UserManager(DjangoUserManager):
     def create_ourumd_user(self, username, email=None, **kwargs):
@@ -194,6 +183,11 @@ class Course(Model):
     credits = IntegerField(null=True)
     description = TextField(null=True)
     created_at = DateTimeField(auto_now_add=True)
+    # determining whether a course is recent or not can actually be extremely
+    # expensive (for reasons I don't quite understand - lacking proper
+    # indices?). Since recency changes so infrequently, we'll cache it and
+    # update it manually with a custom management command (`updaterecency`).
+    is_recent = BooleanField(default=False)
 
     professors = ManyToManyField("Professor", blank=True,
         through="ProfessorCourse")
