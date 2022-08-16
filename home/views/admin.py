@@ -346,7 +346,13 @@ class Admin(UserPassesTestMixin, View):
         if not user.send_review_email:
             return
 
-        status_text = 'Under Review' if verified_status is Review.Status.PENDING else verified_status.value.capitalize()
+        status_map = {
+            Review.Status.PENDING: "Unverified",
+            Review.Status.REJECTED: "Rejected",
+            Review.Status.VERIFIED: "Verified"
+        }
+        status_text = status_map[verified_status]
+
         profile_url = self.request.build_absolute_uri(reverse('profile'))
         professor_url = self.request.build_absolute_uri(professor.get_absolute_url())
         message = (
