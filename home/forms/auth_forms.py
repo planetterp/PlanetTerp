@@ -165,8 +165,7 @@ class RegisterForm(ModelForm):
             Submit(
                 "submit",
                 "Register",
-                css_class="btn-primary mt-2",
-                onclick="submitRegisterForm()"
+                css_class="btn-primary mt-2"
             )
         )
 
@@ -274,8 +273,7 @@ class ResetPasswordForm(ModelForm):
             Submit(
                 "submit",
                 "Reset Password",
-                css_class="btn-primary mt-3",
-                onClick="submitResetPasswordForm()"
+                css_class="btn-primary mt-3"
             )
         )
 
