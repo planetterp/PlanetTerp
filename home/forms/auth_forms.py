@@ -5,7 +5,7 @@ from django.utils.safestring import mark_safe
 from django.contrib.auth import authenticate
 from django.forms import ModelForm, Form
 
-from crispy_forms.layout import Layout, Div, Field, HTML, Button, Submit
+from crispy_forms.layout import Layout, Div, Field, HTML, Submit
 from crispy_forms.helper import FormHelper
 from crispy_forms.bootstrap import Modal
 
