@@ -8,9 +8,13 @@ from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Div, Field, Layout, Button, HTML
 from crispy_forms.bootstrap import FormActions, Modal
 
-from home.utils import AdminAction, slug_in_use_err
+from home.utils import AdminAction
 from home.models import Review, Professor
 from planetterp.settings import DATE_FORMAT
+
+def slug_in_use_err(slug: str, name: str):
+    return (f"Slug '{slug}' is already in use by '{name}'. Please merge these "
+        "professors together if they are the same person.")
 
 # For verifying, rejecting, and asking for help on unverified reviews
 # and verifying/rejecting unverified professors

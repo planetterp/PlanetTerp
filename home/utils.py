@@ -120,9 +120,6 @@ class ReviewsTableColumn(Enum):
     STATUS = auto()
     ACTION = auto()
 
-def slug_in_use_err(slug: str, name: str):
-    return f"Slug '{slug}' is already in use by '{name}'. Please merge these professors together if they are the same person."
-
 # We're going to handroll our own ttl cache instead of using python's
 # `lru_cache` with a time salt (which was the original implementation), for two
 # reasons:
