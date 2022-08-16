@@ -1,4 +1,3 @@
-from turtle import onclick
 from django.forms import CharField, EmailField, PasswordInput
 from django.forms.widgets import HiddenInput
 from django.core.exceptions import ValidationError
@@ -58,7 +57,7 @@ class LoginForm(ModelForm):
                 ),
                 css_class="pb-2"
             ),
-            Button(
+            Submit(
                 "submit",
                 "Login",
                 css_class="btn-primary",
@@ -163,7 +162,7 @@ class RegisterForm(ModelForm):
                 self.field_errors['password'],
                 css_class="password-container mb-1"
             ),
-            Button(
+            Submit(
                 "submit",
                 "Register",
                 css_class="btn-primary mt-2",
@@ -204,11 +203,10 @@ class ForgotPasswordForm(Form):
                         </div>
                     {% endif %}
                 '''),
-                Button(
+                Submit(
                     "submit",
                     "Send Reset Email",
-                    css_class="btn-primary mt-3",
-                    onclick="submitPasswordResetForm()"
+                    css_class="btn-primary mt-3"
                 ),
                 css_id="password-reset-modal",
                 title_id="password-reset-title",
@@ -273,7 +271,7 @@ class ResetPasswordForm(ModelForm):
                     </div>
                 {% endif %}
             '''),
-            Button(
+            Submit(
                 "submit",
                 "Reset Password",
                 css_class="btn-primary mt-3",

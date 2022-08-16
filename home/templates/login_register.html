@@ -62,7 +62,7 @@
 		});
 	}
 
-	function submitPasswordResetForm() {
+	$("#reset-password-form").submit(function() {
 		$.ajax({
 			type: "POST",
 			url: "{% url 'password-reset' %}",
@@ -75,7 +75,8 @@
 				$(`#password-reset-modal`).modal('show');
 			}
 		});
-	}
+		return false;
+	});
 
 </script>
 {% endblock %}
