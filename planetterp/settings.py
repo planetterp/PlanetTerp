@@ -40,6 +40,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = [
     "planetterp.com",
+    "api.planetterp.com",
     "localhost",
     "127.0.0.1",
 ]
