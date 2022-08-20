@@ -220,6 +220,7 @@
 
                 $("#header-search").autocomplete({
                     minLength: 3,
+                    delay: 100,
                     source: function(request, response) {
                         $.get("{% url 'autocomplete' %}", {"query": request.term, "types[]": ["professor", "course"], "return_attrs[]": ["url"]},  function(data) {
                             response(data);
