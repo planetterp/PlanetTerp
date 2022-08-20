@@ -118,7 +118,7 @@ class Grades(APIView):
             course = CourseModel.recent.filter(name=course_name).first()
             if not course:
                 raise ValidationError("course not found")
-            grades = course.grade_set(manger="recent")
+            grades = course.grade_set(manager="recent")
 
         if professor_name:
             professor = (
