@@ -4,7 +4,7 @@ discord-webhook==0.12.0
 google-api-python-client
 google-auth-httplib2
 mysqlclient==2.1.0
-django==3.2.4
+django==3.2.15
 
 # django addons
 django-tables2==2.4.0
