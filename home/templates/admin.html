@@ -31,17 +31,19 @@
 	<div class="tab-pane fade show active" id="reviews-noscroll" role="tabpanel">
 		{% render_table reviews_table %}
 	</div>
+
 	<div class="tab-pane fade" id="professors-noscroll" role="tabpanel">
 		{% render_table professors_table %}
 
 		<div id="merge-container">{% crispy merge_professor_form %}</div>
 		<div id="slug-modal-container"></div>
+		<div id="info-modal-container"></div>
 	</div>
+
 	<div class="tab-pane fade" id="maintenance-noscroll" role="tabpanel">
 		<button class="btn btn-primary" onclick="recomputeTTLCache()">
 			Recompute TTL Caches
 		</button>
-
 
 		<table class="table table-bordered mt-4 mb-4">
 			<thead>
@@ -62,7 +64,6 @@
 				{% endfor %}
 			</tbody>
 		</table>
-
 	</div>
 </div>
 

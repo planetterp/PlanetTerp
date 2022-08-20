@@ -85,8 +85,13 @@ function verifyHelpSuccess(data, args) {
 /* ********* VERIFY PROFESSOR FUNCTIONS ********* */
 function verifyProfessorSuccess(data, args) {
     if (data['form'] != null) {
-        $("#slug-modal-container").html(`${data['form']}`);
-        $(`#slug-modal-${data['id']}`).modal('show');
+        if (data['success_msg'] == "info-modal-container") {
+            $("#info-modal-container").html(`${data['form']}`);
+            $("#info-modal").modal('show');
+        } else {
+            $("#slug-modal-container").html(`${data['form']}`);
+            $(`#slug-modal-${data['id']}`).modal('show');
+        }
     } else {
         var unverified_count;
         if (data['success_msg'] == "unverified") {

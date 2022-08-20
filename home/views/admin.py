@@ -16,7 +16,7 @@ from home.utils import AdminAction
 from home.tables.reviews_table import UnverifiedReviewsTable
 from home.tables.basic import ProfessorsTable
 from home.forms.admin_forms import (ProfessorMergeForm, ProfessorSlugForm,
-    ProfessorUpdateForm, ActionForm)
+    ProfessorUpdateForm, ActionForm, ProfessorInfoModal)
 from home.utils import send_email, _ttl_cache
 from planetterp import config
 
@@ -304,13 +304,13 @@ class Admin(UserPassesTestMixin, View):
                     ) |
                     Q(slug="_".join(reversed(split_name)).lower())
                 )
+                ctx = {}
+                ctx.update(csrf(request))
 
                 if query.exists():
-                    response["error_msg"] = (
-                        f"This {professor.type} might be a duplicate of "
-                        f"{query[0]}. Please merge or delete this {professor.type}."
-                    )
-
+                    form = ProfessorInfoModal(professor, query[0])
+                    response["form"] = render_crispy_form(form, form.helper, context=ctx)
+                    response["success_msg"] = "info-modal-container"
                     return JsonResponse(response)
 
                 if len(split_name) > 2:
@@ -322,8 +322,6 @@ class Admin(UserPassesTestMixin, View):
                     # Create the modal form to manualy enter a slug and add it
                     # to the response. The form creates the modal, though it's
                     # actually summoned from admin-action.js
-                    ctx = {}
-                    ctx.update(csrf(request))
                     form = ProfessorSlugForm(professor, modal_title=modal_msg)
                     response["form"] = render_crispy_form(form, form.helper, context=ctx)
                     response["success_msg"] = modal_msg

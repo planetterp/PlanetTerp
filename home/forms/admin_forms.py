@@ -1,3 +1,5 @@
+from itertools import chain
+
 from django.core.exceptions import ValidationError
 from django.forms import CharField, IntegerField, DateField, ChoiceField
 from django.forms.widgets import DateInput, HiddenInput, TextInput
@@ -9,7 +11,7 @@ from crispy_forms.layout import Div, Field, Layout, Button, HTML
 from crispy_forms.bootstrap import FormActions, Modal
 
 from home.utils import AdminAction
-from home.models import Review, Professor
+from home.models import Course, Review, Professor
 from planetterp.settings import DATE_FORMAT
 
 def slug_in_use_err(slug: str, name: str):
@@ -524,3 +526,78 @@ class ProfessorMergeForm(Form):
                     self.add_error('merge_target', error)
 
         return cleaned_data
+
+
+# Used on /admin when verifying professors that might be duplicates of already
+# verified professors.
+class ProfessorInfoModal(Form):
+    def __init__(self, unverified_professor: Professor, verified_professor: Professor):
+        super().__init__()
+        self.unverified_professor = unverified_professor
+        self.verified_professor = verified_professor
+        self.helper = FormHelper()
+        self.helper.form_tag = False
+        self.helper.layout = self.generate_layout()
+
+    def generate_layout(self):
+        def get_courses(professor: Professor):
+            courses = set()
+            reviews = Review.unfiltered.filter(professor__id=professor.pk).exclude(course=None).select_related("course")
+            if reviews.exists():
+                reviewed_courses = [review.course for review in reviews]
+                courses.add(reviewed_courses)
+
+            model_courses = Course.unfiltered.filter(professors__id=professor.pk)
+            if model_courses.exists():
+                courses.add(tuple(model_courses))
+
+            courses = list(chain(*courses))
+            return "No Courses" if len(courses) == 0 else ', '.join([course.name for course in courses])
+
+        table_str = '''
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Courses</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>{unverified_name} (this professor)</td>
+                        <td>{unverified_courses}</td>
+                    </tr>
+                    <tr>
+                        <td><a href="{absolute_url}" target="_blank">{verified_name}</a></td>
+                        <td>{verified_courses}</td>
+                    </tr>
+                </tbody>
+            </table>
+        '''
+        kwargs = {
+            "unverified_name": self.unverified_professor.name,
+            "unverified_courses": get_courses(self.unverified_professor),
+            "absolute_url": self.verified_professor.get_absolute_url(),
+            "verified_name": self.verified_professor.name,
+            "verified_courses": get_courses(self.verified_professor)
+        }
+
+        modal_title = (
+            f'This {self.unverified_professor.type} might be a duplicate of <b>{self.verified_professor.name} ({self.verified_professor.pk})</b>. <br>'
+            f'Given the information below, please decide if these {self.unverified_professor.type}s are the same.'
+        )
+
+        return Layout(
+            Modal(
+                HTML(format_html(table_str, **kwargs)),
+                Div(
+                    Button("Verify", "Verify", css_class="btn btn-success", onclick=""),
+                    Button("Merge", "Merge", css_class="btn btn-primary", onclick=""),
+                    css_class="btn-group"
+                    css_class="btn-group w-100"
+                ),
+                css_id="info-modal",
+                title=format_html(modal_title),
+                title_class="text-center"
+            )
+        )
