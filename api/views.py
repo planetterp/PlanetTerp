@@ -5,7 +5,8 @@ from rest_framework.views import APIView
 from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 
-from home.models import Course as CourseModel, Professor as ProfessorModel
+from home.models import (Course as CourseModel, Professor as ProfessorModel,
+    Grade as GradeModel)
 from home import queries
 from home.utils import Semester
 from api.serializers import (CourseSerializer, ProfessorSerializer,
@@ -115,11 +116,16 @@ class Grades(APIView):
             raise ValidationError("parameters must include at least one of: "
                 "\"course\", \"professor\"")
 
+        # we'll start with the full queryset and filter it down as filters get
+        # applied. We're leaning on django's lazy evaluation here to be
+        # efficient.
+        grades = GradeModel.unfiltered.all()
+
         if course_name:
             course = CourseModel.recent.filter(name=course_name).first()
             if not course:
                 raise ValidationError("course not found")
-            grades = course.grade_set(manager="recent")
+            grades &= course.grade_set(manager="recent").all()
 
         if professor_name:
             professor = (
@@ -127,7 +133,7 @@ class Grades(APIView):
             )
             if not professor:
                 raise ValidationError("professor not found")
-            grades = professor.grade_set(manager="recent")
+            grades &= professor.grade_set(manager="recent").all()
 
         if semester:
             try:
@@ -135,6 +141,7 @@ class Grades(APIView):
             except:
                 raise ValidationError(f"invalid semester `{semester}`")
             grades = grades.filter(semester=semester)
+
         if section:
             grades = grades.filter(section=section)
 
