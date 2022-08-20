@@ -7,6 +7,7 @@ from rest_framework.response import Response
 
 from home.models import Course as CourseModel, Professor as ProfessorModel
 from home import queries
+from home.utils import Semester
 from api.serializers import (CourseSerializer, ProfessorSerializer,
     ProfessorWithReviewsSerializer, CourseWithReviewsSerializer,
     SearchResultSerializer, GradeSerializer)
@@ -127,6 +128,11 @@ class Grades(APIView):
             if not professor:
                 raise ValidationError("professor not found")
             grades = professor.grade_set(manager="recent")
+
+        try:
+            semester = Semester(semester)
+        except:
+            raise ValidationError(f"invalid semester `{semester}`")
 
         if semester:
             grades = grades.filter(semester=semester)
