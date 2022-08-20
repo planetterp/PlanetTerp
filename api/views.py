@@ -117,15 +117,14 @@ class Grades(APIView):
                 "\"course\", \"professor\"")
 
         # we'll start with the full queryset and filter it down as filters get
-        # applied. We're leaning on django's lazy evaluation here to be
-        # efficient.
-        grades = GradeModel.unfiltered.all()
+        # applied.
+        grades = GradeModel.recent.all()
 
         if course_name:
             course = CourseModel.recent.filter(name=course_name).first()
             if not course:
                 raise ValidationError("course not found")
-            grades &= course.grade_set(manager="recent").all()
+            grades = grades.filter(course=course)
 
         if professor_name:
             professor = (
@@ -133,7 +132,7 @@ class Grades(APIView):
             )
             if not professor:
                 raise ValidationError("professor not found")
-            grades &= professor.grade_set(manager="recent").all()
+            grades = grades.filter(professor=professor)
 
         if semester:
             try:
