@@ -129,12 +129,11 @@ class Grades(APIView):
                 raise ValidationError("professor not found")
             grades = professor.grade_set(manager="recent")
 
-        try:
-            semester = Semester(semester)
-        except:
-            raise ValidationError(f"invalid semester `{semester}`")
-
         if semester:
+            try:
+                semester = Semester(semester)
+            except:
+                raise ValidationError(f"invalid semester `{semester}`")
             grades = grades.filter(semester=semester)
         if section:
             grades = grades.filter(section=section)
