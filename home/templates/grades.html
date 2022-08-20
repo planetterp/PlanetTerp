@@ -146,6 +146,7 @@
 	function initializeCourseSearchAutoComplete() {
 		$("#course-search").autocomplete({
 			minLength: 3,
+			delay: 100,
 			source: function(request, response) {
 				$.ajax({
 					url: "{% url 'autocomplete' %}",
@@ -170,6 +171,7 @@
 	function initializeProfessorSearchAutoComplete() {
 		$("#professor-search").autocomplete({
 			minLength: 3,
+			delay: 100,
 			source: function(request, response) {
 				$.ajax({
 					url: "{% url 'autocomplete' %}",
