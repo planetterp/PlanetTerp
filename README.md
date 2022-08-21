@@ -44,7 +44,7 @@ EMAIL_HOST_USER = None
 EMAIL_HOST_PASSWORD = None
 ```
 
-If you named your database something other than `planetterp`, you'll need to edit `DB_NAME`. If you would like to use a different user than `root` to access mysql, you'll need to edit `USER`, and if your password for your user is not the empty string, you'll need to edit `PASSWORD`.
+If you named your database something other than `planetterp`, you'll need to edit `DB_NAME`. If you would like to use a different user than `root` to access mysql, you'll need to edit `USER`, and if the password for your user is not the empty string, you'll need to edit `PASSWORD`.
 
 The other fields can be left alone for now. We'll discuss the `WEBHOOK_*` and `EMAIL_*` settings in a bit, but they aren't necessary for an initial setup and can be left as `None`.
 
@@ -75,7 +75,7 @@ To start the server:
 python manage.py runserver
 ```
 
-You'll probably want to create an admin user so that you can see the admin panel and other admin-only items. To do so, run `python manage.py createsuperuser`. You'll be able to log in using that user to your local planetterp site, and it will have admin permissions. Make sure you chose a password that's at least 8 characters long, or our client-side validation will reject it on the login page!
+You'll probably want to create an admin user so that you can see the admin panel and other admin-only items. To do so, run `python manage.py createsuperuser`. You'll be able to log in using that user to your local planetterp site, and it will have admin permissions. Make sure you chose a password that's at least 8 characters long, or our client-side validation will reject it on the login page.
 
 #### Advanced Setup
 
