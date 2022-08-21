@@ -25,7 +25,7 @@
 					<h1 class="input-group">
 						<span id="professor-name"><strong>{{ professor.name }}</strong></span>
 						<div class="input-group-append"><i class="fas fa-pencil-alt pl-3 pt-2 admin-tool-icon" data-toggle="modal" data-target="#edit-professor-modal"></i></div>
-						<div class="input-group-append"><i class="fas fa-people-arrows pl-3 pt-2 admin-tool-icon" onclick="mergeProfessor('{{ professor.name}}', '{{professor.pk}}')"></i></div>
+						<div class="input-group-append"><i class="fas fa-people-arrows pl-3 pt-2 admin-tool-icon" onclick="mergeProfessor({'merge_subject':'{{ professor.name}}', 'subject_id':'{{professor.pk}}'})"></i></div>
 					</h1>
 				</div>
 

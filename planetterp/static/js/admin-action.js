@@ -261,15 +261,21 @@ function initalizeAutoComplete(csrf_token) {
     });
 }
 
-function mergeProfessor(name, id_) {
-    initalizeAutoComplete('{{ csrf_token }}');
-    $('#id_merge_subject').val(name);
-    $('#id_subject_id').val(id_);
+function mergeProfessor(args) {
+    $('#id_merge_subject').val(args["merge_subject"]);
+    $('#id_subject_id').val(args["subject_id"]);
 
-    if (location.pathname.includes("professor")) {
-        $("#edit-professor-modal").modal('hide');
-        $(".modal-backdrop").hide();
+    if (args["merge_target"]) {
+        $('#id_merge_target').val(args["merge_target"]);
+        $('#id_target_id').val(args["target_id"]);
+        sendResponse($("#merge-form").serialize(), "professor_merge");
+    } else {
+        initalizeAutoComplete('{{ csrf_token }}');
+        if (location.pathname.includes("professor")) {
+            $("#edit-professor-modal").modal('hide');
+            $(".modal-backdrop").hide();
+        }
+
+        $('#merge-modal').modal('show');
     }
-
-    $('#merge-modal').modal('show');
 }

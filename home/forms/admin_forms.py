@@ -1,4 +1,5 @@
 from itertools import chain
+import json
 
 from django.core.exceptions import ValidationError
 from django.forms import CharField, IntegerField, DateField, ChoiceField
@@ -281,7 +282,7 @@ class ProfessorUpdateForm(ModelForm):
                         'Merge',
                         css_id="merge-professor",
                         css_class="btn-secondary",
-                        onclick=format_html("mergeProfessor('{name}', '{id}')", name=self.professor.name, id=self.professor.pk)
+                        onclick=format_html("mergeProfessor({args})", args=json.dumps({"merge_subject": self.professor.name, "subject_id": self.professor.pk}))
                     ),
                     Button(
                         'unverify',
@@ -544,7 +545,7 @@ class ProfessorInfoModal(Form):
             courses = set()
             reviews = Review.unfiltered.filter(professor__id=professor.pk).exclude(course=None).select_related("course")
             if reviews.exists():
-                reviewed_courses = [review.course for review in reviews]
+                reviewed_courses = (review.course for review in reviews)
                 courses.add(reviewed_courses)
 
             model_courses = Course.unfiltered.filter(professors__id=professor.pk)
@@ -586,14 +587,19 @@ class ProfessorInfoModal(Form):
             f'This {self.unverified_professor.type} might be a duplicate of <b>{self.verified_professor.name} ({self.verified_professor.pk})</b>. <br>'
             f'Given the information below, please decide if these {self.unverified_professor.type}s are the same.'
         )
+        merge_data = {
+            "merge_subject": self.unverified_professor.name,
+            "subject_id": self.unverified_professor.pk,
+            "merge_target": self.verified_professor.name,
+            "target_id": self.verified_professor.pk
+        }
 
         return Layout(
             Modal(
                 HTML(format_html(table_str, **kwargs)),
                 Div(
-                    Button("Verify", "Verify", css_class="btn btn-success", onclick=""),
-                    Button("Merge", "Merge", css_class="btn btn-primary", onclick=""),
-                    css_class="btn-group"
+                    Button("verify", "Verify", css_class="btn btn-success", onclick=""),
+                    Button("merge", "Merge", css_class="btn btn-primary", onclick=format_html("mergeProfessor({args})", args=json.dumps(merge_data))),
                     css_class="btn-group w-100"
                 ),
                 css_id="info-modal",
