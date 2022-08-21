@@ -1,4 +1,5 @@
 from typing import Optional
+import json
 
 from django.shortcuts import render
 from django.views import View
@@ -307,7 +308,8 @@ class Admin(UserPassesTestMixin, View):
                 ctx = {}
                 ctx.update(csrf(request))
 
-                if query.exists():
+                verify_override = json.loads(request.POST["override"])
+                if not verify_override and query.exists():
                     form = ProfessorInfoModal(professor, query[0])
                     response["form"] = render_crispy_form(form, form.helper, context=ctx)
                     response["success_msg"] = "info-modal-container"

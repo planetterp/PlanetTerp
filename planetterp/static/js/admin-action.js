@@ -118,6 +118,7 @@ function verifyProfessorSuccess(data, args) {
             $(`#professor-${data['id']}`).remove();
             unverified_count = Number($("#unverified_count").html());
             $("#unverified_count").html(unverified_count - 1);
+            $("#info-modal").modal('hide');
         }
     }
 }

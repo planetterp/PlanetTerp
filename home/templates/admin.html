@@ -105,17 +105,21 @@
 		sendResponse($('#action_form').serialize(), action_type, args);
 	}
 
-	function verifyProfessor(professor_id, action) {
-		var action_type = action;
+	function verifyProfessor(form_args) {
+		var action_type = form_args["action"];
 		var professor_counter = (prof_count > 0 ? --prof_count : 0);
 		args = {"count" : professor_counter, "num_reviews" : num_reviews}
 
-		if (action != "professor_delete") {
-			$('#verified').val(action);
+		if (form_args["override"]) {
+			$('#override').val("true");
+		}
+
+		if (form_args["action"] != "professor_delete") {
+			$('#verified').val(form_args["action"]);
 			action_type = "professor_verify";
 		}
 
-		$('#id_').val(professor_id);
+		$('#id_').val(form_args["professor_id"]);
 		$('#action_type').val(action_type);
 		sendResponse($('#action_form').serialize(), action_type, args);
 	}

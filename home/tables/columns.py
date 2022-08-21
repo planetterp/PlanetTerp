@@ -240,14 +240,14 @@ class UnverifiedProfessorsActionColumn(ActionColumn):
             <div class="unverified_professor_{id} container" style="white-space: nowrap;">
                 <div class="row">
                     <div class="col">
-                        <button class="btn btn-success w-100" onClick="verifyProfessor('{id}', 'verified')" style="border-bottom-left-radius: 0; border-bottom-right-radius: 0;">Verify</button>
+                        <button class="btn btn-success w-100" onClick="verifyProfessor({{'professor_id': {id}, 'action':'verified'}})" style="border-bottom-left-radius: 0; border-bottom-right-radius: 0;">Verify</button>
                     </div>
                 </div>
                 <div class="row">
                     <div class="col btn-group">
-                        <button class="btn btn-danger w-50" onClick="verifyProfessor('{id}', 'rejected')" style="border-top-left-radius: 0;">Reject</button>
+                        <button class="btn btn-danger w-50" onClick="verifyProfessor({{'professor_id': {id}, 'action':'rejected'}})" style="border-top-left-radius: 0;">Reject</button>
                         <button class="btn btn-primary rounded-0" onclick="mergeProfessor({args})">Merge</button>
-                        <button class="btn btn-dark" onClick="verifyProfessor('{id}', 'professor_delete')" style="border-top-right-radius: 0;">Delete</button>
+                        <button class="btn btn-dark" onClick="verifyProfessor({{'professor_id': {id}, 'action':'professor_delete'}})" style="border-top-right-radius: 0;">Delete</button>
                     </div>
                 </div>
         '''

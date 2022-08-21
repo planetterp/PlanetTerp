@@ -2,7 +2,7 @@ from itertools import chain
 import json
 
 from django.core.exceptions import ValidationError
-from django.forms import CharField, IntegerField, DateField, ChoiceField
+from django.forms import CharField, IntegerField, DateField, ChoiceField, BooleanField
 from django.forms.widgets import DateInput, HiddenInput, TextInput
 from django.utils.html import format_html
 from django.forms import Form, ModelForm
@@ -25,6 +25,7 @@ class ActionForm(Form):
     id_ = IntegerField(required=True, widget=HiddenInput)
     verified = CharField(required=True, widget=HiddenInput)
     action_type = CharField(required=True, widget=HiddenInput)
+    override = BooleanField(required=True, widget=HiddenInput, initial="false")
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -38,7 +39,8 @@ class ActionForm(Form):
         return Layout(
             Field('id_', id="id_"),
             Field('verified', id="verified"),
-            Field('action_type', id="action_type")
+            Field('action_type', id="action_type"),
+            Field('override', id="override")
         )
 
 # For unverifying a verified review. Currently used on /professor
@@ -594,11 +596,17 @@ class ProfessorInfoModal(Form):
             "target_id": self.verified_professor.pk
         }
 
+        verify_data = {
+            "professor_id": self.unverified_professor.pk,
+            "action": "verified",
+            "override": "true"
+        }
+
         return Layout(
             Modal(
                 HTML(format_html(table_str, **kwargs)),
                 Div(
-                    Button("verify", "Verify", css_class="btn btn-success", onclick=""),
+                    Button("verify", "Verify", css_class="btn btn-success", onclick=format_html("verifyProfessor({args})", args=verify_data)),
                     Button("merge", "Merge", css_class="btn btn-primary", onclick=format_html("mergeProfessor({args})", args=json.dumps(merge_data))),
                     css_class="btn-group w-100"
                 ),
