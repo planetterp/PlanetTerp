@@ -85,13 +85,19 @@ function verifyHelpSuccess(data, args) {
 /* ********* VERIFY PROFESSOR FUNCTIONS ********* */
 function verifyProfessorSuccess(data, args) {
     if (data['form'] != null) {
-        if (data['success_msg'] == "info-modal-container") {
-            $("#info-modal-container").html(`${data['form']}`);
-            $("#info-modal").modal('show');
-        } else {
-            $("#slug-modal-container").html(`${data['form']}`);
-            $(`#slug-modal-${data['id']}`).modal('show');
+        container_id_mappings = {
+            "#info-modal-container": "#info-modal",
+            "#slug-modal-container": `#slug-modal-${data['id']}`
         }
+
+        $(".modal").modal("hide");
+        $(data["success_msg"]).html(`${data['form']}`);
+
+        $('#slug-modal').on('show.bs.modal', function (e) {
+            $('#override').val("false");
+        });
+
+        $(container_id_mappings[data["success_msg"]]).modal('show');
     } else {
         var unverified_count;
         if (data['success_msg'] == "unverified") {

@@ -312,7 +312,7 @@ class Admin(UserPassesTestMixin, View):
                 if not verify_override and query.exists():
                     form = ProfessorInfoModal(professor, query[0])
                     response["form"] = render_crispy_form(form, form.helper, context=ctx)
-                    response["success_msg"] = "info-modal-container"
+                    response["success_msg"] = "#info-modal-container"
                     return JsonResponse(response)
 
                 if len(split_name) > 2:
@@ -326,7 +326,7 @@ class Admin(UserPassesTestMixin, View):
                     # actually summoned from admin-action.js
                     form = ProfessorSlugForm(professor, modal_title=modal_msg)
                     response["form"] = render_crispy_form(form, form.helper, context=ctx)
-                    response["success_msg"] = modal_msg
+                    response["success_msg"] = "#slug-modal-container"
                     return JsonResponse(response)
 
                 professor.slug = "_".join(reversed(split_name)).lower()
