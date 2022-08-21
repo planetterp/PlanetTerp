@@ -87,7 +87,7 @@ function verifyProfessorSuccess(data, args) {
     if (data['form'] != null) {
         container_id_mappings = {
             "#info-modal-container": "#info-modal",
-            "#slug-modal-container": `#slug-modal-${data['id']}`
+            "#slug-modal-container": "#slug-modal"
         }
 
         $(".modal").modal("hide");
@@ -212,12 +212,12 @@ function mergeProfessorError(data, args) {
 /* ********* SLUG PROFESSOR FUNCTIONS ********* */
 function slugProfessorSuccess(data, args) {
     if (!data["success"]) {
-        var modal_title = $(`#slug-modal-label-${data['id']}`).html();
+        var modal_title = $("#slug-modal-label").html();
         $(".modal-backdrop").remove();
         $("#slug-modal-container").html(`${data['form']}`);
-        $(`#slug-modal-label-${data['id']}`).html(modal_title);
+        $("#slug-modal-label").html(modal_title);
         $("#slug_errors").show()
-        $(`#slug-modal-${data['id']}`).modal('show');
+        $("#slug-modal").modal('show');
     } else {
         var successText = "<div class=\"alert alert-success text-center success-alert\">";
             successText += `<strong>Successfully slugged and verified ${data["type"]}.</strong>`
@@ -230,7 +230,7 @@ function slugProfessorSuccess(data, args) {
 
         $(".modal").modal('hide');
         $("#slug_errors").html();
-        $(`#slug-form-slug-${data['id']}`).removeClass("is-invalid");
+        $("#slug-form-slug").removeClass("is-invalid");
         $('#slug-modal-container').html();
     }
 }
@@ -239,7 +239,7 @@ function slugProfessorError(data, args) {
     var msg = parsed_data['slug'][0]['message'];
     $("#slug_errors").html(msg);
     $("#slug_errors").show();
-    $(`#slug-form-slug-${data['id']}`).addClass("is-invalid");
+    $("#slug-form-slug").addClass("is-invalid");
 }
 
 /* SHARED FUNCTIONS */

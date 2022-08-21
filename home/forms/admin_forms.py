@@ -103,7 +103,7 @@ class ProfessorSlugForm(Form):
         self.fields['professor_id'].initial = self.professor.pk
 
         self.helper = FormHelper()
-        self.helper.form_id = f"slug-form-{self.professor.pk}"
+        self.helper.form_id = "slug-form"
         self.helper.form_class = "slug-form"
         self.helper.form_show_errors = False
         self.helper.layout = self.generate_layout()
@@ -119,26 +119,26 @@ class ProfessorSlugForm(Form):
             Modal(
                 Field(
                     'slug',
-                    id=f"slug-form-slug-{self.professor.pk}",
+                    id="slug-form-slug",
                     placeholder="EX: Andres De Los Reyes = reyes_los_de_andres"
                 ),
                 slug_errors,
                 Field(
                     'professor_id',
-                    id=f"slug-form-id-{self.professor.pk}"
+                    id="slug-form-id"
                 ),
                 'action_type',
                 FormActions(
                     Button(
                         "done",
                         "Done",
-                        id=f"submit-slug-form-{self.professor.pk}",
+                        id="submit-slug-form",
                         css_class="btn-primary float-right mt-3",
-                        onClick=f"verifySlug('#slug-form-{self.professor.pk}')"
+                        onClick="verifySlug('#slug-form')"
                     )
                 ),
-                css_id=f"slug-modal-{self.professor.pk}",
-                title_id=f"slug-modal-label-{self.professor.pk}",
+                css_id="slug-modal",
+                title_id="slug-modal-label",
                 title=self.modal_title
             )
         )
