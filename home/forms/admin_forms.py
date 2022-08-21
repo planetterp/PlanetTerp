@@ -12,7 +12,7 @@ from crispy_forms.layout import Div, Field, Layout, Button, HTML
 from crispy_forms.bootstrap import FormActions, Modal
 
 from home.utils import AdminAction
-from home.models import Course, Review, Professor
+from home.models import Course, Grade, Review, Professor
 from planetterp.settings import DATE_FORMAT
 
 def slug_in_use_err(slug: str, name: str):
@@ -545,6 +545,7 @@ class ProfessorInfoModal(Form):
     def generate_layout(self):
         def get_courses(professor: Professor):
             courses = set()
+
             reviews = Review.unfiltered.filter(professor__id=professor.pk).exclude(course=None).select_related("course")
             if reviews.exists():
                 reviewed_courses = (review.course for review in reviews)
@@ -553,6 +554,11 @@ class ProfessorInfoModal(Form):
             model_courses = Course.unfiltered.filter(professors__id=professor.pk)
             if model_courses.exists():
                 courses.add(tuple(model_courses))
+
+            grades = Grade.unfiltered.filter(professor__id=professor.pk).select_related("course")
+            if grades.exists():
+                courses_from_grades = (grade.course for grade in grades)
+                courses.add(courses_from_grades)
 
             courses = list(chain(*courses))
             return "No Courses" if len(courses) == 0 else ', '.join([course.name for course in courses])
