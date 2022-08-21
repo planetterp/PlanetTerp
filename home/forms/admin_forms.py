@@ -548,12 +548,12 @@ class ProfessorInfoModal(Form):
 
             reviews = Review.unfiltered.filter(professor__id=professor.pk).exclude(course=None).select_related("course")
             if reviews.exists():
-                reviewed_courses = (review.course for review in reviews)
-                courses.add(reviewed_courses)
+                courses_from_reviews = (review.course for review in reviews)
+                courses.add(courses_from_reviews)
 
-            model_courses = Course.unfiltered.filter(professors__id=professor.pk)
-            if model_courses.exists():
-                courses.add(tuple(model_courses))
+            courses_from_courses = Course.unfiltered.filter(professors__id=professor.pk)
+            if courses_from_courses.exists():
+                courses.add(tuple(courses_from_courses))
 
             grades = Grade.unfiltered.filter(professor__id=professor.pk).select_related("course")
             if grades.exists():
