@@ -276,14 +276,14 @@ class ProfessorUpdateForm(ModelForm):
                         'update',
                         'Update',
                         css_id="update-professor",
-                        css_class="btn-primary",
+                        css_class="btn-success",
                         onClick='sendResponse($("#edit-professor-form").serialize(), "professor_edit");'
                     ),
                     Button(
                         'merge',
                         'Merge',
                         css_id="merge-professor",
-                        css_class="btn-secondary",
+                        css_class="btn-primary",
                         onclick=format_html("mergeProfessor({args})", args=json.dumps({"merge_subject": self.professor.name, "subject_id": self.professor.pk}))
                     ),
                     Button(
