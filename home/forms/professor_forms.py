@@ -203,10 +203,6 @@ class ProfessorForm(Form):
         embed = DiscordEmbed(title=title,
             url=self.request.build_absolute_uri(reverse("admin")))
         webhook.add_embed(embed)
-
-        if num % config.WEBHOOK_FREQUENCY != 0:
-            return
-
         webhook.execute()
 
 # The review form that contains fields specific to the review form
