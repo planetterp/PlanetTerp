@@ -177,7 +177,7 @@ class Admin(UserPassesTestMixin, View):
         elif action_type is AdminAction.PROFESSOR_DELETE:
             professor_id = int(data["id_"])
             professor_type = Professor.unfiltered.get(pk=professor_id).type
-            has_reviews = Review.unfiltered.filter(professor__id=professor_id).exists()
+            has_reviews = Review.verified.filter(professor__id=professor_id).exists()
             has_grades = Grade.unfiltered.filter(professor__id=professor_id).exists()
             has_courses = ProfessorCourse.objects.filter(professor__id=professor_id).exists()
             response = {
