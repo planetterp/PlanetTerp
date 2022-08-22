@@ -15,7 +15,7 @@ from google.oauth2 import service_account
 from googleapiclient.discovery import build
 
 from planetterp.config import (WEBHOOK_URL_UPDATE, EMAIL_HOST_USER,
-    EMAIL_SERVICE_ACCOUNT_CREDENTIALS)
+    EMAIL_SERVICE_ACCOUNT_CREDENTIALS, WEBHOOK_FREQUENCY)
 
 @total_ordering
 class Semester:
@@ -205,13 +205,14 @@ def send_updates_webhook(request, *, include_professors=True, include_reviews=Tr
         return
 
     title = ""
+    num_professors = Professor.pending.count()
+    num_reviews = Review.pending.count()
+
     if include_professors:
-        num_professors = Professor.pending.count()
         title += f"{num_professors} unverified professor(s)"
     if include_professors and include_reviews:
         title += " and "
     if include_reviews:
-        num_reviews = Review.pending.count()
         title += f"{num_reviews} unverified review(s)"
 
     webhook = DiscordWebhook(url=WEBHOOK_URL_UPDATE)
@@ -219,6 +220,10 @@ def send_updates_webhook(request, *, include_professors=True, include_reviews=Tr
         url=request.build_absolute_uri(reverse("admin")))
 
     webhook.add_embed(embed)
+
+    if (num_reviews + num_professors) % WEBHOOK_FREQUENCY != 0:
+        return
+
     webhook.execute()
 
 
