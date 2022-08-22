@@ -221,7 +221,7 @@ def send_updates_webhook(request, *, include_professors=True, include_reviews=Tr
 
     webhook.add_embed(embed)
 
-    if num_reviews + num_professors % WEBHOOK_FREQUENCY != 0:
+    if (num_reviews + num_professors) % WEBHOOK_FREQUENCY != 0:
         return
 
     webhook.execute()
