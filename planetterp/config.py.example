@@ -13,4 +13,6 @@ EMAIL_SERVICE_ACCOUNT_CREDENTIALS = None
 
 WEBHOOK_URL_HELP = None
 WEBHOOK_URL_UPDATE = None
+
+# Frequency is in units of notifications. The webhook won't send unless there are WEBHOOK_FREQUENCY new notificaitons
 WEBHOOK_FREQUENCY = 20
