@@ -205,13 +205,14 @@ def send_updates_webhook(request, *, include_professors=True, include_reviews=Tr
         return
 
     title = ""
+    num_professors = Professor.pending.count()
+    num_reviews = Review.pending.count()
+
     if include_professors:
-        num_professors = Professor.pending.count()
         title += f"{num_professors} unverified professor(s)"
     if include_professors and include_reviews:
         title += " and "
     if include_reviews:
-        num_reviews = Review.pending.count()
         title += f"{num_reviews} unverified review(s)"
 
     webhook = DiscordWebhook(url=WEBHOOK_URL_UPDATE)
