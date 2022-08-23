@@ -559,7 +559,7 @@ class ProfessorInfoModal(Form):
                 courses.add(grade.course for grade in grades)
 
             courses = set(chain(*courses))
-            return "No Courses" if len(courses) == 0 else ', '.join([course.name for course in courses])
+            return "No Courses" if len(courses) == 0 else ', '.join(course.name for course in courses)
 
         table_str = '''
             <table class="table">
