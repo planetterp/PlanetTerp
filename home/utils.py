@@ -70,7 +70,7 @@ class Semester:
     def current():
         now = datetime.now()
         # fall
-        if 3 >= now.month >= 9:
+        if 3 <= now.month <= 9:
             semester = "08"
         # spring
         else:
