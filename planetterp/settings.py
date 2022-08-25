@@ -13,7 +13,7 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 from pathlib import Path
 from planetterp import config
 
-
+ADMINS = config.ADMINS
 LOGIN_URL = 'login'
 
 AUTH_USER_MODEL = "home.User"
