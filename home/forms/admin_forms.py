@@ -22,7 +22,7 @@ class ActionForm(Form):
     id_ = IntegerField(required=True, widget=HiddenInput)
     verified = CharField(required=True, widget=HiddenInput)
     action_type = CharField(required=True, widget=HiddenInput)
-    override = BooleanField(required=True, widget=HiddenInput, initial="false")
+    override = BooleanField(required=True, widget=HiddenInput)
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)

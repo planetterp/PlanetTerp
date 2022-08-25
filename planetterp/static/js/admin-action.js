@@ -92,10 +92,6 @@ function verifyProfessorSuccess(data, args) {
 
         $(data["success_msg"]).html(`${data['form']}`);
 
-        $('#info-modal').on('hide.bs.modal', function (e) {
-            $('#override').val("false");
-        });
-
         $(".modal").modal("hide");
         $(container_id_mappings[data["success_msg"]]).modal('show');
     } else {

@@ -110,9 +110,7 @@
 		var professor_counter = (prof_count > 0 ? --prof_count : 0);
 		args = {"count" : professor_counter, "num_reviews" : num_reviews}
 
-		if (form_args["override"]) {
-			$('#override').val("true");
-		}
+		$("#override").val(form_args["override"]);
 
 		if (form_args["action"] != "professor_delete") {
 			$('#verified').val(form_args["action"]);
