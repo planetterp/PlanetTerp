@@ -85,8 +85,15 @@ function verifyHelpSuccess(data, args) {
 /* ********* VERIFY PROFESSOR FUNCTIONS ********* */
 function verifyProfessorSuccess(data, args) {
     if (data['form'] != null) {
-        $("#slug-modal-container").html(`${data['form']}`);
-        $(`#slug-modal-${data['id']}`).modal('show');
+        container_id_mappings = {
+            "#info-modal-container": "#info-modal",
+            "#slug-modal-container": "#slug-modal"
+        }
+
+        $(data["success_msg"]).html(`${data['form']}`);
+
+        $(".modal").modal("hide");
+        $(container_id_mappings[data["success_msg"]]).modal('show');
     } else {
         var unverified_count;
         if (data['success_msg'] == "unverified") {
@@ -113,6 +120,7 @@ function verifyProfessorSuccess(data, args) {
             $(`#professor-${data['id']}`).remove();
             unverified_count = Number($("#unverified_count").html());
             $("#unverified_count").html(unverified_count - 1);
+            $("#info-modal").modal('hide');
         }
     }
 }
@@ -200,12 +208,12 @@ function mergeProfessorError(data, args) {
 /* ********* SLUG PROFESSOR FUNCTIONS ********* */
 function slugProfessorSuccess(data, args) {
     if (!data["success"]) {
-        var modal_title = $(`#slug-modal-label-${data['id']}`).html();
+        var modal_title = $("#slug-modal-label").html();
         $(".modal-backdrop").remove();
         $("#slug-modal-container").html(`${data['form']}`);
-        $(`#slug-modal-label-${data['id']}`).html(modal_title);
+        $("#slug-modal-label").html(modal_title);
         $("#slug_errors").show()
-        $(`#slug-modal-${data['id']}`).modal('show');
+        $("#slug-modal").modal('show');
     } else {
         var successText = "<div class=\"alert alert-success text-center success-alert\">";
             successText += `<strong>Successfully slugged and verified ${data["type"]}.</strong>`
@@ -218,7 +226,7 @@ function slugProfessorSuccess(data, args) {
 
         $(".modal").modal('hide');
         $("#slug_errors").html();
-        $(`#slug-form-slug-${data['id']}`).removeClass("is-invalid");
+        $("#slug-form-slug").removeClass("is-invalid");
         $('#slug-modal-container').html();
     }
 }
@@ -227,7 +235,7 @@ function slugProfessorError(data, args) {
     var msg = parsed_data['slug'][0]['message'];
     $("#slug_errors").html(msg);
     $("#slug_errors").show();
-    $(`#slug-form-slug-${data['id']}`).addClass("is-invalid");
+    $("#slug-form-slug").addClass("is-invalid");
 }
 
 /* SHARED FUNCTIONS */
@@ -256,15 +264,21 @@ function initalizeAutoComplete(csrf_token) {
     });
 }
 
-function mergeProfessor(name, id_) {
-    initalizeAutoComplete('{{ csrf_token }}');
-    $('#id_merge_subject').val(name);
-    $('#id_subject_id').val(id_);
+function mergeProfessor(args) {
+    $('#id_merge_subject').val(args["merge_subject"]);
+    $('#id_subject_id').val(args["subject_id"]);
 
-    if (location.pathname.includes("professor")) {
-        $("#edit-professor-modal").modal('hide');
-        $(".modal-backdrop").hide();
+    if (args["merge_target"]) {
+        $('#id_merge_target').val(args["merge_target"]);
+        $('#id_target_id').val(args["target_id"]);
+        sendResponse($("#merge-form").serialize(), "professor_merge");
+    } else {
+        initalizeAutoComplete('{{ csrf_token }}');
+        if (location.pathname.includes("professor")) {
+            $("#edit-professor-modal").modal('hide');
+            $(".modal-backdrop").hide();
+        }
+
+        $('#merge-modal').modal('show');
     }
-
-    $('#merge-modal').modal('show');
 }

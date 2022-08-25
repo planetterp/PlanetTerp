@@ -31,17 +31,19 @@
 	<div class="tab-pane fade show active" id="reviews-noscroll" role="tabpanel">
 		{% render_table reviews_table %}
 	</div>
+
 	<div class="tab-pane fade" id="professors-noscroll" role="tabpanel">
 		{% render_table professors_table %}
 
 		<div id="merge-container">{% crispy merge_professor_form %}</div>
 		<div id="slug-modal-container"></div>
+		<div id="info-modal-container"></div>
 	</div>
+
 	<div class="tab-pane fade" id="maintenance-noscroll" role="tabpanel">
 		<button class="btn btn-primary" onclick="recomputeTTLCache()">
 			Recompute TTL Caches
 		</button>
-
 
 		<table class="table table-bordered mt-4 mb-4">
 			<thead>
@@ -62,7 +64,6 @@
 				{% endfor %}
 			</tbody>
 		</table>
-
 	</div>
 </div>
 
@@ -104,17 +105,19 @@
 		sendResponse($('#action_form').serialize(), action_type, args);
 	}
 
-	function verifyProfessor(professor_id, action) {
-		var action_type = action;
+	function verifyProfessor(form_args) {
+		var action_type = form_args["action"];
 		var professor_counter = (prof_count > 0 ? --prof_count : 0);
 		args = {"count" : professor_counter, "num_reviews" : num_reviews}
 
-		if (action != "professor_delete") {
-			$('#verified').val(action);
+		$("#override").val(form_args["override"]);
+
+		if (form_args["action"] != "professor_delete") {
+			$('#verified').val(form_args["action"]);
 			action_type = "professor_verify";
 		}
 
-		$('#id_').val(professor_id);
+		$('#id_').val(form_args["professor_id"]);
 		$('#action_type').val(action_type);
 		sendResponse($('#action_form').serialize(), action_type, args);
 	}

@@ -1,5 +1,6 @@
 from datetime import date
 from abc import abstractmethod
+import json
 
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
@@ -239,20 +240,21 @@ class UnverifiedProfessorsActionColumn(ActionColumn):
             <div class="unverified_professor_{id} container" style="white-space: nowrap;">
                 <div class="row">
                     <div class="col">
-                        <button class="btn btn-success w-100" onClick="verifyProfessor('{id}', 'verified')" style="border-bottom-left-radius: 0; border-bottom-right-radius: 0;">Verify</button>
+                        <button class="btn btn-success w-100" onClick="verifyProfessor({{'professor_id': {id}, 'action':'verified', 'override':'false'}})" style="border-bottom-left-radius: 0; border-bottom-right-radius: 0;">Verify</button>
                     </div>
                 </div>
                 <div class="row">
                     <div class="col btn-group">
-                        <button class="btn btn-danger w-50" onClick="verifyProfessor('{id}', 'rejected')" style="border-top-left-radius: 0;">Reject</button>
-                        <button class="btn btn-primary rounded-0" onclick="mergeProfessor('{name}', '{id}')">Merge</button>
-                        <button class="btn btn-dark" onClick="verifyProfessor('{id}', 'professor_delete')" style="border-top-right-radius: 0;">Delete</button>
+                        <button class="btn btn-danger w-50" onClick="verifyProfessor({{'professor_id': {id}, 'action':'rejected', 'override':'false'}})" style="border-top-left-radius: 0;">Reject</button>
+                        <button class="btn btn-primary rounded-0" onclick="mergeProfessor({args})">Merge</button>
+                        <button class="btn btn-dark" onClick="verifyProfessor({{'professor_id': {id}, 'action':'professor_delete', 'override':'false'}})" style="border-top-right-radius: 0;">Delete</button>
                     </div>
                 </div>
         '''
         kwargs = {
             "id": model_obj.pk,
             "name": model_obj.name,
-            "csrf": csrf_token['csrf_token']
+            "csrf": csrf_token['csrf_token'],
+            "args": json.dumps({"merge_subject": model_obj.name, "subject_id": model_obj.pk})
         }
         return format_html(column_html, **kwargs)

@@ -1,5 +1,5 @@
 from django.core.exceptions import ValidationError
-from django.forms import CharField, IntegerField, DateField, ChoiceField
+from django.forms import CharField, IntegerField, DateField, ChoiceField, BooleanField
 from django.forms.widgets import DateInput, HiddenInput, TextInput
 from django.utils.html import format_html
 from django.forms import Form, ModelForm
@@ -9,7 +9,7 @@ from crispy_forms.layout import Div, Field, Layout, Button, HTML
 from crispy_forms.bootstrap import FormActions, Modal
 
 from home.utils import AdminAction
-from home.models import Review, Professor
+from home.models import Course, Grade, Review, Professor
 from planetterp.settings import DATE_FORMAT
 
 def slug_in_use_err(slug: str, name: str):
@@ -22,6 +22,7 @@ class ActionForm(Form):
     id_ = IntegerField(required=True, widget=HiddenInput)
     verified = CharField(required=True, widget=HiddenInput)
     action_type = CharField(required=True, widget=HiddenInput)
+    override = BooleanField(required=True, widget=HiddenInput)
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -35,7 +36,8 @@ class ActionForm(Form):
         return Layout(
             Field('id_', id="id_"),
             Field('verified', id="verified"),
-            Field('action_type', id="action_type")
+            Field('action_type', id="action_type"),
+            Field('override', id="override")
         )
 
 # For unverifying a verified review. Currently used on /professor
@@ -98,7 +100,7 @@ class ProfessorSlugForm(Form):
         self.fields['professor_id'].initial = self.professor.pk
 
         self.helper = FormHelper()
-        self.helper.form_id = f"slug-form-{self.professor.pk}"
+        self.helper.form_id = "slug-form"
         self.helper.form_class = "slug-form"
         self.helper.form_show_errors = False
         self.helper.layout = self.generate_layout()
@@ -114,26 +116,26 @@ class ProfessorSlugForm(Form):
             Modal(
                 Field(
                     'slug',
-                    id=f"slug-form-slug-{self.professor.pk}",
+                    id="slug-form-slug",
                     placeholder="EX: Andres De Los Reyes = reyes_los_de_andres"
                 ),
                 slug_errors,
                 Field(
                     'professor_id',
-                    id=f"slug-form-id-{self.professor.pk}"
+                    id="slug-form-id"
                 ),
                 'action_type',
                 FormActions(
                     Button(
                         "done",
                         "Done",
-                        id=f"submit-slug-form-{self.professor.pk}",
+                        id="submit-slug-form",
                         css_class="btn-primary float-right mt-3",
-                        onClick=f"verifySlug('#slug-form-{self.professor.pk}')"
+                        onClick="verifySlug('#slug-form')"
                     )
                 ),
-                css_id=f"slug-modal-{self.professor.pk}",
-                title_id=f"slug-modal-label-{self.professor.pk}",
+                css_id="slug-modal",
+                title_id="slug-modal-label",
                 title=self.modal_title
             )
         )
@@ -271,15 +273,15 @@ class ProfessorUpdateForm(ModelForm):
                         'update',
                         'Update',
                         css_id="update-professor",
-                        css_class="btn-primary",
+                        css_class="btn-success",
                         onClick='sendResponse($("#edit-professor-form").serialize(), "professor_edit");'
                     ),
                     Button(
                         'merge',
                         'Merge',
                         css_id="merge-professor",
-                        css_class="btn-secondary",
-                        onclick=format_html("mergeProfessor('{name}', '{id}')", name=self.professor.name, id=self.professor.pk)
+                        css_class="btn-primary",
+                        onclick=format_html("mergeProfessor({args})", args={"merge_subject": self.professor.name, "subject_id": self.professor.pk})
                     ),
                     Button(
                         'unverify',
@@ -524,3 +526,92 @@ class ProfessorMergeForm(Form):
                     self.add_error('merge_target', error)
 
         return cleaned_data
+
+
+# Used on /admin when verifying professors that might be duplicates of already
+# verified professors.
+class ProfessorInfoModal(Form):
+    def __init__(self, unverified_professor: Professor, verified_professor: Professor):
+        super().__init__()
+        self.unverified_professor = unverified_professor
+        self.verified_professor = verified_professor
+        self.helper = FormHelper()
+        self.helper.form_tag = False
+        self.helper.layout = self.generate_layout()
+
+    def generate_layout(self):
+        def get_courses(professor: Professor):
+            courses = set()
+
+            reviews = Review.unfiltered.filter(professor__id=professor.pk).exclude(course=None).select_related("course")
+            if reviews.exists():
+                courses |= {review.course for review in reviews}
+
+            courses_from_courses = Course.unfiltered.filter(professors__id=professor.pk)
+            if courses_from_courses.exists():
+                courses |= {course for course in courses_from_courses}
+
+            grades = Grade.unfiltered.filter(professor__id=professor.pk).select_related("course")
+            if grades.exists():
+                courses |= {grade.course for grade in grades}
+
+            return "No Courses" if len(courses) == 0 else ', '.join(course.name for course in courses)
+
+        table_str = '''
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Courses</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>{unverified_name} (this professor)</td>
+                        <td>{unverified_courses}</td>
+                    </tr>
+                    <tr>
+                        <td><a href="{absolute_url}" target="_blank">{verified_name}</a></td>
+                        <td>{verified_courses}</td>
+                    </tr>
+                </tbody>
+            </table>
+        '''
+        kwargs = {
+            "unverified_name": self.unverified_professor.name,
+            "unverified_courses": get_courses(self.unverified_professor),
+            "absolute_url": self.verified_professor.get_absolute_url(),
+            "verified_name": self.verified_professor.name,
+            "verified_courses": get_courses(self.verified_professor)
+        }
+
+        modal_title = (
+            f'This {self.unverified_professor.type} might be a duplicate of <b>{self.verified_professor.name} ({self.verified_professor.pk})</b>. <br>'
+            f'Given the information below, please decide if these {self.unverified_professor.type}s are the same.'
+        )
+        merge_data = {
+            "merge_subject": self.unverified_professor.name,
+            "subject_id": self.unverified_professor.pk,
+            "merge_target": self.verified_professor.name,
+            "target_id": self.verified_professor.pk
+        }
+
+        verify_data = {
+            "professor_id": self.unverified_professor.pk,
+            "action": "verified",
+            "override": "true"
+        }
+
+        return Layout(
+            Modal(
+                HTML(format_html(table_str, **kwargs)),
+                Div(
+                    Button("verify", "Verify", css_class="btn btn-success", onclick=format_html("verifyProfessor({args})", args=verify_data)),
+                    Button("merge", "Merge", css_class="btn btn-primary", onclick=format_html("mergeProfessor({args})", args=merge_data)),
+                    css_class="btn-group w-100"
+                ),
+                css_id="info-modal",
+                title=format_html(modal_title),
+                title_class="text-center"
+            )
+        )
