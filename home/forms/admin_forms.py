@@ -1,4 +1,3 @@
-from itertools import chain
 import json
 
 from django.core.exceptions import ValidationError
@@ -548,17 +547,16 @@ class ProfessorInfoModal(Form):
 
             reviews = Review.unfiltered.filter(professor__id=professor.pk).exclude(course=None).select_related("course")
             if reviews.exists():
-                courses.add(review.course for review in reviews)
+                courses |= {review.course for review in reviews}
 
             courses_from_courses = Course.unfiltered.filter(professors__id=professor.pk)
             if courses_from_courses.exists():
-                courses.add(course for course in courses_from_courses)
+                courses |= {course for course in courses_from_courses}
 
             grades = Grade.unfiltered.filter(professor__id=professor.pk).select_related("course")
             if grades.exists():
-                courses.add(grade.course for grade in grades)
+                courses |= {grade.course for grade in grades}
 
-            courses = set(chain(*courses))
             return "No Courses" if len(courses) == 0 else ', '.join(course.name for course in courses)
 
         table_str = '''
