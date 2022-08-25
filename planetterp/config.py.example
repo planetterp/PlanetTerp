@@ -6,6 +6,7 @@ PASSWORD = ''
 SECRET_KEY = 'django-insecure-zt7yxn++)bh)j#wzb)ofgd0^scu9rwr85%=3l%6g1zt(cx!t)_'
 STATIC_ROOT = None
 ADS_ENABLED = False
+ADMINS = []
 
 EMAIL_HOST_USER = None
 EMAIL_HOST_PASSWORD = None # app password
