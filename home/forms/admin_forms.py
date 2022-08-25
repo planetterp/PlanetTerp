@@ -1,5 +1,3 @@
-import json
-
 from django.core.exceptions import ValidationError
 from django.forms import CharField, IntegerField, DateField, ChoiceField, BooleanField
 from django.forms.widgets import DateInput, HiddenInput, TextInput
@@ -283,7 +281,7 @@ class ProfessorUpdateForm(ModelForm):
                         'Merge',
                         css_id="merge-professor",
                         css_class="btn-primary",
-                        onclick=format_html("mergeProfessor({args})", args=json.dumps({"merge_subject": self.professor.name, "subject_id": self.professor.pk}))
+                        onclick=format_html("mergeProfessor({args})", args={"merge_subject": self.professor.name, "subject_id": self.professor.pk})
                     ),
                     Button(
                         'unverify',
@@ -609,7 +607,7 @@ class ProfessorInfoModal(Form):
                 HTML(format_html(table_str, **kwargs)),
                 Div(
                     Button("verify", "Verify", css_class="btn btn-success", onclick=format_html("verifyProfessor({args})", args=verify_data)),
-                    Button("merge", "Merge", css_class="btn btn-primary", onclick=format_html("mergeProfessor({args})", args=json.dumps(merge_data))),
+                    Button("merge", "Merge", css_class="btn btn-primary", onclick=format_html("mergeProfessor({args})", args=merge_data)),
                     css_class="btn-group w-100"
                 ),
                 css_id="info-modal",
