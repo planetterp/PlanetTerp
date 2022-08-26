@@ -1,6 +1,5 @@
 from datetime import date
 from abc import abstractmethod
-import json
 
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
@@ -255,6 +254,6 @@ class UnverifiedProfessorsActionColumn(ActionColumn):
             "id": model_obj.pk,
             "name": model_obj.name,
             "csrf": csrf_token['csrf_token'],
-            "args": json.dumps({"merge_subject": model_obj.name, "subject_id": model_obj.pk})
+            "args": {"merge_subject": model_obj.name, "subject_id": model_obj.pk}
         }
         return format_html(column_html, **kwargs)
