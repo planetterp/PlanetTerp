@@ -7,6 +7,14 @@ SECRET_KEY = 'django-insecure-zt7yxn++)bh)j#wzb)ofgd0^scu9rwr85%=3l%6g1zt(cx!t)_
 STATIC_ROOT = None
 ADS_ENABLED = False
 ADMINS = []
+DEBUG = True
+ALLOWED_HOSTS = [
+    "planetterp.com",
+    "api.planetterp.com",
+    "localhost",
+    "127.0.0.1",
+]
+
 
 EMAIL_HOST_USER = None
 EMAIL_HOST_PASSWORD = None # app password
