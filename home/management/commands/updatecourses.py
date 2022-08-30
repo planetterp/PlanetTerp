@@ -68,7 +68,7 @@ class Command(BaseCommand):
             if not professor:
                 # To make our lives easier, attempt to automatically verify the professor
                 # following the same criteria in admin.py
-                split_name = item['name'].strip().split(" ")
+                split_name = item['name'].strip().split()
                 first_name = split_name[0].lower().strip()
                 last_name = split_name[-1].lower().strip()
                 query = Professor.verified.filter(
