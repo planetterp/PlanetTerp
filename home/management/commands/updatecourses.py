@@ -1,6 +1,7 @@
 import requests
 
 from django.core.management import BaseCommand
+from django.db.models import Q
 
 from home.models import Course, Professor
 from home.utils import Semester
@@ -47,7 +48,7 @@ class Command(BaseCommand):
                 kwargs["page"] += 1
                 course_data = requests.get("https://api.umd.io/v1/courses", params=kwargs).json()
 
-        print(f"New Courses Created: {self.num_new_courses}")
+        print(f"\nNew Courses Created: {self.num_new_courses}")
         print(f"New Professors Created: {self.num_new_professors}")
 
     def _professors(self, course):
@@ -65,7 +66,25 @@ class Command(BaseCommand):
                 continue
 
             if not professor:
+                # To make our lives easier, attempt to automatically verify the professor
+                # following the same criteria in admin.py
+                split_name = item['name'].strip().split(" ")
+                first_name = split_name[0].lower().strip()
+                last_name = split_name[-1].lower().strip()
+                query = Professor.verified.filter(
+                    (
+                        Q(name__istartswith=first_name) &
+                        Q(name__iendswith=last_name)
+                    ) |
+                    Q(slug="_".join(reversed(split_name)).lower())
+                )
+
                 professor = Professor(name=item['name'], type=Professor.Type.PROFESSOR)
+
+                if not query.exists() and len(split_name) < 2:
+                    professor.slug = "_".join(reversed(split_name)).lower()
+                    professor.verified = Professor.Status.VERIFIED
+
                 professor.save()
                 self.num_new_professors += 1
                 print(f"Created professor {professor.name} for {course.name}")
