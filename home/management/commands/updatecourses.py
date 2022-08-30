@@ -56,7 +56,14 @@ class Command(BaseCommand):
         professor_data = requests.get("https://api.umd.io/v1/professors", params=kwargs).json()
 
         for item in professor_data:
-            professor = Professor.unfiltered.filter(name=item['name']).first()
+            try:
+                professor = Professor.unfiltered.filter(name=item['name']).first()
+            except Exception:
+                continue
+
+            if item['name'] == "Instructor: TBA":
+                continue
+
             if not professor:
                 professor = Professor(name=item['name'], type=Professor.Type.PROFESSOR)
                 professor.save()
