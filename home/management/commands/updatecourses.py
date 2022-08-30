@@ -1,6 +1,6 @@
 import requests
 
-from django.core.management import BaseCommand, CommandError
+from django.core.management import BaseCommand
 
 from home.models import Course, Professor
 from home.utils import Semester
