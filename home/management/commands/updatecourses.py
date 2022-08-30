@@ -79,7 +79,8 @@ class Command(BaseCommand):
                     Q(slug="_".join(reversed(split_name)).lower())
                 )
 
-                professor = Professor(name=item['name'], type=Professor.Type.PROFESSOR)
+                prof_name = " ".join([name.capitalize() for name in item['name'].split()])
+                professor = Professor(name=prof_name, type=Professor.Type.PROFESSOR)
 
                 if not query.exists() and len(split_name) < 2:
                     professor.slug = "_".join(reversed(split_name)).lower()
