@@ -3,6 +3,7 @@ import requests
 from django.core.management import BaseCommand, CommandError
 
 from home.models import Course, Professor
+from home.utils import Semester
 
 class Command(BaseCommand):
     def __init__(self):
@@ -15,6 +16,12 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         for semester in options['semesters']:
+            s = Semester(semester)
+            if Semester.current() < s:
+                print(f"{s.name()} hasn't happened yet! Skipping...")
+                continue
+
+            print(f"Working on data for {s.name()}...")
             kwargs = {"semester": semester, "per_page": 100, "page": 1}
             course_data = requests.get("https://api.umd.io/v1/courses", params=kwargs).json()
             while course_data:
