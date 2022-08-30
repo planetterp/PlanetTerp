@@ -31,7 +31,7 @@ class Command(BaseCommand):
                         course = Course(
                             name=item['course_id'],
                             department=item['dept_id'],
-                            course_number=item['course_id'][-3:],
+                            course_number=item['course_id'][4:],
                             title=item['name'],
                             credits=item['credits'],
                             description=self._description(item["relationships"])
@@ -44,15 +44,15 @@ class Command(BaseCommand):
                     professors = self._professors(course)
                     course.professors.add(*professors)
 
-                    kwargs["page"] += 1
-                    course_data = requests.get("https://api.umd.io/v1/courses", params=kwargs).json()
+                kwargs["page"] += 1
+                course_data = requests.get("https://api.umd.io/v1/courses", params=kwargs).json()
 
-        print(f"New Courses Added: {self.num_new_courses}")
-        print(f"New Professors Added: {self.num_new_professors}")
+        print(f"New Courses Created: {self.num_new_courses}")
+        print(f"New Professors Created: {self.num_new_professors}")
 
     def _professors(self, course):
         ret = []
-        kwargs = {"course_id":course.name}
+        kwargs = {"course_id": course.name}
         professor_data = requests.get("https://api.umd.io/v1/professors", params=kwargs).json()
 
         for item in professor_data:
@@ -61,7 +61,7 @@ class Command(BaseCommand):
                 professor = Professor(name=item['name'], type=Professor.Type.PROFESSOR)
                 professor.save()
                 self.num_new_professors += 1
-                print(f"  Created professor {professor.name}")
+                print(f"Created professor {professor.name} for {course.name}")
 
             ret.append(professor)
 
