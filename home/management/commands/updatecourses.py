@@ -84,7 +84,7 @@ class Command(BaseCommand):
 
                 if (not query.exists()) and len(split_name) <= 2:
                     professor.slug = "_".join(reversed(split_name)).lower()
-                    professor.verified = Professor.Status.VERIFIED
+                    professor.status = Professor.Status.VERIFIED
 
                 professor.save()
                 self.num_new_professors += 1
