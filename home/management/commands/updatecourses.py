@@ -35,7 +35,16 @@ class Command(BaseCommand):
                             course_number=item['course_id'][4:],
                             title=item['name'],
                             credits=item['credits'],
-                            description=self._description(item["relationships"])
+                            additional_info=item['relationships']['additional_info'],
+                            cross_listed_with=item['relationships']['also_offered_as'],
+                            credit_granted_for=item['relationships']['credit_granted_for'],
+                            formerly=item['relationships']['formerly'],
+                            prereqs=item['relationships']['prereqs'],
+                            recs=item['relationships']['recs'], # TODO: check name after umdio gets updated
+                            coreqs=item['relationships']['coreqs'],
+                            restrictions=item['relationships']['restrictions'],
+                            # TODO: Add new field when umdio gets updated
+                            description=item["description"]
                         )
 
                         course.save()
@@ -93,15 +102,3 @@ class Command(BaseCommand):
             ret.append(professor)
 
         return ret
-
-    def _description(self, relationships):
-        mappings = {
-            "prereqs": "\n<b>Prerequisite:</b> ",
-            "coreqs": "\n<b>Corequisite:</b> ",
-            "restrictions": "\n<b>Restriction:</b> ",
-            "formerly": "\n<b>Formerly:</b> ",
-            "credit_granted_for": "\n<b>Credit only granted for:</b> ",
-            "additional_info": "\n<b>Additional information:</b> "
-        }
-        description = "".join([mappings[key] + relationships[key] for key in mappings.keys() if relationships[key]])
-        return description
