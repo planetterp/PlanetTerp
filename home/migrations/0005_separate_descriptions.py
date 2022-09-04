@@ -33,7 +33,7 @@ def forwards_func(apps, schema_editor):
                 desc = re.sub(pattern, '', desc)
 
         desc = desc.strip('\'').strip('\"').strip()
-        if desc.isspace() or desc in ['', 'None', None]:
+        if desc in ['', 'None']:
             course.description = None
         else:
             # Some descriptions on testduo have links to different pages.
