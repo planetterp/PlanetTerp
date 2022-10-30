@@ -83,7 +83,7 @@ class Admin(UserPassesTestMixin, View):
                 embed = DiscordEmbed(title=professor.name, description="\n", url=admin_url)
                 course = review.course.name if review.course else "N/A"
                 review_text = review_text if len(review_text) <= 1000 else review_text[:1000] + "..."
-                username = "Anonymous" if review.anonymous else review.user.username
+                username = "Anonymous" if (review.anonymous or not review.user) else review.user.username
 
                 embed.add_embed_field(name="Reviewer", value=username, inline=True)
                 embed.add_embed_field(name="Course", value=course, inline=True)
