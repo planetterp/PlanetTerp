@@ -4,7 +4,7 @@ from datetime import datetime
 from django.core.management import BaseCommand
 from django.db.models import Q
 
-from home.models import Course, Professor
+from home.models import Course, Professor, ProfessorCourse
 from home.utils import Semester
 
 class Command(BaseCommand):
@@ -26,7 +26,7 @@ class Command(BaseCommand):
             kwargs = {"semester": semester, "per_page": 100, "page": 1}
             course_data = requests.get("https://api.umd.io/v1/courses", params=kwargs).json()
 
-            if course_data["error_code"]:
+            if "error_code" in course_data[0].keys():
                 print(f"{s.name()} hasn't happened yet! Skipping...")
                 continue
 
@@ -34,7 +34,6 @@ class Command(BaseCommand):
 
             while course_data:
                 for umdio_course in course_data:
-                    output = ""
                     course = Course.unfiltered.filter(name=umdio_course['course_id']).first()
                     if not course:
                         course = Course(
@@ -57,17 +56,10 @@ class Command(BaseCommand):
 
                         course.save()
                         self.total_num_new_courses += 1
-                        output += "created"
 
-                    new_professors = self._professors(course)
-                    num_new_professors = len(new_professors)
-                    if num_new_professors > 0:
-                        output += f"{'updated' if output == '' else 'and updated'}"
-                        course.professors.add(*new_professors)
-
-                    print(output + f"course {course.name}")
-
+                    self._professors(course, s)
                     print(course)
+
                 kwargs["page"] += 1
                 course_data = requests.get("https://api.umd.io/v1/courses", params=kwargs).json()
 
@@ -77,11 +69,9 @@ class Command(BaseCommand):
         runtime = datetime.now() - t_start
         print(f"Runtime: {round(runtime.seconds / 60, 2)} minutes")
 
-    def _professors(self, course: Course):
-        new_professors = set()
+    def _professors(self, course: Course, semester: Semester):
         kwargs = {"course_id": course.name}
         umdio_professors = requests.get("https://api.umd.io/v1/professors", params=kwargs).json()
-        course_professors = course.professors.all()
 
         for umdio_professor in umdio_professors:
             try:
@@ -116,7 +106,8 @@ class Command(BaseCommand):
                 professor.save()
                 self.total_num_new_professors += 1
 
-            if professor not in course_professors:
-                new_professors.add(professor)
-
-        return new_professors
+            for entry in umdio_professor['taught']:
+                c, s = entry.values()
+                if c == course.name and Semester(s) == semester:
+                    ProfessorCourse.objects.create(course=course, professor=professor, recent_semester=semester)
+                    break
