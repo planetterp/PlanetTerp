@@ -99,7 +99,7 @@ class Command(BaseCommand):
                 prof_name = " ".join([name.capitalize() for name in umdio_professor['name'].split()])
                 professor = Professor(name=prof_name, type=Professor.Type.PROFESSOR)
 
-                if (not query.exists()) and len(split_name) <= 2:
+                if not query.exists():
                     professor.slug = "_".join(reversed(split_name)).lower()
                     professor.status = Professor.Status.VERIFIED
 
