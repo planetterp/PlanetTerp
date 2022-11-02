@@ -32,8 +32,8 @@ class Command(BaseCommand):
 
             while course_data:
                 for umdio_course in course_data:
+                    output = ""
                     course = Course.unfiltered.filter(name=umdio_course['course_id']).first()
-
                     if not course:
                         course = Course(
                             name=umdio_course['course_id'],
@@ -55,10 +55,17 @@ class Command(BaseCommand):
 
                         course.save()
                         self.total_num_new_courses += 1
-                        print(f"Created course {course.name}")
+                        output += "created"
 
-                    self._professors(course)
+                    new_professors = self._professors(course)
+                    num_new_professors = len(new_professors)
+                    if num_new_professors > 0:
+                        output += f"{'updated' if output == '' else 'and updated'}"
+                        course.professors.add(*new_professors)
 
+                    print(output + f"course {course.name}")
+
+                    print(course)
                 kwargs["page"] += 1
                 course_data = requests.get("https://api.umd.io/v1/courses", params=kwargs).json()
 
@@ -103,12 +110,8 @@ class Command(BaseCommand):
 
                 professor.save()
                 self.total_num_new_professors += 1
-                print(f"Created professor {professor.name} for {course.name}")
 
             if professor not in course_professors:
                 new_professors.add(professor)
 
-        num_new_professors = len(new_professors)
-        if num_new_professors > 0:
-            print(f"Updated course {course.name} with {num_new_professors} new {'professors' if num_new_professors > 0 else 'professor'}")
-            course.professors.add(*new_professors)
+        return new_professors
