@@ -1,4 +1,5 @@
 import requests
+from datetime import datetime
 
 from django.core.management import BaseCommand
 from django.db.models import Q
@@ -16,6 +17,7 @@ class Command(BaseCommand):
         parser.add_argument("semesters", nargs='+')
 
     def handle(self, *args, **options):
+        t_start = datetime.now()
         inputted_semesters = [Semester(s).name() for s in options['semesters']]
         print(f"Inputted Semesters: {', '.join(inputted_semesters)}")
 
@@ -71,6 +73,9 @@ class Command(BaseCommand):
 
         print(f"\n** New Courses Created: {self.total_num_new_courses} **")
         print(f"** New Professors Created: {self.total_num_new_professors} **")
+
+        runtime = datetime.now() - t_start
+        print(f"Runtime: {round(runtime.seconds / 60, 2)} minutes")
 
     def _professors(self, course: Course):
         new_professors = set()
