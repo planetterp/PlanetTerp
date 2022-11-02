@@ -21,13 +21,15 @@ class Command(BaseCommand):
 
         for semester in options['semesters']:
             s = Semester(semester)
-            if Semester.current() < s:
+            kwargs = {"semester": semester, "per_page": 100, "page": 1}
+            course_data = requests.get("https://api.umd.io/v1/courses", params=kwargs).json()
+
+            if course_data["error_code"]:
                 print(f"{s.name()} hasn't happened yet! Skipping...")
                 continue
 
             print(f"Working on courses for {s.name()}...")
-            kwargs = {"semester": semester, "per_page": 100, "page": 1}
-            course_data = requests.get("https://api.umd.io/v1/courses", params=kwargs).json()
+
             while course_data:
                 for umdio_course in course_data:
                     course = Course.unfiltered.filter(name=umdio_course['course_id']).first()
