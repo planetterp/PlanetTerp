@@ -27,7 +27,7 @@ class Command(BaseCommand):
             course_data = requests.get("https://api.umd.io/v1/courses", params=kwargs).json()
 
             if "error_code" in course_data[0].keys():
-                print(f"{s.name()} hasn't happened yet! Skipping...")
+                print(f"umd.io doesn't have data for {s.name()}!")
                 continue
 
             print(f"Working on courses for {s.name()}...")
