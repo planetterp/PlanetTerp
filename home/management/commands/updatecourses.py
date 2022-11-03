@@ -18,19 +18,18 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         t_start = datetime.now()
-        inputted_semesters = [Semester(s).name() for s in options['semesters']]
-        print(f"Inputted Semesters: {', '.join(inputted_semesters)}")
+        semesters = [Semester(s) for s in options['semesters']]
+        print(f"Inputted Semesters: {', '.join(s.name for s in semesters)}")
 
-        for semester in options['semesters']:
-            s = Semester(semester)
+        for semester in semesters:
             kwargs = {"semester": semester, "per_page": 100, "page": 1}
             course_data = requests.get("https://api.umd.io/v1/courses", params=kwargs).json()
 
             if "error_code" in course_data[0].keys():
-                print(f"umd.io doesn't have data for {s.name()}!")
+                print(f"umd.io doesn't have data for {semester.name()}!")
                 continue
 
-            print(f"Working on courses for {s.name()}...")
+            print(f"Working on courses for {semester.name()}...")
 
             while course_data:
                 for umdio_course in course_data:
@@ -48,7 +47,7 @@ class Command(BaseCommand):
                         course.save()
                         self.total_num_new_courses += 1
 
-                    self._professors(course, s)
+                    self._professors(course, semester)
                     print(course)
 
                 kwargs["page"] += 1
