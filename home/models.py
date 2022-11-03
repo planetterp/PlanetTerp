@@ -182,6 +182,14 @@ class Course(Model):
     title = TextField(null=True)
     credits = IntegerField(null=True)
     description = TextField(null=True)
+    prereqs = TextField(null=True)
+    coreqs = TextField(null=True)
+    recs = TextField(null=True)
+    restrictions = TextField(null=True)
+    formerly = TextField(null=True)
+    cross_listed_with = TextField(null=True)
+    credit_granted_for = TextField(null=True)
+    additional_info = TextField(null=True)
     created_at = DateTimeField(auto_now_add=True)
     # determining whether a course is recent or not can actually be extremely
     # expensive (for reasons I don't quite understand - lacking proper
