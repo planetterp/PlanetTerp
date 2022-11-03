@@ -97,7 +97,6 @@ class Command(BaseCommand):
                 self.total_num_new_professors += 1
 
             for entry in umdio_professor['taught']:
-                c, s = entry.values()
-                if c == course.name and Semester(s) == semester:
+                if entry['course_id'] == course.name and Semester(entry['semester']) == semester:
                     ProfessorCourse.objects.create(course=course, professor=professor, recent_semester=semester)
                     break
