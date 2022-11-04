@@ -32,7 +32,7 @@ class Professor(View):
         courses_taught = (
             Course.recent
             .filter(professors__pk=professor.pk)
-            .order_by("name")
+            .order_by("name").distinct()
         )
 
         courses_reviewed = []
