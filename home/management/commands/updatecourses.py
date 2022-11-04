@@ -19,7 +19,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         t_start = datetime.now()
         semesters = [Semester(s) for s in options['semesters']]
-        print(f"Inputted Semesters: {', '.join(s.name for s in semesters)}")
+        print(f"Inputted Semesters: {', '.join(s.name() for s in semesters)}")
 
         for semester in semesters:
             kwargs = {"semester": semester, "per_page": 100, "page": 1}
