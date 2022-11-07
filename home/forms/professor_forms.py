@@ -187,8 +187,11 @@ class ProfessorForm(Form):
 # The review form that contains fields specific to the review form
 class ProfessorFormReview(ProfessorForm):
     course = ChoiceField(
-        required=False,
-        label=False
+        required=True,
+        label=False,
+        error_messages={
+            "required": "You must select a course"
+        }
     )
 
     other_course = CharField(
