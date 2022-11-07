@@ -43,11 +43,9 @@ class Command(BaseCommand):
             for row in reader:
                 self.add_grade(row)
 
-        try:
-            grades = Grade.unfiltered.bulk_create(self.grades)
-            self.stdout.write(f"Done, added {len(grades)} grades")
-        except Exception as e:
-            print(e)
+
+        grades = Grade.unfiltered.bulk_create(self.grades)
+        self.stdout.write(f"Done, added {len(grades)} grades")
 
         if self.reject_rows:
             print(f"Exporting {len(self.reject_rows)} rejected rows...")
