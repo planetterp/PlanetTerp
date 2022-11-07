@@ -240,8 +240,6 @@ class ProfessorFormReview(ProfessorForm):
         return self.cleaned_data
 
     def validate_course(self, course, other_course):
-        clean_course = None
-
         if course =='other':
             if other_course == '' or other_course.isspace():
                 error_msg = "Please specify a course or select one from the dropdown above"
@@ -249,12 +247,10 @@ class ProfessorFormReview(ProfessorForm):
                 self.add_error("other_course", error)
             else:
                 clean_course = other_course
-        elif course == '':
-            clean_course = None
         else:
             clean_course = course
 
-        if clean_course and not Course.unfiltered.filter(name=clean_course.replace(" ", "")).exists():
+        if not Course.unfiltered.filter(name=clean_course.replace(" ", "")).exists():
             error_msg = '''The course you specified is not in our database.
                 If you think it should be, please email us at admin@planetterp.com.'''
             error = ValidationError(error_msg, code='Not Found')
