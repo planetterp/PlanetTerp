@@ -279,9 +279,12 @@ class ProfessorFormAdd(ProfessorForm):
     )
 
     course = CharField(
-        required=False,
+        required=True,
         widget=TextInput,
-        label=False
+        label=False,
+        error_messages={
+            "required": "You must enter a course"
+        }
     )
 
     def __init__(self, user, **kwargs):
