@@ -48,8 +48,17 @@ class ReviewListSerializer(ListSerializer):
 
 class ProfessorListSerializer(ListSerializer):
     def to_representation(self, data):
-        data = data.filter(status=Professor.Status.VERIFIED)
-        return super().to_representation()
+        # one would expect to be able to write
+        # `data.filter(status=Professor.Status.VERIFIED)` here, but filtering an
+        # already-sliced queryset is prohibited by django due to ambiguity
+        # concerns: https://docs.djangoproject.com/en/3.2/ref/models/querysets/.
+        # I can't see how it would be ambiguous unless you did something like
+        # slice-filter-slice, but oh well.
+        # We should be careful in the future that this doesn't cause performance
+        # issues; this relies on slicing already having occured before we
+        # receive `data`, limiting it to a reasonable 100 professors.
+        data = [p for p in data if p.status == Professor.Status.VERIFIED]
+        return super().to_representation(data)
 
 class ReviewsSerializer(ModelSerializer):
     course = CourseField()
