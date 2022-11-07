@@ -43,7 +43,6 @@ class Command(BaseCommand):
             for row in reader:
                 self.add_grade(row)
 
-
         grades = Grade.unfiltered.bulk_create(self.grades)
         self.stdout.write(f"Done, added {len(grades)} grades")
 
