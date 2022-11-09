@@ -6,6 +6,7 @@ google-auth-httplib2
 mysqlclient==2.1.0
 django==3.2.4
 fuzzywuzzy==0.18.0
+python-Levenshtein==0.20.8
 
 # django addons
 django-tables2==2.4.0
