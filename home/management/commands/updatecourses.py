@@ -86,8 +86,7 @@ class Command(BaseCommand):
                     Q(slug="_".join(reversed(split_name)).lower())
                 )
 
-                prof_name = " ".join(umdio_professor['name'].split())
-                professor = Professor(name=prof_name, type=Professor.Type.PROFESSOR)
+                professor = Professor(name=umdio_professor['name'], type=Professor.Type.PROFESSOR)
 
                 if not query.exists():
                     professor.slug = "_".join(reversed(split_name)).lower()
