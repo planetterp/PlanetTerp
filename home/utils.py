@@ -78,7 +78,7 @@ class Semester:
             semester = "08"
             year = now.year
         # spring (of next year)
-        if 10 < now.month:
+        if 9 < now.month:
             semester = "01"
             year = now.year + 1
 
