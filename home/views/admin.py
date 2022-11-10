@@ -297,11 +297,11 @@ class Admin(UserPassesTestMixin, View):
                 ctx = {}
                 ctx.update(csrf(request))
 
-                similar_professor = Professor.find_similar(professor.name)
+                similar_professors = Professor.find_similar(professor.name)
                 verify_override = json.loads(request.POST["override"])
 
-                if not verify_override and similar_professor:
-                    form = ProfessorInfoModal(professor, similar_professor)
+                if not verify_override and len(similar_professors) > 0:
+                    form = ProfessorInfoModal(professor, similar_professors)
                     response["form"] = render_crispy_form(form, form.helper, context=ctx)
                     response["success_msg"] = "#info-modal-container"
                     return JsonResponse(response)

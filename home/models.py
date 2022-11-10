@@ -268,12 +268,13 @@ class Professor(Model):
 
     @staticmethod
     def find_similar(professor_name):
-        SIMILARITY_TOLERANCE = 80
+        SIMILARITY_TOLERANCE = 70
+        similar_professors = []
         for professor in Professor.verified.all():
             if fuzz.ratio(professor_name, professor.name) > SIMILARITY_TOLERANCE:
-                return professor
+                similar_professors.append(professor)
 
-        return None
+        return similar_professors
 
     def __str__(self):
         return f"{self.name} ({self.id})"
