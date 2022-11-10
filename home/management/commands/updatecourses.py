@@ -63,11 +63,12 @@ class Command(BaseCommand):
         kwargs = {"course_id": course.name}
         umdio_professors = requests.get("https://api.umd.io/v1/professors", params=kwargs).json()
 
+        if isinstance(umdio_professors, dict) and 'error_code' in umdio_professors.keys():
+            print(f"No professors found for {course} during {semester.name()}")
+            return
+
         for umdio_professor in umdio_professors:
-            try:
-                professor = Professor.unfiltered.filter(name=umdio_professor['name']).first()
-            except TypeError:
-                continue
+            professor = Professor.unfiltered.filter(name=umdio_professor['name']).first()
 
             if umdio_professor['name'] == "Instructor: TBA":
                 continue
