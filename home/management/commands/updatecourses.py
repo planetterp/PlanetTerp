@@ -68,10 +68,10 @@ class Command(BaseCommand):
             return
 
         for umdio_professor in umdio_professors:
-            professor = Professor.unfiltered.filter(name=umdio_professor['name']).first()
-
             if umdio_professor['name'] == "Instructor: TBA":
                 continue
+
+            professor = Professor.unfiltered.filter(name=umdio_professor['name']).first()
 
             if not professor:
                 # To make our lives easier, attempt to automatically verify the professor
