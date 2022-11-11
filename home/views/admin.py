@@ -3,16 +3,16 @@ import json
 
 from django.shortcuts import render
 from django.views import View
-from django.db.models import Q
 from django.http import JsonResponse
 from django.template.context_processors import csrf
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.urls import reverse
+from django.utils.safestring import mark_safe
 
 from crispy_forms.utils import render_crispy_form
 from discord_webhook import DiscordWebhook, DiscordEmbed
 
-from home.models import Review, Professor, ProfessorAlias, ProfessorCourse, Grade, User
+from home.models import Review, Professor, ProfessorCourse, Grade, User
 from home.utils import AdminAction
 from home.tables.reviews_table import UnverifiedReviewsTable
 from home.tables.basic import ProfessorsTable
@@ -166,11 +166,6 @@ class Admin(UserPassesTestMixin, View):
                 ProfessorCourse.objects.filter(professor__id=subject_id).update(professor=merge_target)
                 Review.unfiltered.filter(professor__id=subject_id).update(professor=merge_target)
                 Grade.unfiltered.filter(professor__id=subject_id).update(professor=merge_target)
-                
-                aliases = ProfessorAlias.objects.filter(name=merge_subject.name, professor=merge_target)
-                if not aliases.exists():
-                    ProfessorAlias(name=merge_subject.name, professor=merge_target).save()
-
                 context['success'] = True
                 context["target_slug"] = merge_target.slug
                 merge_subject.delete()
@@ -298,27 +293,24 @@ class Admin(UserPassesTestMixin, View):
                 response["error_msg"] = self.not_found_err("Professor")
                 return JsonResponse(response)
             if not professor.slug and slug is None:
-                # Attempt to create slug automatically
-                split_name = str(professor.name).strip().split(" ")
-                first_name = split_name[0].lower().strip()
-                last_name = split_name[-1].lower().strip()
-
-                query = Professor.verified.filter(
-                    (
-                        Q(name__istartswith=first_name) &
-                        Q(name__iendswith=last_name)
-                    ) |
-                    Q(slug="_".join(reversed(split_name)).lower())
-                )
                 ctx = {}
                 ctx.update(csrf(request))
 
+                similar_professors = Professor.find_similar(professor.name)
                 verify_override = json.loads(request.POST["override"])
-                if not verify_override and query.exists():
-                    form = ProfessorInfoModal(professor, query[0])
+
+                if not verify_override and len(similar_professors) > 0:
+                    form = ProfessorInfoModal(professor, similar_professors)
                     response["form"] = render_crispy_form(form, form.helper, context=ctx)
                     response["success_msg"] = "#info-modal-container"
                     return JsonResponse(response)
+
+                split_name = str(professor.name).strip().split(" ")
+                new_slug = "_".join(reversed(split_name)).lower()
+                modal_msg = None
+
+                if Professor.verified.filter(slug=new_slug).exists():
+                    modal_msg = mark_safe(f"The slug <b>{new_slug}</b> already belongs to a professor. Please enter a slug below.")
 
                 if len(split_name) > 2:
                     modal_msg = (
@@ -326,6 +318,7 @@ class Admin(UserPassesTestMixin, View):
                         "can't be slugged automatcially. Please enter a slug below."
                     )
 
+                if modal_msg:
                     # Create the modal form to manualy enter a slug and add it
                     # to the response. The form creates the modal, though it's
                     # actually summoned from admin-action.js
@@ -334,7 +327,7 @@ class Admin(UserPassesTestMixin, View):
                     response["success_msg"] = "#slug-modal-container"
                     return JsonResponse(response)
 
-                professor.slug = "_".join(reversed(split_name)).lower()
+                professor.slug = new_slug
         else:
             professor.slug = None
             if verified_status is Professor.Status.REJECTED:

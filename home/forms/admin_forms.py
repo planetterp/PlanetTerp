@@ -531,10 +531,10 @@ class ProfessorMergeForm(Form):
 # Used on /admin when verifying professors that might be duplicates of already
 # verified professors.
 class ProfessorInfoModal(Form):
-    def __init__(self, unverified_professor: Professor, verified_professor: Professor):
+    def __init__(self, unverified_professor, verified_professors):
         super().__init__()
         self.unverified_professor = unverified_professor
-        self.verified_professor = verified_professor
+        self.verified_professors = verified_professors
         self.helper = FormHelper()
         self.helper.form_tag = False
         self.helper.layout = self.generate_layout()
@@ -557,44 +557,46 @@ class ProfessorInfoModal(Form):
 
             return "No Courses" if len(courses) == 0 else ', '.join(course.name for course in courses)
 
+        def create_row(professor: Professor):
+            row = '''
+                <tr>
+                    <td><a href="{absolute_url}" target="_blank">{verified_name}</a></td>
+                    <td>{verified_courses}</td>
+                    <td><button class="btn btn-primary" onclick="mergeProfessor({merge_args})">Merge</button></td>
+                </tr>
+            '''
+
+            merge_data = {
+                "merge_subject": self.unverified_professor.name,
+                "subject_id": self.unverified_professor.pk,
+                "merge_target": professor.name,
+                "target_id": professor.pk
+            }
+
+            kwargs = {
+                "absolute_url": professor.get_absolute_url(),
+                "verified_name": professor.name,
+                "verified_courses": get_courses(professor),
+                "merge_args": merge_data
+            }
+            return format_html(row, **kwargs)
+
         table_str = '''
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Courses</th>
-                    </tr>
-                </thead>
+            <table class="table text-center w-100">
                 <tbody>
-                    <tr>
-                        <td>{unverified_name} (this professor)</td>
-                        <td>{unverified_courses}</td>
-                    </tr>
-                    <tr>
-                        <td><a href="{absolute_url}" target="_blank">{verified_name}</a></td>
-                        <td>{verified_courses}</td>
-                    </tr>
+        '''
+        for professor in self.verified_professors:
+            table_str += create_row(professor)
+
+        table_str += '''
                 </tbody>
             </table>
         '''
-        kwargs = {
-            "unverified_name": self.unverified_professor.name,
-            "unverified_courses": get_courses(self.unverified_professor),
-            "absolute_url": self.verified_professor.get_absolute_url(),
-            "verified_name": self.verified_professor.name,
-            "verified_courses": get_courses(self.verified_professor)
-        }
 
         modal_title = (
-            f'This {self.unverified_professor.type} might be a duplicate of <b>{self.verified_professor.name} ({self.verified_professor.pk})</b>. <br>'
-            f'Given the information below, please decide if these {self.unverified_professor.type}s are the same.'
+            f'This {self.unverified_professor.type} might be a duplicate of one of the professors below. <br>'
+            f'{self.unverified_professor.name} has taught: {get_courses(self.unverified_professor)}'
         )
-        merge_data = {
-            "merge_subject": self.unverified_professor.name,
-            "subject_id": self.unverified_professor.pk,
-            "merge_target": self.verified_professor.name,
-            "target_id": self.verified_professor.pk
-        }
 
         verify_data = {
             "professor_id": self.unverified_professor.pk,
@@ -604,14 +606,10 @@ class ProfessorInfoModal(Form):
 
         return Layout(
             Modal(
-                HTML(format_html(table_str, **kwargs)),
-                Div(
-                    Button("verify", "Verify", css_class="btn btn-success", onclick=format_html("verifyProfessor({args})", args=verify_data)),
-                    Button("merge", "Merge", css_class="btn btn-primary", onclick=format_html("mergeProfessor({args})", args=merge_data)),
-                    css_class="btn-group w-100"
-                ),
+                HTML(table_str),
+                Button("verify", "Verify", css_class="btn btn-success w-100", onclick=format_html("verifyProfessor({args})", args=verify_data)),
                 css_id="info-modal",
                 title=format_html(modal_title),
-                title_class="text-center"
+                title_class="text-center w-100"
             )
         )
