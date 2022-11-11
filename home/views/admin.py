@@ -297,7 +297,7 @@ class Admin(UserPassesTestMixin, View):
                 ctx = {}
                 ctx.update(csrf(request))
 
-                similar_professors = Professor.find_similar(professor.name)
+                similar_professors = Professor.find_similar(professor.name, 70)
                 verify_override = json.loads(request.POST["override"])
 
                 if not verify_override and len(similar_professors) > 0:
