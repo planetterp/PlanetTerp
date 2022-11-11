@@ -12,7 +12,7 @@ from django.utils.safestring import mark_safe
 from crispy_forms.utils import render_crispy_form
 from discord_webhook import DiscordWebhook, DiscordEmbed
 
-from home.models import Review, Professor, ProfessorCourse, Grade, User
+from home.models import Review, Professor, ProfessorCourse, ProfessorAlias, Grade, User
 from home.utils import AdminAction
 from home.tables.reviews_table import UnverifiedReviewsTable
 from home.tables.basic import ProfessorsTable
@@ -166,6 +166,11 @@ class Admin(UserPassesTestMixin, View):
                 ProfessorCourse.objects.filter(professor__id=subject_id).update(professor=merge_target)
                 Review.unfiltered.filter(professor__id=subject_id).update(professor=merge_target)
                 Grade.unfiltered.filter(professor__id=subject_id).update(professor=merge_target)
+
+                aliases = ProfessorAlias.objects.filter(name=merge_subject.name, professor=merge_target)
+                if not aliases.exists():
+                    ProfessorAlias(name=merge_subject.name, professor=merge_target).save()
+
                 context['success'] = True
                 context["target_slug"] = merge_target.slug
                 merge_subject.delete()

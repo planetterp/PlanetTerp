@@ -279,6 +279,13 @@ class Professor(Model):
     def __str__(self):
         return f"{self.name} ({self.id})"
 
+class ProfessorAlias(Model):
+    class Meta:
+        db_table = "home_professor_alias"
+
+    alias = CharField(max_length=100)
+    professor = ForeignKey(Professor, CASCADE)
+
 
 class ProfessorSection(Model):
     class Meta:
