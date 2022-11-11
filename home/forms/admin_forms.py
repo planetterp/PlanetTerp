@@ -531,10 +531,10 @@ class ProfessorMergeForm(Form):
 # Used on /admin when verifying professors that might be duplicates of already
 # verified professors.
 class ProfessorInfoModal(Form):
-    def __init__(self, unverified_professor, verified_professors):
+    def __init__(self, professor_in_question, similar_professors):
         super().__init__()
-        self.unverified_professor = unverified_professor
-        self.verified_professors = verified_professors
+        self.professor_in_question = professor_in_question
+        self.similar_professors = similar_professors
         self.helper = FormHelper()
         self.helper.form_tag = False
         self.helper.layout = self.generate_layout()
@@ -567,8 +567,8 @@ class ProfessorInfoModal(Form):
             '''
 
             merge_data = {
-                "merge_subject": self.unverified_professor.name,
-                "subject_id": self.unverified_professor.pk,
+                "merge_subject": self.professor_in_question.name,
+                "subject_id": self.professor_in_question.pk,
                 "merge_target": professor.name,
                 "target_id": professor.pk
             }
@@ -585,7 +585,7 @@ class ProfessorInfoModal(Form):
             <table class="table text-center w-100">
                 <tbody>
         '''
-        for professor in self.verified_professors:
+        for professor in self.similar_professors:
             table_str += create_row(professor)
 
         table_str += '''
@@ -594,12 +594,12 @@ class ProfessorInfoModal(Form):
         '''
 
         modal_title = (
-            f'This {self.unverified_professor.type} might be a duplicate of one of the professors below. <br>'
-            f'{self.unverified_professor.name} has taught: {get_courses(self.unverified_professor)}'
+            f'This {self.professor_in_question.type} might be a duplicate of one of the professors below. <br>'
+            f'{self.professor_in_question.name} has taught: {get_courses(self.professor_in_question)}'
         )
 
         verify_data = {
-            "professor_id": self.unverified_professor.pk,
+            "professor_id": self.professor_in_question.pk,
             "action": "verified",
             "override": "true"
         }
