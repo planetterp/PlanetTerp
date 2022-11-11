@@ -267,12 +267,17 @@ class Professor(Model):
         return reverse("professor", kwargs={"slug": self.slug})
 
     @staticmethod
-    def find_similar(professor_name):
-        SIMILARITY_TOLERANCE = 70
+    def find_similar(professor_name, tolerance):
         similar_professors = []
         for professor in Professor.verified.all():
-            if fuzz.ratio(professor_name, professor.name) > SIMILARITY_TOLERANCE:
+            if fuzz.ratio(professor_name, professor.name) > tolerance:
                 similar_professors.append(professor)
+            ratio = fuzz.ratio(professor_name, professor.name)
+            if ratio > tolerance:
+                similar_professors.append({"professor" : professor, "ratio" : ratio})
+
+        similar_professors.sort(key=lambda e: e["ratio"], reverse=True)
+        similar_professors = [p["professor"] for p in similar_professors]
 
         return similar_professors
 
