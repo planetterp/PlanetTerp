@@ -2,7 +2,6 @@ import requests
 from datetime import datetime
 
 from django.core.management import BaseCommand
-from django.db.models import Q
 
 from home.models import Course, Professor, ProfessorCourse
 from home.utils import Semester
@@ -77,19 +76,13 @@ class Command(BaseCommand):
                 # To make our lives easier, attempt to automatically verify the professor
                 # following the same criteria in admin.py
                 split_name = umdio_professor['name'].strip().split()
-                first_name = split_name[0].lower().strip()
-                last_name = split_name[-1].lower().strip()
-                query = Professor.verified.filter(
-                    (
-                        Q(name__istartswith=first_name) &
-                        Q(name__iendswith=last_name)
-                    ) |
-                    Q(slug="_".join(reversed(split_name)).lower())
-                )
+                similar_professors = Professor.find_similar(professor.name, 70)
+                split_name = str(professor.name).strip().split(" ")
+                new_slug = "_".join(reversed(split_name)).lower()
 
                 professor = Professor(name=umdio_professor['name'], type=Professor.Type.PROFESSOR)
 
-                if not query.exists():
+                if len(similar_professors) == 0 and not Professor.verified.filter(slug=new_slug).exists():
                     professor.slug = "_".join(reversed(split_name)).lower()
                     professor.status = Professor.Status.VERIFIED
 
