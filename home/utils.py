@@ -69,20 +69,14 @@ class Semester:
     @staticmethod
     def current():
         now = datetime.now()
-        # spring (current year)
-        if now.month < 3:
-            semester = "01"
-            year = now.year
         # fall
         if 3 <= now.month <= 9:
             semester = "08"
-            year = now.year
-        # spring (of next year)
-        if 9 < now.month:
+        # spring
+        else:
             semester = "01"
-            year = now.year + 1
 
-        return Semester(f"{year}{semester}")
+        return Semester(f"{now.year}{semester}")
 
     def name(self, *, year_first=False, short=False):
         year = self.year

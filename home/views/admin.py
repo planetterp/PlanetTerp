@@ -86,7 +86,6 @@ class Admin(UserPassesTestMixin, View):
                 username = "Anonymous" if (review.anonymous or not review.user) else review.user.username
 
                 embed.add_embed_field(name="Reviewer", value=username, inline=True)
-                embed.add_embed_field(name="Rating", value=review.rating, inline=True)
                 embed.add_embed_field(name="Course", value=course, inline=True)
                 embed.add_embed_field(name="Grade", value=grade, inline=True)
                 embed.add_embed_field(name="Review", value=review_text, inline=False)
