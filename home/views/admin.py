@@ -167,10 +167,10 @@ class Admin(UserPassesTestMixin, View):
                 ProfessorCourse.objects.filter(professor__id=subject_id).update(professor=merge_target)
                 Review.unfiltered.filter(professor__id=subject_id).update(professor=merge_target)
                 Grade.unfiltered.filter(professor__id=subject_id).update(professor=merge_target)
-                
-                aliases = ProfessorAlias.objects.filter(name=merge_subject.name, professor=merge_target)
+
+                aliases = ProfessorAlias.objects.filter(alias=merge_subject.name, professor=merge_target)
                 if not aliases.exists():
-                    ProfessorAlias(name=merge_subject.name, professor=merge_target).save()
+                    ProfessorAlias(alias=merge_subject.name, professor=merge_target).save()
 
                 context['success'] = True
                 context["target_slug"] = merge_target.slug
