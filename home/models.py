@@ -11,8 +11,6 @@ from django.db.models import (Model, CharField, DateTimeField, TextField,
     CASCADE, ManyToManyField, SlugField, TextChoices, FloatField, Manager,
     QuerySet, Sum, UniqueConstraint, Index, Count)
 
-from fuzzywuzzy import fuzz
-
 class GradeQuerySet(QuerySet):
 
     def exclude_pf(self):
