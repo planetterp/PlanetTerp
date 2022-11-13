@@ -270,8 +270,6 @@ class Professor(Model):
     def find_similar(professor_name, tolerance):
         similar_professors = []
         for professor in Professor.verified.all():
-            if fuzz.ratio(professor_name, professor.name) > tolerance:
-                similar_professors.append(professor)
             ratio = fuzz.ratio(professor_name, professor.name)
             if ratio > tolerance:
                 similar_professors.append({"professor" : professor, "ratio" : ratio})

@@ -3,6 +3,7 @@ from django.forms import CharField, IntegerField, DateField, ChoiceField, Boolea
 from django.forms.widgets import DateInput, HiddenInput, TextInput
 from django.utils.html import format_html
 from django.forms import Form, ModelForm
+from django.utils.safestring import mark_safe
 
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Div, Field, Layout, Button, HTML
@@ -531,10 +532,10 @@ class ProfessorMergeForm(Form):
 # Used on /admin when verifying professors that might be duplicates of already
 # verified professors.
 class ProfessorInfoModal(Form):
-    def __init__(self, unverified_professor, verified_professors):
+    def __init__(self, professor_in_question, similar_professors):
         super().__init__()
-        self.unverified_professor = unverified_professor
-        self.verified_professors = verified_professors
+        self.professor_in_question = professor_in_question
+        self.similar_professors = similar_professors
         self.helper = FormHelper()
         self.helper.form_tag = False
         self.helper.layout = self.generate_layout()
@@ -555,7 +556,35 @@ class ProfessorInfoModal(Form):
             if grades.exists():
                 courses |= {grade.course for grade in grades}
 
-            return "No Courses" if len(courses) == 0 else ', '.join(course.name for course in courses)
+            def url_html(course):
+                return f'<a href="{course.get_absolute_url()}" target="_blank">{course.name}</a>'
+
+            return "No Courses" if len(courses) == 0 else mark_safe(', '.join(url_html(course) for course in courses))
+
+        def create_row(professor: Professor):
+            row = '''
+                <tr class="row">
+                    <td class="col-3 text-center"><a href="{absolute_url}" target="_blank">{similar_name}</a><br> (ID: {pid})</td>
+                    <td class="col-6 text-center">{similar_courses}</td>
+                    <td class="col-3 text-center"><button class="btn btn-primary" onclick="mergeProfessor({merge_args})">Merge</button></td>
+                </tr>
+            '''
+
+            merge_data = {
+                "merge_subject": self.professor_in_question.name,
+                "subject_id": self.professor_in_question.pk,
+                "merge_target": professor.name,
+                "target_id": professor.pk
+            }
+
+            kwargs = {
+                "absolute_url": professor.get_absolute_url(),
+                "similar_name": professor.name,
+                "pid": professor.pk,
+                "similar_courses": get_courses(professor),
+                "merge_args": merge_data
+            }
+            return format_html(row, **kwargs)
 
         def create_row(professor: Professor):
             row = '''
@@ -582,10 +611,10 @@ class ProfessorInfoModal(Form):
             return format_html(row, **kwargs)
 
         table_str = '''
-            <table class="table text-center w-100">
+            <table class="table">
                 <tbody>
         '''
-        for professor in self.verified_professors:
+        for professor in self.similar_professors:
             table_str += create_row(professor)
 
         table_str += '''
@@ -594,12 +623,12 @@ class ProfessorInfoModal(Form):
         '''
 
         modal_title = (
-            f'This {self.unverified_professor.type} might be a duplicate of one of the professors below. <br>'
-            f'{self.unverified_professor.name} has taught: {get_courses(self.unverified_professor)}'
+            f'This {self.professor_in_question.type} might be a duplicate of one of the professors below. <br>'
+            f'<i>{self.professor_in_question.name}</i> ({self.professor_in_question.pk}) has taught: {get_courses(self.professor_in_question)}'
         )
 
         verify_data = {
-            "professor_id": self.unverified_professor.pk,
+            "professor_id": self.professor_in_question.pk,
             "action": "verified",
             "override": "true"
         }
@@ -610,6 +639,6 @@ class ProfessorInfoModal(Form):
                 Button("verify", "Verify", css_class="btn btn-success w-100", onclick=format_html("verifyProfessor({args})", args=verify_data)),
                 css_id="info-modal",
                 title=format_html(modal_title),
-                title_class="text-center w-100"
+                title_class="col-11 text-center"
             )
         )
