@@ -612,7 +612,7 @@ class ProfessorInfoModal(Form):
         return Layout(
             Modal(
                 HTML(table_str),
-                Button("verify", "Verify", css_class="btn btn-success", onclick=format_html("verifyProfessor({args})", args=verify_data)),
+                Button("verify", "Verify", css_class="btn btn-success w-100", onclick=format_html("verifyProfessor({args})", args=verify_data)),
                 css_id="info-modal",
                 title=format_html(modal_title),
                 title_class="col-11 text-center"
