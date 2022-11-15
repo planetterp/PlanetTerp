@@ -11,6 +11,8 @@ from django.db.models import (Model, CharField, DateTimeField, TextField,
     CASCADE, ManyToManyField, SlugField, TextChoices, FloatField, Manager,
     QuerySet, Sum, UniqueConstraint, Index, Count)
 
+from fuzzywuzzy import fuzz
+
 class GradeQuerySet(QuerySet):
 
     def exclude_pf(self):
@@ -263,6 +265,19 @@ class Professor(Model):
 
     def get_absolute_url(self):
         return reverse("professor", kwargs={"slug": self.slug})
+
+    @staticmethod
+    def find_similar(professor_name, tolerance):
+        similar_professors = []
+        for professor in Professor.verified.all():
+            ratio = fuzz.ratio(professor_name, professor.name)
+            if ratio > tolerance:
+                similar_professors.append({"professor" : professor, "ratio" : ratio})
+
+        similar_professors.sort(key=lambda e: e["ratio"], reverse=True)
+        similar_professors = [p["professor"] for p in similar_professors]
+
+        return similar_professors
 
     def __str__(self):
         return f"{self.name} ({self.id})"
