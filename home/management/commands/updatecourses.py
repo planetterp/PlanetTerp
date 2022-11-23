@@ -70,7 +70,7 @@ class Command(BaseCommand):
             if umdio_professor['name'] == "Instructor: TBA":
                 continue
 
-            professor = Professor.unfiltered.filter(name=umdio_professor['name']).first()
+            professor = Professor.verified.filter(name=umdio_professor['name']).first()
 
             if not professor:
                 # To make our lives easier, attempt to automatically verify the professor
