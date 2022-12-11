@@ -70,20 +70,24 @@ class Command(BaseCommand):
             if umdio_professor['name'] == "Instructor: TBA":
                 continue
 
-            professor = Professor.verified.filter(name=umdio_professor['name']).first()
+            professors = Professor.verified.all()
 
-            if not professor:
+            if not professors.filter(name=umdio_professor['name']).first():
                 # To make our lives easier, attempt to automatically verify the professor
-                # following the same criteria in admin.py
-                split_name = umdio_professor['name'].strip().split()
-                similar_professors = Professor.find_similar(professor.name, 70)
-                split_name = str(professor.name).strip().split(" ")
-                new_slug = "_".join(reversed(split_name)).lower()
-
+                # following a similar process to that in admin.py
                 professor = Professor(name=umdio_professor['name'], type=Professor.Type.PROFESSOR)
+                similar_professors = Professor.find_similar(professor.name, 70)
+                split_name = professor.name.strip().split()
+                new_slug = split_name[-1].lower()
+                valid_slug = True
 
-                if len(similar_professors) == 0 and not Professor.verified.filter(slug=new_slug).exists():
-                    professor.slug = "_".join(reversed(split_name)).lower()
+                if professors.filter(slug=new_slug).exists():
+                    new_slug = f"{split_name[-1]}_{split_name[0]}".lower()
+                    if professors.filter(slug=new_slug).exists():
+                        valid_slug = False
+
+                if len(similar_professors) == 0 and valid_slug:
+                    professor.slug = new_slug
                     professor.status = Professor.Status.VERIFIED
 
                 professor.save()
