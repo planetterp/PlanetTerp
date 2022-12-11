@@ -4,6 +4,8 @@
 #   A+, A, A-, B+, B, B-, C+, C, C-, D+, D, D-, F, W, OTHER
 #
 # * Remove column headers and check data for invalid entires (bottom of data)
+#
+# UPDATE COURSES AND PROFESSORS BEFORE RUNNING THIS SCRIPT
 
 import csv
 from pathlib import Path
