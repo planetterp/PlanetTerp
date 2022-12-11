@@ -458,7 +458,7 @@ class Review(Model):
 
 class Grade(Model):
     POSSIBLE_GRADES = [choice[0] for choice in Review.Grades.choices]
-    VOWEL_GRADES = ["A", "A-", "A+", "F"]
+    VOWEL_GRADES = ["A", "A-", "A+", "F", "XF"]
 
     course = ForeignKey(Course, CASCADE)
     professor = ForeignKey(Professor, CASCADE, null=True)
