@@ -13,7 +13,7 @@ from pathlib import Path
 from django.db.models import Q
 from django.core.management import BaseCommand, CommandError
 
-from home.models import Professor, Course, Grade
+from home.models import Professor, Course, Grade, ProfessorAlias
 from home.utils import Semester
 
 class ValidationError(Exception):
@@ -82,6 +82,10 @@ class Command(BaseCommand):
         )
         if professors.exists():
             return professors.first()
+        # .first() is ok here because at most one record will be returned
+        alias = ProfessorAlias.objects.filter(alias=name.strip()).first()
+        if alias:
+            return alias.professor
 
         raise ValidationError("Professor doesn't exist")
 
