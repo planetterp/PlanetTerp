@@ -74,21 +74,29 @@ class Command(BaseCommand):
         if name is None or name == "":
             return None
 
-        names = name.strip().split(",")
-        lastname = names[0]
-        firstname = names[-1].strip().split()[0]
-        professors = Professor.verified.filter(
-            Q(name__istartswith=firstname) & Q(name__iendswith=lastname)
-        )
-        if professors.exists():
-            return professors.first()
         # .first() is ok here because at most one record will be returned
         alias = ProfessorAlias.objects.filter(alias=name.strip()).first()
         if alias:
             return alias.professor
 
-        raise ValidationError("Professor doesn't exist")
+        professors = Professor.verified.filter(name=name.strip())
+        if not professors.exists():
+            raise ValidationError("Professor doesn't exist")
+        if professors.count() == 1:
+            return professors.first()
 
+        similar_professors = Professor.find_similar(name.strip(), 70)
+        if professors.count() > 1 or len(similar_professors):
+            # if 'name' matches more than one professor or
+            # is similar to more than one professor, create a new
+            # unverified professor for us to manually decide
+            # which professor the data manually belongs to.
+            new_professor = Professor(
+                name=name.strip(),
+                type=Professor.Type.PROFESSOR
+            )
+            new_professor.save()
+            return new_professor
 
     def add_grade(self, row):
         try:
