@@ -134,6 +134,43 @@
 		</div>
 	</form>
 
+	<div id="query-buttons" class="container py-3">
+		<div class="row">
+			<div class="col btn-group" role="group">
+				<button onclick="updateQuery('FSAW')" class="btn btn-primary" style="border-bottom-left-radius: 0;">FSAW</button>
+				<button onclick="updateQuery('FSAR')" class="btn btn-primary">FSAR</button>
+				<button onclick="updateQuery('FSMA')" class="btn btn-primary">FSMA</button>
+				<button onclick="updateQuery('FSOC')" class="btn btn-primary">FSOC</button>
+				<button onclick="updateQuery('FSPW')" class="btn btn-primary" style="border-bottom-right-radius: 0;">FSPW</button>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col btn-group" role="group">
+				<button onclick="updateQuery('DSHS')" class="btn btn-info" style="border-bottom-left-radius: 0; border-top-left-radius: 0;">DSHS</button>
+				<button onclick="updateQuery('DSHU')" class="btn btn-info">DSHU</button>
+				<button onclick="updateQuery('DSNS')" class="btn btn-info">DSNS</button>
+				<button onclick="updateQuery('DSNL')" class="btn btn-info">DSNL</button>
+				<button onclick="updateQuery('DSSP')" class="btn btn-info" style="border-bottom-right-radius: 0; border-top-right-radius: 0;">DSSP</button>
+			</div>
+		</div>
+		<div class="row align-items-center">
+			<div class="col btn-group" role="group">
+				<button onclick="updateQuery('DVCC')" class="btn btn-success" style="border-top-left-radius: 0;">DVCC</button>
+				<button onclick="updateQuery('DVUP')" class="btn btn-success">DVUP</button>
+				<button onclick="updateQuery('SCIS')" class="btn btn-warning">SCIS</button>
+				<button onclick="updateQuery('AND')" class="btn btn-secondary text-center">AND</button>
+				<button onclick="updateQuery('OR')" class="btn btn-secondary text-center" style="border-top-right-radius: 0;">OR</button>
+			</div>
+		</div>
+	</div>
+
+	<div class="container">
+		<div id="query-container" style="border-style: solid; height: 5rem;">
+
+		</div>
+
+	</div>
+
 	<br />
 
 	<div id="table-container">
@@ -199,5 +236,12 @@
 				e.preventDefault();
 			});
 		});
+
+		query = [];
+		function updateQuery(term) {
+			query.push(term);
+			$("#query-container").html(' '.join(query));
+		}
+
 	</script>
 {% endblock %}
