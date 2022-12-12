@@ -80,8 +80,6 @@ class Command(BaseCommand):
             return alias.professor
 
         professors = Professor.verified.filter(name=name.strip())
-        if not professors.exists():
-            raise ValidationError("Professor doesn't exist")
         if professors.count() == 1:
             return professors.first()
 
@@ -97,6 +95,9 @@ class Command(BaseCommand):
             )
             new_professor.save()
             return new_professor
+
+        raise ValidationError("Professor doesn't exist")
+        
 
     def add_grade(self, row):
         try:
