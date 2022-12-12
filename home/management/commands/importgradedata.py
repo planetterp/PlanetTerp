@@ -88,7 +88,7 @@ class Command(BaseCommand):
             # if 'name' matches more than one professor or
             # is similar to more than one professor, create a new
             # unverified professor for us to manually decide
-            # which professor the data manually belongs to.
+            # which professor the data belongs to.
             new_professor = Professor(
                 name=name.strip(),
                 type=Professor.Type.PROFESSOR
@@ -97,7 +97,7 @@ class Command(BaseCommand):
             return new_professor
 
         raise ValidationError("Professor doesn't exist")
-        
+
 
     def add_grade(self, row):
         try:
