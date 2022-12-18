@@ -42,9 +42,9 @@ class ActionForm(Form):
         )
 
 # For unverifying a verified review. Currently used on /professor
-class ReviewUnverifyForm(Form):
+class ReviewActionForm(Form):
     id_ = IntegerField(required=True, widget=HiddenInput)
-    verified = CharField(required=True, widget=HiddenInput, initial=Review.Status.PENDING.value)
+    verified = CharField(required=True, widget=HiddenInput)
     action_type = CharField(required=True, widget=HiddenInput, initial=AdminAction.REVIEW_VERIFY.value)
 
     def __init__(self, review_id, **kwargs):
@@ -52,23 +52,31 @@ class ReviewUnverifyForm(Form):
         self.fields['id_'].initial = review_id
 
         self.helper = FormHelper()
-        self.helper.form_id = f"unverify_review_{review_id}"
-        self.helper.form_class = "unverify_review"
+        self.helper.form_id = f"review_action_{review_id}"
+        self.helper.form_class = "review_action"
         self.helper.form_show_errors = False
         self.helper.layout = self.generate_layout()
 
     def generate_layout(self):
-        submit_button = Button(
-            "unverify",
-            "Unverify",
-            css_class="btn-danger btn-lg",
-            onClick=f"unverifyReview('#{self.helper.form_id}')"
-        )
         return Layout(
             'id_',
             'verified',
             'action_type',
-            FormActions(submit_button)
+            Div(
+                Button(
+                    "unverify",
+                    "Unverify",
+                    onClick=f"reviewAction('#{self.helper.form_id}', '{Review.Status.PENDING.value}')",
+                    css_class="btn-danger btn-lg"
+                ),
+                Button(
+                    "delete",
+                    "Delete",
+                    onClick=f"reviewAction('#{self.helper.form_id}', '{Review.Status.DELETED.value}')",
+                    css_class="btn-dark btn-lg"
+                ),
+                css_class="btn-group"
+            )
         )
 
 # For deleting unverified professors. This action cannot be undone.

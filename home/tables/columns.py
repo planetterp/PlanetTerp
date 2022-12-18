@@ -11,7 +11,7 @@ import django_tables2 as tables
 
 from planetterp.settings import DATE_FORMAT
 from home.models import Review, Grade
-from home.forms.admin_forms import ReviewUnverifyForm
+from home.forms.admin_forms import ReviewActionForm
 
 class InformationColumn(tables.Column):
     def __init__(self, *args, **kwargs):
@@ -191,7 +191,7 @@ class VerifiedReviewsActionColumn(ActionColumn):
         ctx = {}
         ctx.update(csrf(request))
 
-        form = ReviewUnverifyForm(model_obj.pk)
+        form = ReviewActionForm(model_obj.pk)
         column_html = render_crispy_form(form, form.helper, context=ctx)
         return mark_safe(column_html)
 

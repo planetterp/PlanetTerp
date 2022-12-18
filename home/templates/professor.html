@@ -210,7 +210,8 @@
 		$("#professor-stats").html(stats);
 	}
 
-	function unverifyReview(form) {
+	function reviewAction(form, verified_status) {
+		$(`${form} input[name="verified"]`).val(verified_status);
 		sendResponse($(form).serialize(), 'review_verify', {"count" : --num_reviews});
 	}
 

@@ -252,11 +252,22 @@ class Admin(UserPassesTestMixin, View):
 
     def verify_review(self, review_id: int, verified_status: Review.Status, user: User):
         review = Review.unfiltered.filter(pk=review_id).first()
+        response = {
+            "success_msg": None,
+            "verified_status": 'unverified' if verified_status is Review.Status.PENDING else verified_status.value,
+            "success": True,
+            "review_id": review.pk
+        }
+
         if not review:
             response = {
                 "error_msg": self.not_found_err("Review"),
                 "success": False
             }
+            return JsonResponse(response)
+
+        if verified_status is Review.Status.DELETED:
+            Review.unfiltered.filter(pk=review_id).delete()
             return JsonResponse(response)
 
         review.status = verified_status
@@ -266,12 +277,6 @@ class Admin(UserPassesTestMixin, View):
         reviewer = review.user
         professor = review.professor
         professor_status = Professor.Status(professor.status)
-        response = {
-            "success_msg": None,
-            "verified_status": 'unverified' if verified_status is Review.Status.PENDING else verified_status.value,
-            "success": True,
-            "review_id": review.pk
-        }
 
         if professor_status is Professor.Status.PENDING:
             response['success_msg'] = (

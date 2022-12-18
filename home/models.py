@@ -404,6 +404,7 @@ class Review(Model):
         VERIFIED = "verified"
         PENDING = "pending"
         REJECTED = "rejected"
+        DELETED = "deleted"
 
     class ReviewType(Enum):
         ADD = "add"

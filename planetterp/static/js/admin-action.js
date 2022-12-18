@@ -56,14 +56,13 @@ function addAdminResponse(target, msg) {
 function verifyReviewSuccess(data, args) {
     var verified_status = data['verified_status'];
     var unverified_count = Number($("#unverified_count").html());
-    $("#unverified_count").html(unverified_count - 1);
 
-    if (verified_status == "unverified") {
+    if (verified_status == "unverified" || verified_status == "deleted") {
         location.reload();
     }
 
+    $("#unverified_count").html(unverified_count - 1);
     $("#review-counter").html(args["count"]);
-
     $(`#review-${data["review_id"]}`).remove();
     //addAdminResponse("#admin-tool-response", successText);
 }
