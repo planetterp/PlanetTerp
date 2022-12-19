@@ -312,17 +312,20 @@ class Admin(UserPassesTestMixin, View):
                     return JsonResponse(response)
 
                 split_name = str(professor.name).strip().split(" ")
-                new_slug = "_".join(reversed(split_name)).lower()
+                new_slug = split_name[-1].lower()
                 modal_msg = None
 
-                if Professor.verified.filter(slug=new_slug).exists():
-                    modal_msg = mark_safe(f"The slug <b>{new_slug}</b> already belongs to a professor. Please enter a slug below.")
+                professors = Professor.verified.all()
+                if professors.filter(slug=new_slug).exists():
+                    new_slug = "_".join(reversed(split_name)).lower()
+                    if professors.filter(slug=new_slug).exists():
+                        modal_msg = mark_safe(f"The slug <b>{new_slug}</b> already belongs to a professor. Please enter a slug below.")
 
-                if len(split_name) > 2:
-                    modal_msg = (
-                        f"The name '{professor.name}' is too long and "
-                        "can't be slugged automatcially. Please enter a slug below."
-                    )
+                    if len(split_name) > 2:
+                        modal_msg = (
+                            f"The name '{professor.name}' is too long and "
+                            "can't be slugged automatcially. Please enter a slug below."
+                        )
 
                 if modal_msg:
                     # Create the modal form to manualy enter a slug and add it
