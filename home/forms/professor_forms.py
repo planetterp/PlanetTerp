@@ -205,7 +205,7 @@ class ProfessorFormReview(ProfessorForm):
     def __init__(self, user, professor, **kwargs):
         super().__init__(user, Review.ReviewType.REVIEW, **kwargs)
 
-        courses = professor.course_set.order_by("name").distinct()
+        courses = professor.course_set.order_by("name")
         choices = [(course.name, course.name) for course in courses]
         choices.insert(0, ('', "Course"))
         choices.append(("other", "Other"))

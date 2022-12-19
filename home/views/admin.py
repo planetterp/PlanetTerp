@@ -12,7 +12,7 @@ from django.utils.safestring import mark_safe
 from crispy_forms.utils import render_crispy_form
 from discord_webhook import DiscordWebhook, DiscordEmbed
 
-from home.models import Review, Professor, ProfessorAlias, ProfessorCourse, Grade, User
+from home.models import Review, Professor, ProfessorCourse, ProfessorAlias, Grade, User
 from home.utils import AdminAction
 from home.tables.reviews_table import UnverifiedReviewsTable
 from home.tables.basic import ProfessorsTable
@@ -86,7 +86,6 @@ class Admin(UserPassesTestMixin, View):
                 username = "Anonymous" if (review.anonymous or not review.user) else review.user.username
 
                 embed.add_embed_field(name="Reviewer", value=username, inline=True)
-                embed.add_embed_field(name="Rating", value=review.rating, inline=True)
                 embed.add_embed_field(name="Course", value=course, inline=True)
                 embed.add_embed_field(name="Grade", value=grade, inline=True)
                 embed.add_embed_field(name="Review", value=review_text, inline=False)
