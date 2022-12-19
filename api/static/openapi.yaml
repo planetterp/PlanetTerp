@@ -84,7 +84,7 @@ paths:
           schema:
             type: boolean
             default: false
-        - $ref: "#/components/parameters/limit-100-1000"
+        - $ref: "#/components/parameters/limit-100-100"
         - $ref: "#/components/parameters/offset"
       responses:
         '200':
@@ -160,7 +160,7 @@ paths:
           schema:
             type: boolean
             default: false
-        - $ref: "#/components/parameters/limit-100-1000"
+        - $ref: "#/components/parameters/limit-100-100"
         - $ref: "#/components/parameters/offset"
       responses:
         '200':
@@ -425,7 +425,7 @@ components:
         minimum: 1
         maximum: 100
         default: 30
-    limit-100-1000:
+    limit-100-100:
       in: query
       name: limit
       description: "Maximum number of records to return."
@@ -434,7 +434,7 @@ components:
       schema:
         type: integer
         minimum: 1
-        maximum: 1000
+        maximum: 100
         default: 100
     offset:
       in: query
