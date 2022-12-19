@@ -33,6 +33,7 @@ class Professor(View):
             Course.recent
             .filter(professors__pk=professor.pk)
             .order_by("name")
+            .distinct()
         )
 
         courses_reviewed = []
@@ -101,7 +102,7 @@ class Professor(View):
             new_review = Review(**review_data)
             new_review.save()
 
-            send_updates_webhook(request, include_professors=False)
+            send_updates_webhook(request)
 
             form = ProfessorFormReview(user, professor)
             context = {

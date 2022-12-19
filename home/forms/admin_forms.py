@@ -3,6 +3,7 @@ from django.forms import CharField, IntegerField, DateField, ChoiceField, Boolea
 from django.forms.widgets import DateInput, HiddenInput, TextInput
 from django.utils.html import format_html
 from django.forms import Form, ModelForm
+from django.utils.safestring import mark_safe
 
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Div, Field, Layout, Button, HTML
@@ -531,10 +532,10 @@ class ProfessorMergeForm(Form):
 # Used on /admin when verifying professors that might be duplicates of already
 # verified professors.
 class ProfessorInfoModal(Form):
-    def __init__(self, unverified_professor: Professor, verified_professor: Professor):
+    def __init__(self, professor_in_question, similar_professors):
         super().__init__()
-        self.unverified_professor = unverified_professor
-        self.verified_professor = verified_professor
+        self.professor_in_question = professor_in_question
+        self.similar_professors = similar_professors
         self.helper = FormHelper()
         self.helper.form_tag = False
         self.helper.layout = self.generate_layout()
@@ -555,63 +556,65 @@ class ProfessorInfoModal(Form):
             if grades.exists():
                 courses |= {grade.course for grade in grades}
 
-            return "No Courses" if len(courses) == 0 else ', '.join(course.name for course in courses)
+            def url_html(course):
+                return f'<a href="{course.get_absolute_url()}" target="_blank">{course.name}</a>'
+
+            return "No Courses" if len(courses) == 0 else mark_safe(', '.join(url_html(course) for course in courses))
+
+        def create_row(professor: Professor):
+            row = '''
+                <tr class="row">
+                    <td class="col-3 text-center"><a href="{absolute_url}" target="_blank">{similar_name}</a><br> (ID: {pid})</td>
+                    <td class="col-6 text-center">{similar_courses}</td>
+                    <td class="col-3 text-center"><button class="btn btn-primary" onclick="mergeProfessor({merge_args})">Merge</button></td>
+                </tr>
+            '''
+
+            merge_data = {
+                "merge_subject": self.professor_in_question.name,
+                "subject_id": self.professor_in_question.pk,
+                "merge_target": professor.name,
+                "target_id": professor.pk
+            }
+
+            kwargs = {
+                "absolute_url": professor.get_absolute_url(),
+                "similar_name": professor.name,
+                "pid": professor.pk,
+                "similar_courses": get_courses(professor),
+                "merge_args": merge_data
+            }
+            return format_html(row, **kwargs)
 
         table_str = '''
             <table class="table">
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Courses</th>
-                    </tr>
-                </thead>
                 <tbody>
-                    <tr>
-                        <td>{unverified_name} (this professor)</td>
-                        <td>{unverified_courses}</td>
-                    </tr>
-                    <tr>
-                        <td><a href="{absolute_url}" target="_blank">{verified_name}</a></td>
-                        <td>{verified_courses}</td>
-                    </tr>
+        '''
+        for professor in self.similar_professors:
+            table_str += create_row(professor)
+
+        table_str += '''
                 </tbody>
             </table>
         '''
-        kwargs = {
-            "unverified_name": self.unverified_professor.name,
-            "unverified_courses": get_courses(self.unverified_professor),
-            "absolute_url": self.verified_professor.get_absolute_url(),
-            "verified_name": self.verified_professor.name,
-            "verified_courses": get_courses(self.verified_professor)
-        }
 
         modal_title = (
-            f'This {self.unverified_professor.type} might be a duplicate of <b>{self.verified_professor.name} ({self.verified_professor.pk})</b>. <br>'
-            f'Given the information below, please decide if these {self.unverified_professor.type}s are the same.'
+            f'This {self.professor_in_question.type} might be a duplicate of one of the professors below. <br>'
+            f'<i>{self.professor_in_question.name}</i> ({self.professor_in_question.pk}) has taught: {get_courses(self.professor_in_question)}'
         )
-        merge_data = {
-            "merge_subject": self.unverified_professor.name,
-            "subject_id": self.unverified_professor.pk,
-            "merge_target": self.verified_professor.name,
-            "target_id": self.verified_professor.pk
-        }
 
         verify_data = {
-            "professor_id": self.unverified_professor.pk,
+            "professor_id": self.professor_in_question.pk,
             "action": "verified",
             "override": "true"
         }
 
         return Layout(
             Modal(
-                HTML(format_html(table_str, **kwargs)),
-                Div(
-                    Button("verify", "Verify", css_class="btn btn-success", onclick=format_html("verifyProfessor({args})", args=verify_data)),
-                    Button("merge", "Merge", css_class="btn btn-primary", onclick=format_html("mergeProfessor({args})", args=merge_data)),
-                    css_class="btn-group w-100"
-                ),
+                HTML(table_str),
+                Button("verify", "Verify", css_class="btn btn-success w-100", onclick=format_html("verifyProfessor({args})", args=verify_data)),
                 css_id="info-modal",
                 title=format_html(modal_title),
-                title_class="text-center"
+                title_class="col-11 text-center"
             )
         )
