@@ -281,3 +281,8 @@ function mergeProfessor(args) {
         $('#merge-modal').modal('show');
     }
 }
+
+function triggerDeleteModal(review_id) {
+    $("#delete_review_id").val(review_id);
+    $("#review-delete-modal").modal('show');
+}

@@ -12,6 +12,9 @@
 {% endblock %}
 
 {% block content %}
+
+{% crispy delete_review_modal %}
+
 <script type="text/javascript" src="{% static 'js/jquery-toggle.js' %}"></script>
 <br />
 
@@ -131,6 +134,11 @@
 	var num_reviews = parseInt("{{ num_reviews }}");
 	var average_rating = {% if professor.average_rating %} {{ professor.average_rating }} {% else %} null {% endif %};
 	var is_admin = {{ user.is_staff|yesno:"true,false" }};
+
+	$("#delete-review-btn").click(function() {
+		$("#review-delete-modal").modal('hide');
+		sendResponse($('#delete_review_form').serialize(), 'review_verify');
+	})
 
 	$(function() {
 		initializeRateYo(3, "review");

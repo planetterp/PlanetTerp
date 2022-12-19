@@ -10,6 +10,7 @@
 {% block content %}
 
 
+{% crispy delete_review_modal %}
 {% crispy action_form %}
 
 <div id="admin-tool-response" class="fixed-top hidden"></div>
@@ -70,6 +71,13 @@
 <script type="text/javascript">
 	var prof_count = Number({{ professors|length }});
 	var num_reviews = Number({{ reviews|length }});
+
+	$("#delete-review-btn").click(function() {
+		args = {"count" : (num_reviews > 0 ? --num_reviews : 0)};
+		$("#review-delete-modal").modal('hide');
+		sendResponse($('#delete_review_form').serialize(), 'review_verify', args);
+	})
+
 
 	$(function() {
 		var hash = window.location.hash;

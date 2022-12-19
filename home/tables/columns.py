@@ -214,7 +214,7 @@ class UnverifiedReviewsActionColumn(ActionColumn):
                 <div class="row">
                     <div class="col btn-group">
                         <button class="btn btn-danger" onClick="verifyReview('{review_id}', 'rejected')" style="border-top-left-radius: 0;">Reject</button>
-                        <button class="btn btn-dark" onClick="verifyReview('{review_id}', 'deleted')">Delete</button>
+                        <button class="btn btn-dark" onClick="triggerDeleteModal('{review_id}')">Delete</button>
                         <button class="btn btn-warning" onClick="verifyReview('{review_id}', 'review_help')" style="border-top-right-radius: 0;">Help</button>
                     </div>
                 </div>
