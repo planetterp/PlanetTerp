@@ -41,7 +41,7 @@ class ActionForm(Form):
             Field('override', id="override")
         )
 
-# For unverifying a verified review. Currently used on /professor
+# For unverifying or deleting a verified review. Currently used on /professor
 class ReviewActionForm(Form):
     id_ = IntegerField(required=True, widget=HiddenInput)
     verified = CharField(required=True, widget=HiddenInput)
