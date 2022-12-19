@@ -4,6 +4,8 @@
 #   A+, A, A-, B+, B, B-, C+, C, C-, D+, D, D-, F, W, OTHER
 #
 # * Remove column headers and check data for invalid entires (bottom of data)
+#
+# UPDATE COURSES AND PROFESSORS BEFORE RUNNING THIS SCRIPT
 
 import csv
 from pathlib import Path
@@ -11,7 +13,7 @@ from pathlib import Path
 from django.db.models import Q
 from django.core.management import BaseCommand, CommandError
 
-from home.models import Professor, Course, Grade
+from home.models import Professor, Course, Grade, ProfessorAlias
 from home.utils import Semester
 
 class ValidationError(Exception):
@@ -72,14 +74,27 @@ class Command(BaseCommand):
         if name is None or name == "":
             return None
 
-        names = name.strip().split(",")
-        lastname = names[0]
-        firstname = names[-1].strip().split()[0]
-        professors = Professor.unfiltered.filter(
-            Q(name__istartswith=firstname) & Q(name__iendswith=lastname)
-        )
-        if professors.exists():
+        # .first() is ok here because at most one record will be returned
+        alias = ProfessorAlias.objects.filter(alias=name.strip()).first()
+        if alias:
+            return alias.professor
+
+        professors = Professor.verified.filter(name=name.strip())
+        if professors.count() == 1:
             return professors.first()
+
+        similar_professors = Professor.find_similar(name.strip(), 70)
+        if professors.count() > 1 or len(similar_professors):
+            # if 'name' matches more than one professor or
+            # is similar to more than one professor, create a new
+            # unverified professor for us to manually decide
+            # which professor the data belongs to.
+            new_professor = Professor(
+                name=name.strip(),
+                type=Professor.Type.PROFESSOR
+            )
+            new_professor.save()
+            return new_professor
 
         raise ValidationError("Professor doesn't exist")
 
