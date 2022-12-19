@@ -6,7 +6,7 @@ from home.utils import send_updates_webhook
 from home.forms.professor_forms import ProfessorFormReview
 from home.models import Professor as ProfessorModel, Review, Course
 from home.tables.reviews_table import VerifiedReviewsTable
-from home.forms.admin_forms import ProfessorUpdateForm, ProfessorUnverifyForm, ProfessorMergeForm
+from home.forms.admin_forms import ProfessorUpdateForm, ProfessorUnverifyForm, ProfessorMergeForm, ReviewDeleteForm
 
 
 class Professor(View):
@@ -69,9 +69,11 @@ class Professor(View):
         }
 
         if request.user.is_staff:
+            delete_review_modal = ReviewDeleteForm()
             edit_professor_form = ProfessorUpdateForm(professor, instance=professor)
             unverify_professor_form = ProfessorUnverifyForm(professor.pk)
             merge_professor_form = ProfessorMergeForm(request)
+            context["delete_review_modal"] = delete_review_modal
             context["edit_professor_form"] = edit_professor_form
             context['unverify_professor_form'] = unverify_professor_form
             context['merge_professor_form'] = merge_professor_form

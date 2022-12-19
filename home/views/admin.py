@@ -17,7 +17,7 @@ from home.utils import AdminAction
 from home.tables.reviews_table import UnverifiedReviewsTable
 from home.tables.basic import ProfessorsTable
 from home.forms.admin_forms import (ProfessorMergeForm, ProfessorSlugForm,
-    ProfessorUpdateForm, ActionForm, ProfessorInfoModal)
+    ProfessorUpdateForm, ActionForm, ProfessorInfoModal, ReviewDeleteForm)
 from home.utils import send_email, _ttl_cache
 from planetterp import config
 
@@ -34,6 +34,7 @@ class Admin(UserPassesTestMixin, View):
         )
         professors = Professor.pending.all()
 
+        delete_review_modal = ReviewDeleteForm()
         reviews_table = UnverifiedReviewsTable(reviews, request)
         professors_table = ProfessorsTable(professors, request)
         merge_professor_form = ProfessorMergeForm(request)
@@ -50,6 +51,7 @@ class Admin(UserPassesTestMixin, View):
             "professors": professors,
             "reviews_table": reviews_table,
             "professors_table": professors_table,
+            "delete_review_modal": delete_review_modal,
             "action_form": action_form,
             "merge_professor_form": merge_professor_form,
             "ttl_cache_items": ttl_cache_items
@@ -252,11 +254,22 @@ class Admin(UserPassesTestMixin, View):
 
     def verify_review(self, review_id: int, verified_status: Review.Status, user: User):
         review = Review.unfiltered.filter(pk=review_id).first()
+        response = {
+            "success_msg": None,
+            "verified_status": 'unverified' if verified_status is Review.Status.PENDING else verified_status.value,
+            "success": True,
+            "review_id": review.pk
+        }
+
         if not review:
             response = {
                 "error_msg": self.not_found_err("Review"),
                 "success": False
             }
+            return JsonResponse(response)
+
+        if verified_status is Review.Status.DELETED:
+            Review.unfiltered.filter(pk=review_id).delete()
             return JsonResponse(response)
 
         review.status = verified_status
@@ -266,12 +279,6 @@ class Admin(UserPassesTestMixin, View):
         reviewer = review.user
         professor = review.professor
         professor_status = Professor.Status(professor.status)
-        response = {
-            "success_msg": None,
-            "verified_status": 'unverified' if verified_status is Review.Status.PENDING else verified_status.value,
-            "success": True,
-            "review_id": review.pk
-        }
 
         if professor_status is Professor.Status.PENDING:
             response['success_msg'] = (

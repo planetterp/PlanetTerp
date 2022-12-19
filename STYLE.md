@@ -39,10 +39,10 @@ break up the import across as many lines as neccessary to keep it under 80 chara
 ```python
                                                                          # 80 chars
 # BAD:                                                                         |
-from home.forms.admin_forms import ReviewUnverifyForm, ReviewVerifyForm, ProfessorVerifyForm, ReviewRejectForm, ReviewHelpForm, ProfessorRejectForm, ProfessorDeleteForm
+from home.forms.admin_forms import ReviewActionForm, ReviewVerifyForm, ProfessorVerifyForm, ReviewRejectForm, ReviewHelpForm, ProfessorRejectForm, ProfessorDeleteForm
 
 # GOOD:
-from home.forms.admin_forms import (ReviewUnverifyForm, ReviewVerifyForm,
+from home.forms.admin_forms import (ReviewActionForm, ReviewVerifyForm,
     ProfessorVerifyForm, ReviewRejectForm, ReviewHelpForm,
     ProfessorRejectForm, ProfessorDeleteForm)
 ```
