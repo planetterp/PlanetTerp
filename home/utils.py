@@ -8,6 +8,7 @@ from threading import Thread
 from datetime import datetime
 
 from django.urls import reverse
+from django.template.defaultfilters import pluralize
 
 from discord_webhook import DiscordWebhook
 from discord_webhook.webhook import DiscordEmbed
@@ -69,14 +70,20 @@ class Semester:
     @staticmethod
     def current():
         now = datetime.now()
+        # spring (current year)
+        if now.month < 3:
+            semester = "01"
+            year = now.year
         # fall
         if 3 <= now.month <= 9:
             semester = "08"
-        # spring
-        else:
+            year = now.year
+        # spring (of next year)
+        if 9 < now.month:
             semester = "01"
+            year = now.year + 1
 
-        return Semester(f"{now.year}{semester}")
+        return Semester(f"{year}{semester}")
 
     def name(self, *, year_first=False, short=False):
         year = self.year
@@ -198,22 +205,19 @@ def recompute_ttl_cache():
         value = (0, *values)
         _ttl_cache[key] = value
 
-def send_updates_webhook(request, *, include_professors=True, include_reviews=True):
+def send_updates_webhook(request):
     # avoid circular imports
     from home.models import Professor, Review
     if not WEBHOOK_URL_UPDATE:
         return
 
-    title = ""
     num_professors = Professor.pending.count()
     num_reviews = Review.pending.count()
 
-    if include_professors:
-        title += f"{num_professors} unverified professor(s)"
-    if include_professors and include_reviews:
-        title += " and "
-    if include_reviews:
-        title += f"{num_reviews} unverified review(s)"
+    title = f"{num_reviews} unverified review{pluralize(num_reviews)}"
+
+    if num_professors:
+        title += f" and {num_professors} unverified professor{pluralize(num_professors)}"
 
     webhook = DiscordWebhook(url=WEBHOOK_URL_UPDATE)
     embed = DiscordEmbed(title=title, description="\n",
@@ -221,7 +225,7 @@ def send_updates_webhook(request, *, include_professors=True, include_reviews=Tr
 
     webhook.add_embed(embed)
 
-    if (num_reviews + num_professors) % WEBHOOK_FREQUENCY != 0:
+    if num_reviews % WEBHOOK_FREQUENCY != 0:
         return
 
     webhook.execute()
