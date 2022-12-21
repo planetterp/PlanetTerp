@@ -146,7 +146,7 @@ class StatusColumn(tables.Column):
     def __init__(self, *args, **kwargs):
         attrs = {
             "th": {"class": "status"},
-            "td": {"class": "status"}
+            "td": {"class": "status w-100"}
         }
         super().__init__(verbose_name="Status", orderable=False, attrs=attrs, *args, **kwargs)
 
