@@ -1,15 +1,13 @@
-function submitProfessorForm(form_id) {
-    if (form_id == '#professor-form-review') {
-        form_type = "review"
-        post_url = ""
-    } else {
-        form_type = "add"
-        post_url = "/add_professor"
+function submitProfessorForm(form_id, form_type) {
+    var url_mappings = {
+        "review": "",
+        "add": "/add_professor",
+        "edit": "/add_professor"
     }
 
     $.ajax({
         type: "POST",
-        url: post_url,
+        url: url_mappings[form_type],
         data: $(form_id).serialize(),
         success: function(data) {
             if (!(data['success'])) {
