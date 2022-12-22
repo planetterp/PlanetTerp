@@ -11,9 +11,9 @@ register = template.Library()
 def professor_form_add(context):
     request = context['request']
     user = request.user
-    form = ProfessorFormAdd(user)
+    add_form = ProfessorFormAdd(user)
     ctx = {}
     ctx.update(csrf(request))
 
     # https://django-crispy-forms.readthedocs.io/en/latest/crispy_tag_forms.html#render-a-form-within-python-code
-    return render_crispy_form(form, form.helper, context=ctx)
+    return render_crispy_form(add_form, add_form.helper, context=ctx)

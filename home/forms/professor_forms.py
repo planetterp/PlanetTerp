@@ -164,7 +164,8 @@ class ProfessorForm(Form):
         field_errors = {}
 
         for field in self.fields:
-            error_html = f'<div id="{{{{ form.{field}.name }}}}_errors" class="invalid-feedback text-center mb-3" style="font-size: 15px"></div>'
+            form_template_name = "form" if self.form_type is Review.ReviewType.ADD else f"{self.form_type.value}_form"
+            error_html = f'<div id="{{{{ {form_template_name}.{field}.name }}}}_errors" class="invalid-feedback text-center mb-3" style="font-size: 15px"></div>'
             field_errors[field] = HTML(error_html)
 
         return field_errors

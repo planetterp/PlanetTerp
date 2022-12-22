@@ -26,7 +26,7 @@ class Profile(LoginRequiredMixin, View):
         context = {
             "reviews_table": ProfileReviewsTable(reviews, request),
             "form": ProfileForm(instance=request.user),
-            "edit_review_form": EditReviewForm(request.user)
+            "edit_form": EditReviewForm(request.user)
         }
         return render(request, self.template, context)
 

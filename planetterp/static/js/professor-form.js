@@ -23,10 +23,12 @@ function submitProfessorForm(form_id) {
 
                 $(".anonymous-checkbox > div.form-group").addClass("mb-0");
 
-                if (form_type == "add") {
+                if (form_type != "review") {
                     delete field_mapping.other_course;
                     field_mapping["name"] = `id_name_${form_type}`;
+                }
 
+                if (form_type == "add") {
                     if ("type_" in errors) {
                         $("#div_id_type_").addClass("mb-0");
                         $("#type__errors").html(errors["type_"][0]["message"]);
@@ -72,9 +74,11 @@ function submitProfessorForm(form_id) {
                 $("div.invalid-feedback").hide();
                 $("div.form-group .is-invalid").removeClass("is-invalid");
 
-                $(`#success-banner-${form_type}`).removeClass("d-none");
-                $(':input', form_id).not(':button, :submit, :reset, :hidden').val('').prop('checked', false);
-                $(`#rateYo_${form_type}`).rateYo("option", "rating", 0);
+                if (form_type != "edit") {
+                    $(`#success-banner-${form_type}`).removeClass("d-none");
+                    $(':input', form_id).not(':button, :submit, :reset, :hidden').val('').prop('checked', false);
+                    $(`#rateYo_${form_type}`).rateYo("option", "rating", 0);
+                }
 
                 if (form_type == "add") {
                     $("#success-banner-add").removeClass("w-100").css({"width": "69rem"});
