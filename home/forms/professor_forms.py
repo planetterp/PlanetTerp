@@ -85,7 +85,7 @@ class ProfessorForm(Form):
             "Submit",
             css_id=f"submit-{self.form_type.value}-form",
             css_class="btn-warning w-100 mt-3",
-            onClick=f'submitProfessorForm("#{self.form_html_id}")'
+            onClick=f'submitProfessorForm("#{self.form_html_id}", {self.form_type.value})'
         )
 
         rateYo = HTML(f'<div id="div_id_rating"><div id="rateYo_{self.form_type.value}" class="rateYo" class="p-0"></div></div>')
@@ -261,6 +261,11 @@ class ProfessorFormReview(ProfessorForm):
         return self.cleaned_data
 
 class ProfessorAndReviewForm(ProfessorForm):
+    form_type = CharField(
+        required=True,
+        widget=HiddenInput
+    )
+
     name = CharField(
         required=False,
         widget=TextInput,
@@ -322,6 +327,7 @@ class ProfessorFormAdd(ProfessorAndReviewForm):
     def __init__(self, user, **kwargs):
         super().__init__(user, Review.ReviewType.ADD, **kwargs)
         self.fields['type_'].choices = Professor.Type.choices
+        self.fields['form_type'].initial = Review.ReviewType.ADD.value
 
     def left_side_layout(self):
         name = Field('name', placeholder="Instructor Name", id=f"id_name_{self.form_type.value}")
@@ -344,6 +350,7 @@ class ProfessorFormAdd(ProfessorAndReviewForm):
     def generate_layout(self):
         layout = Layout(
             Modal(
+                'form_type',
                 super().generate_layout(),
                 css_id="add-professor-modal",
                 title_id="add-professor-label",
@@ -366,6 +373,7 @@ class ProfessorFormAdd(ProfessorAndReviewForm):
 class EditReviewForm(ProfessorAndReviewForm):
     def __init__(self, user, **kwargs):
         super().__init__(user, Review.ReviewType.EDIT, **kwargs)
+        self.fields['form_type'].initial = Review.ReviewType.EDIT.value
 
     def left_side_layout(self):
         name = Field('name', placeholder="Instructor Name", id=f"id_name_{self.form_type.value}")
@@ -384,6 +392,7 @@ class EditReviewForm(ProfessorAndReviewForm):
     def generate_layout(self):
         layout = Layout(
             Modal(
+                'form_type',
                 super().generate_layout(),
                 css_id="edit-professor-modal",
                 title_id="edit-professor-label",
