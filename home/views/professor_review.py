@@ -5,7 +5,7 @@ from home.forms.professor_forms import ProfessorFormAdd
 from home.models import Professor, Review, Course
 from home.utils import send_updates_webhook
 
-class AddProfessor(View):
+class AddProfessorAndReview(View):
     def post(self, request):
         user = request.user
         form = ProfessorFormAdd(user, data=request.POST)
@@ -47,3 +47,6 @@ class AddProfessor(View):
             }
 
         return JsonResponse(context)
+
+class EditReview(View):
+    pass

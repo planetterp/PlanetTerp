@@ -2,7 +2,7 @@ from django.urls import path, register_converter, reverse
 from django.contrib.sitemaps import Sitemap
 from django.contrib.sitemaps.views import sitemap
 
-from home.views.add_professor import AddProfessor
+from home.views.professor_review import AddProfessorAndReview, EditReview
 from home.views.admin import Admin
 from home.views.authentication import Login, Logout, ForgotPassword, Register
 from home.views.basic import (About, Contact, PrivacyPolicy, TermsOfUse,
@@ -129,7 +129,8 @@ urlpatterns = [
     path('course/<course:name>', Course.as_view(), name='course'),
     path('course/<course:name>/reviews', CourseReviews.as_view(), name='course-reviews'),
     path('admin', Admin.as_view(), name='admin'),
-    path('add_professor', AddProfessor.as_view(), name='add-professor'),
+    path('add_professor_and_review', AddProfessorAndReview.as_view(), name='add-professor'),
+    path('edit_review', EditReview.as_view(), name='edit-review'),
     path('grades', Grades.as_view(), name='grades'),
 
     # profile
