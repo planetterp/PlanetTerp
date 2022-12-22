@@ -277,9 +277,12 @@ class ProfessorAndReviewForm(ProfessorForm):
 
     def get_content_styles(self):
         if self.user.is_authenticated:
-            return "height: 15.8rem; margin: auto; border-bottom-left-radius: 0rem;"
-        else:
-            return "height: 18rem;"
+            styles = "margin: auto; border-bottom-left-radius: 0rem;"
+            if self.form_type is Review.ReviewType.ADD:
+                return "height: 15.8rem; " + styles
+            return "height: 13.2rem; " + styles
+
+        return "height: 18rem;"
 
     @abstractmethod
     def left_side_layout(self):
