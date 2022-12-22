@@ -386,7 +386,6 @@ class EditReviewForm(ProfessorAndReviewForm):
                 super().generate_layout(),
                 css_id="edit-professor-modal",
                 title_id="edit-professor-label",
-                title_class="w-100 text-center",
                 title="Edit your review below"
             )
         )
