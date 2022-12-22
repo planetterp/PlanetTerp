@@ -1,3 +1,4 @@
+import json
 from datetime import date
 from abc import abstractmethod
 
@@ -10,7 +11,7 @@ from crispy_forms.utils import render_crispy_form
 import django_tables2 as tables
 
 from planetterp.settings import DATE_FORMAT
-from home.models import Review, Grade
+from home.models import Review, Grade, Course
 from home.forms.admin_forms import ReviewUnverifyForm
 
 class InformationColumn(tables.Column):
@@ -257,3 +258,21 @@ class UnverifiedProfessorsActionColumn(ActionColumn):
             "args": {"merge_subject": model_obj.name, "subject_id": model_obj.pk}
         }
         return format_html(column_html, **kwargs)
+
+class ProfileReviewsActionColumn(ActionColumn):
+    def render(self, value: dict):
+        request = value.pop("request")
+        model_obj = value.pop("model_obj")
+
+        ctx = {}
+        ctx.update(csrf(request))
+
+        review = {
+            "content": model_obj.content,
+            "rating": model_obj.rating,
+            "course": None if not model_obj.course_id else {"id": model_obj.course_id, "name": Course.unfiltered.get(pk=model_obj.course_id)},
+            "grade": None if not model_obj.grade else model_obj.grade
+        }
+
+        column_html = f'''<button class="btn btn-primary" onclick="editReview({json.dumps(review)})">Edit</button>'''
+        return mark_safe(column_html)

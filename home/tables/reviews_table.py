@@ -8,7 +8,7 @@ import django_tables2 as tables
 
 from home.utils import ReviewsTableColumn
 from home.models import Review
-from home.tables.columns import InformationColumn, ReviewColumn, StatusColumn, VerifiedReviewsActionColumn, UnverifiedReviewsActionColumn
+from home.tables.columns import InformationColumn, ReviewColumn, StatusColumn, VerifiedReviewsActionColumn, UnverifiedReviewsActionColumn, ProfileReviewsActionColumn
 
 class BaseReviewsTable(tables.Table):
     '''
@@ -104,9 +104,11 @@ class UnverifiedReviewsTable(BaseReviewsTable):
         super().__init__(self.columns, reviews, request, *args, **kwargs)
 
 class ProfileReviewsTable(BaseReviewsTable):
+    action = ProfileReviewsActionColumn()
+
     def __init__(self, reviews, request, *args, **kwargs):
         empty_text = mark_safe('<h4 class="text-center">You haven\'t written any reviews! Why not start now?</h4>')
-        self.columns = [ReviewsTableColumn.INFORMATION, ReviewsTableColumn.REVIEW, ReviewsTableColumn.STATUS]
+        self.columns = [ReviewsTableColumn.INFORMATION, ReviewsTableColumn.REVIEW, ReviewsTableColumn.ACTION, ReviewsTableColumn.STATUS]
 
         kwargs = {"empty_text": empty_text}
         super().__init__(self.columns, reviews, request, *args, **kwargs)
