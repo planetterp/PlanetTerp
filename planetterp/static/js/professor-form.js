@@ -1,14 +1,10 @@
 function submitProfessorForm(form_id) {
     if (form_id == '#professor-form-review') {
-        rateYo_multiplier = 3.1
         form_type = "review"
         post_url = ""
-        container_id = form_id;
     } else {
-        rateYo_multiplier = 1.8
         form_type = "add"
         post_url = "/add_professor"
-        container_id = "#add-professor-form-container";
     }
 
     $.ajax({
