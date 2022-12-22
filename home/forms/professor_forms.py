@@ -261,11 +261,6 @@ class ProfessorFormReview(ProfessorForm):
         return self.cleaned_data
 
 class ProfessorAndReviewForm(ProfessorForm):
-    form_type = CharField(
-        required=True,
-        widget=HiddenInput
-    )
-
     name = CharField(
         required=False,
         widget=TextInput,
@@ -327,7 +322,6 @@ class ProfessorFormAdd(ProfessorAndReviewForm):
     def __init__(self, user, **kwargs):
         super().__init__(user, Review.ReviewType.ADD, **kwargs)
         self.fields['type_'].choices = Professor.Type.choices
-        self.fields['form_type'].initial = Review.ReviewType.ADD.value
 
     def left_side_layout(self):
         name = Field('name', placeholder="Instructor Name", id=f"id_name_{self.form_type.value}")
@@ -350,7 +344,6 @@ class ProfessorFormAdd(ProfessorAndReviewForm):
     def generate_layout(self):
         layout = Layout(
             Modal(
-                'form_type',
                 super().generate_layout(),
                 css_id="add-professor-modal",
                 title_id="add-professor-label",
@@ -373,7 +366,6 @@ class ProfessorFormAdd(ProfessorAndReviewForm):
 class EditReviewForm(ProfessorAndReviewForm):
     def __init__(self, user, **kwargs):
         super().__init__(user, Review.ReviewType.EDIT, **kwargs)
-        self.fields['form_type'].initial = Review.ReviewType.EDIT.value
 
     def left_side_layout(self):
         name = Field('name', placeholder="Instructor Name", id=f"id_name_{self.form_type.value}")
@@ -392,7 +384,6 @@ class EditReviewForm(ProfessorAndReviewForm):
     def generate_layout(self):
         layout = Layout(
             Modal(
-                'form_type',
                 super().generate_layout(),
                 css_id="edit-professor-modal",
                 title_id="edit-professor-label",
