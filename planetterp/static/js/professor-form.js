@@ -1,8 +1,8 @@
 function submitProfessorForm(form_id, form_type) {
     var url_mappings = {
         "review": "",
-        "add": "/add_professor",
-        "edit": "/add_professor"
+        "add": "/add_professor_and_review",
+        "edit": "/edit_review"
     }
 
     $.ajax({
