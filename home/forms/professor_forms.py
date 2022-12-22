@@ -17,7 +17,6 @@ from discord_webhook.webhook import DiscordEmbed
 from home.models import Review, Professor, Course
 from planetterp import config
 
-# Base form that contains common form fields
 class ProfessorForm(Form):
     grade = ChoiceField(
         choices=[('', 'Expected Grade')] + Review.Grades.choices,
@@ -184,7 +183,6 @@ class ProfessorForm(Form):
 
         return cleaned_data
 
-# The review form that contains fields specific to the review form
 class ProfessorFormReview(ProfessorForm):
     course = ChoiceField(
         required=False,
@@ -311,7 +309,6 @@ class ProfessorAndReviewForm(ProfessorForm):
 
         return self.cleaned_data
 
-# The add professor/TA form that contains fields specific to the add professor/TA form
 class ProfessorFormAdd(ProfessorAndReviewForm):
     type_ = ChoiceField(
         required=False,
