@@ -271,9 +271,10 @@ class ProfileReviewsActionColumn(ActionColumn):
             "professor": escape(Professor.verified.get(pk=model_obj.professor_id).name),
             "content": escape(model_obj.content),
             "rating": model_obj.rating,
-            "anonymous": model_obj.anonymous, 
+            "anonymous": model_obj.anonymous,
             "course": None if not model_obj.course_id else {"id": model_obj.course_id, "name": Course.unfiltered.get(pk=model_obj.course_id).name},
-            "grade": None if not model_obj.grade else model_obj.grade
+            "grade": None if not model_obj.grade else model_obj.grade,
+            "id": model_obj.pk
         }
 
         column_html = f'''<button class="btn btn-primary" onclick='editReview({json.dumps(review)})'>Edit</button>'''

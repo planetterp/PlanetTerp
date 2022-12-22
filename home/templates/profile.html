@@ -92,6 +92,7 @@
 	}
 
 	function editReview(review) {
+		$("#review_id_edit").val(review["id"]);
 		$("#id_name_edit").val(review["professor"]);
 		$("#id_content_edit").val(review["content"]);
 		$("#id_grade_edit").val(review["grade"]);

@@ -364,6 +364,8 @@ class ProfessorFormAdd(ProfessorAndReviewForm):
         return self.cleaned_data
 
 class EditReviewForm(ProfessorAndReviewForm):
+    review_id = IntegerField(required=True, widget=HiddenInput)
+
     def __init__(self, user, **kwargs):
         super().__init__(user, Review.ReviewType.EDIT, **kwargs)
 
@@ -384,6 +386,7 @@ class EditReviewForm(ProfessorAndReviewForm):
     def generate_layout(self):
         layout = Layout(
             Modal(
+                Field('review_id', id=f"review_id_{self.form_type.value}"),
                 super().generate_layout(),
                 css_id="edit-professor-modal",
                 title_id="edit-professor-label",
