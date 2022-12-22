@@ -2,7 +2,7 @@ import json
 from datetime import date
 from abc import abstractmethod
 
-from django.utils.html import format_html
+from django.utils.html import format_html, escape
 from django.utils.safestring import mark_safe
 from django.template.context_processors import csrf
 from django.urls import reverse
@@ -11,7 +11,7 @@ from crispy_forms.utils import render_crispy_form
 import django_tables2 as tables
 
 from planetterp.settings import DATE_FORMAT
-from home.models import Review, Grade, Course
+from home.models import Review, Grade, Course, Professor
 from home.forms.admin_forms import ReviewUnverifyForm
 
 class InformationColumn(tables.Column):
@@ -268,11 +268,13 @@ class ProfileReviewsActionColumn(ActionColumn):
         ctx.update(csrf(request))
 
         review = {
-            "content": model_obj.content,
+            "professor": escape(Professor.verified.get(pk=model_obj.professor_id).name),
+            "content": escape(model_obj.content),
             "rating": model_obj.rating,
-            "course": None if not model_obj.course_id else {"id": model_obj.course_id, "name": Course.unfiltered.get(pk=model_obj.course_id)},
+            "anonymous": model_obj.anonymous, 
+            "course": None if not model_obj.course_id else {"id": model_obj.course_id, "name": Course.unfiltered.get(pk=model_obj.course_id).name},
             "grade": None if not model_obj.grade else model_obj.grade
         }
 
-        column_html = f'''<button class="btn btn-primary" onclick="editReview({json.dumps(review)})">Edit</button>'''
+        column_html = f'''<button class="btn btn-primary" onclick='editReview({json.dumps(review)})'>Edit</button>'''
         return mark_safe(column_html)

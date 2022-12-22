@@ -29,7 +29,7 @@ function submitProfessorForm(form_id) {
 
                 if (form_type == "add") {
                     delete field_mapping.other_course;
-                    field_mapping["name"] = "id_name";
+                    field_mapping["name"] = `id_name_${form_type}`;
 
                     if ("type_" in errors) {
                         $("#div_id_type_").addClass("mb-0");

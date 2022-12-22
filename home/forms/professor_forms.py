@@ -285,9 +285,8 @@ class ProfessorAndReviewForm(ProfessorForm):
     def left_side_layout(self):
         pass
 
-    @abstractmethod
     def generate_layout(self):
-        pass
+        return super().generate_layout()
 
     def clean(self):
         super().clean()
@@ -317,11 +316,11 @@ class ProfessorFormAdd(ProfessorAndReviewForm):
     )
 
     def __init__(self, user, **kwargs):
-        super.__init__(user, Review.ReviewType.ADD, **kwargs)
+        super().__init__(user, Review.ReviewType.ADD, **kwargs)
         self.fields['type_'].choices = Professor.Type.choices
 
     def left_side_layout(self):
-        name = Field('name', placeholder="Instructor Name")
+        name = Field('name', placeholder="Instructor Name", id=f"id_name_{self.form_type.value}")
         name_errors = self.field_errors["name"]
 
         type_ = InlineRadios('type_')
@@ -360,13 +359,12 @@ class ProfessorFormAdd(ProfessorAndReviewForm):
 
         return self.cleaned_data
 
-
 class EditReviewForm(ProfessorAndReviewForm):
     def __init__(self, user, **kwargs):
-        super.__init__(user, Review.ReviewType.EDIT, **kwargs)
+        super().__init__(user, Review.ReviewType.EDIT, **kwargs)
 
     def left_side_layout(self):
-        name = Field('name', placeholder="Instructor Name")
+        name = Field('name', placeholder="Instructor Name", id=f"id_name_{self.form_type.value}")
         name_errors = self.field_errors["name"]
 
         course = Field(
@@ -385,6 +383,7 @@ class EditReviewForm(ProfessorAndReviewForm):
                 super().generate_layout(),
                 css_id="edit-professor-modal",
                 title_id="edit-professor-label",
+                title_class="w-100 text-center",
                 title="Edit your review below"
             )
         )

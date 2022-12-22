@@ -10,6 +10,7 @@ from crispy_forms.utils import render_crispy_form
 from home.models import ResetCode
 from home.tables.reviews_table import ProfileReviewsTable
 from home.forms.basic import ProfileForm
+from home.forms.professor_forms import EditReviewForm
 from home.forms.auth_forms import ResetPasswordForm
 from planetterp.settings import DATE_FORMAT
 
@@ -24,7 +25,8 @@ class Profile(LoginRequiredMixin, View):
 
         context = {
             "reviews_table": ProfileReviewsTable(reviews, request),
-            "form": ProfileForm(instance=request.user)
+            "form": ProfileForm(instance=request.user),
+            "edit_review_form": EditReviewForm(request.user)
         }
         return render(request, self.template, context)
 

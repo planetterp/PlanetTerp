@@ -39,7 +39,7 @@ class BaseReviewsTable(tables.Table):
         kwargs = {
             "exclude": [column.name.lower() for column in ReviewsTableColumn if column not in self.columns],
             "attrs": {"class": "table table-striped reviews-table"},
-            "sequence": (column.name.lower() for column in ReviewsTableColumn if column in self.columns),
+            "sequence": [column.name.lower() for column in self.columns],
             **kwargs
         }
 
@@ -63,13 +63,13 @@ class BaseReviewsTable(tables.Table):
                 }
             if ReviewsTableColumn.REVIEW in self.columns:
                 formatted_data['review'] = {"review": review}
-            if ReviewsTableColumn.STATUS in self.columns:
-                formatted_data['status'] = {"review": review}
             if ReviewsTableColumn.ACTION in self.columns:
                 formatted_data['action'] = {
                     "request": self.request,
                     "model_obj": review
                 }
+            if ReviewsTableColumn.STATUS in self.columns:
+                formatted_data['status'] = {"review": review}
 
             data.append(formatted_data)
         return data
