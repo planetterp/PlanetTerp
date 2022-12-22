@@ -261,17 +261,10 @@ class ProfessorFormReview(ProfessorForm):
 
         return self.cleaned_data
 
-# The add professor/TA form that contains fields specific to the add professor/TA form
-class ProfessorFormAdd(ProfessorForm):
+class ProfessorAndReviewForm(ProfessorForm):
     name = CharField(
         required=False,
         widget=TextInput,
-        label=False
-    )
-
-    type_ = ChoiceField(
-        required=False,
-        widget=RadioSelect,
         label=False
     )
 
@@ -281,10 +274,6 @@ class ProfessorFormAdd(ProfessorForm):
         label=False
     )
 
-    def __init__(self, user, **kwargs):
-        super().__init__(user, Review.ReviewType.ADD, **kwargs)
-        self.fields['type_'].choices = Professor.Type.choices
-
     def error_message(self, field_name):
         return f"You must specify the instructor's {field_name}"
 
@@ -293,6 +282,46 @@ class ProfessorFormAdd(ProfessorForm):
             return "height: 15.8rem; margin: auto; border-bottom-left-radius: 0rem;"
         else:
             return "height: 18rem;"
+
+    @abstractmethod
+    def left_side_layout(self):
+        pass
+
+    @abstractmethod
+    def generate_layout(self):
+        pass
+
+    def clean(self):
+        super().clean()
+
+        name = self.cleaned_data.get('name')
+        course = self.cleaned_data.get('course')
+
+        if name == '' or name.isspace():
+            error = ValidationError(self.error_message('name'), code='Empty')
+            self.add_error("name", error)
+
+        if course and not Course.unfiltered.filter(name=course).exists():
+            error_msg = '''The course you specified is not in our database.
+                If you think it should be, please email us at admin@planetterp.com.'''
+            error = ValidationError(error_msg, code='Not Found')
+            self.add_error("course", error)
+        else:
+            self.cleaned_data['course'] = course
+
+        return self.cleaned_data
+
+# The add professor/TA form that contains fields specific to the add professor/TA form
+class ProfessorFormAdd(ProfessorAndReviewForm):
+    type_ = ChoiceField(
+        required=False,
+        widget=RadioSelect,
+        label=False
+    )
+
+    def __init__(self, user, **kwargs):
+        super.__init__(user, Review.ReviewType.ADD, **kwargs)
+        self.fields['type_'].choices = Professor.Type.choices
 
     def left_side_layout(self):
         name = Field('name', placeholder="Instructor Name")
@@ -318,7 +347,7 @@ class ProfessorFormAdd(ProfessorForm):
                 super().generate_layout(),
                 css_id="add-professor-modal",
                 title_id="add-professor-label",
-                title="Add a new Professor/TA"
+                title="Add a New Professor/TA"
             )
         )
         return layout
@@ -326,24 +355,40 @@ class ProfessorFormAdd(ProfessorForm):
     def clean(self):
         super().clean()
 
-        name = self.cleaned_data.get('name')
         type_ = self.cleaned_data.get('type_')
-        course = self.cleaned_data.get('course')
-
-        if name == '' or name.isspace():
-            error = ValidationError(self.error_message('name'), code='Empty')
-            self.add_error("name", error)
 
         if type_ == '' or type_.isspace():
             error = ValidationError(self.error_message('type'), code='Empty')
             self.add_error("type_", error)
 
-        if course and not Course.unfiltered.filter(name=course).exists():
-            error_msg = '''The course you specified is not in our database.
-                If you think it should be, please email us at admin@planetterp.com.'''
-            error = ValidationError(error_msg, code='Not Found')
-            self.add_error("course", error)
-        else:
-            self.cleaned_data['course'] = course
-
         return self.cleaned_data
+
+
+class EditReviewForm(ProfessorAndReviewForm):
+    def __init__(self, user, **kwargs):
+        super.__init__(user, Review.ReviewType.EDIT, **kwargs)
+
+    def left_side_layout(self):
+        name = Field('name', placeholder="Instructor Name")
+        name_errors = self.field_errors["name"]
+
+        course = Field(
+            'course',
+            placeholder="Course",
+            id=f"id_course_{self.form_type.value}"
+        )
+        crispy_course_errors = self.field_errors["course"]
+
+        left_side = (name, name_errors, course, crispy_course_errors)
+        return left_side
+
+    def generate_layout(self):
+        layout = Layout(
+            Modal(
+                super().generate_layout(),
+                css_id="edit-professor-modal",
+                title_id="edit-professor-label",
+                title="Edit your review below"
+            )
+        )
+        return layout
