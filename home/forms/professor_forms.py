@@ -85,7 +85,7 @@ class ProfessorForm(Form):
             "Submit",
             css_id=f"submit-{self.form_type.value}-form",
             css_class="btn-warning w-100 mt-3",
-            onClick=f'submitProfessorForm("#{self.form_html_id}", {self.form_type.value})'
+            onClick=f'submitProfessorForm("#{self.form_html_id}", "{self.form_type.value}")'
         )
 
         rateYo = HTML(f'<div id="div_id_rating"><div id="rateYo_{self.form_type.value}" class="rateYo" class="p-0"></div></div>')
