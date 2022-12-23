@@ -78,9 +78,12 @@ class ProfessorForm(Form):
         pass
 
     def generate_layout(self):
+        btn_name = ("submit", "Submit")
+        if self.form_type is Review.ReviewType.EDIT:
+            btn_name = ("update", "Update")
+
         submit_button = Button(
-            "submit",
-            "Submit",
+            *btn_name,
             css_id=f"submit-{self.form_type.value}-form",
             css_class="btn-warning w-100 mt-3",
             onClick=f'submitProfessorForm("#{self.form_html_id}", "{self.form_type.value}")'
