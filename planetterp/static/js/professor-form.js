@@ -65,21 +65,19 @@ function submitProfessorForm(form_id, form_type) {
                 }
 
             } else {
-                if (form_type == "review") {
+                if (form_type == "review")
                     $(".anonymous-checkbox > div.form-group").addClass("mb-0");
-                }
+                else
+                    $(`#success-banner-${form_type}`).removeClass("w-100").css({"width": "69rem"});
 
-                $("div.invalid-feedback").hide();
-                $("div.form-group .is-invalid").removeClass("is-invalid");
+                $(`${form_id} div.invalid-feedback`).hide();
+                $(`${form_id} div.form-group .is-invalid`).removeClass("is-invalid");
 
-                if (form_type != "edit") {
-                    $(`#success-banner-${form_type}`).removeClass("d-none");
-                    $(':input', form_id).not(':button, :submit, :reset, :hidden').val('').prop('checked', false);
-                    $(`#rateYo_${form_type}`).rateYo("option", "rating", 0);
-                }
+                $(`#success-banner-${form_type}`).removeClass("d-none");
+                $(':input', form_id).not(':button, :submit, :reset, :hidden').val('').prop('checked', false);
+                $(`#rateYo_${form_type}`).rateYo("option", "rating", 0);
 
                 if (form_type == "add") {
-                    $("#success-banner-add").removeClass("w-100").css({"width": "69rem"});
                     $("#id_type__0").val("professor");
                     $("#id_type__1").val("TA");
                 }

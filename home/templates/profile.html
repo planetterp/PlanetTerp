@@ -101,6 +101,10 @@
 		$("#id_rating_edit").val(review["rating"]);
 		$("#rateYo_edit").rateYo("option", "rating", review["rating"]);
 
+		$("#edit-professor-modal div.invalid-feedback").hide();
+		$("#edit-professor-modal div.form-group .is-invalid").removeClass("is-invalid");
+		$("#id_content_edit").removeClass("is-invalid");
+
 		if (review["course"] != null)
 			$("#id_course_edit").val(review["course"]["name"]);
 
