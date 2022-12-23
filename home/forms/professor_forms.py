@@ -78,8 +78,6 @@ class ProfessorForm(Form):
         pass
 
     def generate_layout(self):
-        # Ordering the fields/elements and assigning css styles
-        # https://django-crispy-forms.readthedocs.io/en/latest/layouts.html#universal-layout-objects
         submit_button = Button(
             "submit",
             "Submit",
