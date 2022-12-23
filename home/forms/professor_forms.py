@@ -101,13 +101,6 @@ class ProfessorForm(Form):
         )
         content_errors = self.field_errors["content"]
 
-        success_banner = Div(
-            HTML('Review submitted successfully! <button type="button" class="close">&times;</button>'),
-            css_id=f"success-banner-{self.form_type.value}",
-            css_class="alert alert-dismissable alert-success text-center w-100 rounded-0 d-none position-absolute",
-            style="z-index: 1;"
-        )
-
         login_banner = None
         anonymous = None
 
@@ -131,7 +124,6 @@ class ProfessorForm(Form):
             )
 
         layout = Layout(
-            success_banner,
             login_banner,
             Fieldset(
                 None,
@@ -224,6 +216,19 @@ class ProfessorFormReview(ProfessorForm):
 
         left_side = (course, course_errors, other_course_container, 'slug')
         return left_side
+
+    def generate_layout(self):
+        success_banner = Div(
+            HTML('Review submitted successfully! <button type="button" class="close">&times;</button>'),
+            css_id=f"success-banner-{self.form_type.value}",
+            css_class="alert alert-dismissable alert-success text-center w-100 rounded-0 d-none position-absolute",
+            style="z-index: 1;"
+        )
+
+        return Layout(
+            success_banner,
+            super().generate_layout()
+        )
 
     def clean(self):
         super().clean()
@@ -340,8 +345,16 @@ class ProfessorFormAdd(ProfessorAndReviewForm):
         return left_side
 
     def generate_layout(self):
+        success_banner = Div(
+            HTML('Review submitted successfully! <button type="button" class="close">&times;</button>'),
+            css_id=f"success-banner-{self.form_type.value}",
+            css_class="alert alert-dismissable alert-success text-center rounded-0 d-none position-absolute",
+            style="z-index: 1;"
+        )
+
         layout = Layout(
             Modal(
+                success_banner,
                 super().generate_layout(),
                 css_id="add-professor-modal",
                 title_id="add-professor-label",

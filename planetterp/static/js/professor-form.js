@@ -68,7 +68,7 @@ function submitProfessorForm(form_id, form_type) {
                 if (form_type == "review")
                     $(".anonymous-checkbox > div.form-group").addClass("mb-0");
                 else
-                    $(`#success-banner-${form_type}`).removeClass("w-100").css({"width": "69rem"});
+                    $(`#success-banner-${form_type}`).css({"width": "69rem"});
 
                 $(`${form_id} div.invalid-feedback`).hide();
                 $(`${form_id} div.form-group .is-invalid`).removeClass("is-invalid");

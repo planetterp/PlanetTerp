@@ -10,6 +10,17 @@
 {% crispy edit_form %}
 
 <br />
+<div id="success-banner-edit"  class="container fixed-top d-none" style="margin-top: 5rem;">
+	<div class="row">
+		<div class="col">
+			<div class="alert alert-dismissable alert-success text-center" style="margin-left: 12rem; margin-right: 12rem">
+				Review updated successfully! <button type="button" class="close">&times;</button>
+			</div>
+		</div>
+	</div>
+
+</div>
+
 
 <ul class="nav nav-tabs" role="tablist">
 	<li class="nav-item">
@@ -92,6 +103,9 @@
 	}
 
 	function editReview(review) {
+		if (!$("#success-banner-edit").hasClass("d-none"))
+			$("#success-banner-edit").addClass("d-none");
+
 		$("#review_id_edit").val(review["id"]);
 		$("#id_name_edit").val(review["professor"]);
 		$("#id_content_edit").val(review["content"]);
