@@ -81,6 +81,10 @@ function submitProfessorForm(form_id, form_type) {
                     $("#id_type__0").val("professor");
                     $("#id_type__1").val("TA");
                 }
+
+                if (form_type == "edit")
+                    $("#edit-professor-modal").modal('hide');
+
             }
         },
         error: function () {
