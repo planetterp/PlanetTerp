@@ -268,7 +268,7 @@ class ProfileReviewsActionColumn(ActionColumn):
         ctx.update(csrf(request))
 
         review = {
-            "professor": escape(Professor.verified.get(pk=model_obj.professor_id).name),
+            "professor": escape(Professor.unfiltered.get(pk=model_obj.professor_id).name),
             "content": escape(model_obj.content),
             "rating": model_obj.rating,
             "anonymous": model_obj.anonymous,
