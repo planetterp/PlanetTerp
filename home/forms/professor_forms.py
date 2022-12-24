@@ -263,7 +263,7 @@ class ProfessorFormReview(ProfessorForm):
 
         return self.cleaned_data
 
-class ProfessorAndReviewForm(ProfessorForm):
+class ProfessorFormAdd(ProfessorForm):
     name = CharField(
         required=False,
         widget=TextInput,
@@ -276,46 +276,6 @@ class ProfessorAndReviewForm(ProfessorForm):
         label=False
     )
 
-    def error_message(self, field_name):
-        return f"You must specify the instructor's {field_name}"
-
-    def get_content_styles(self):
-        if self.user.is_authenticated:
-            styles = "margin: auto; border-bottom-left-radius: 0rem;"
-            if self.form_type is Review.ReviewType.ADD:
-                return "height: 15.8rem; " + styles
-            return "height: 13.2rem; " + styles
-
-        return "height: 18rem;"
-
-    @abstractmethod
-    def left_side_layout(self):
-        pass
-
-    def generate_layout(self):
-        return super().generate_layout()
-
-    def clean(self):
-        super().clean()
-
-        name = self.cleaned_data.get('name')
-        course = self.cleaned_data.get('course')
-
-        if name == '' or name.isspace():
-            error = ValidationError(self.error_message('name'), code='Empty')
-            self.add_error("name", error)
-
-        if course and not Course.unfiltered.filter(name=course).exists():
-            error_msg = '''The course you specified is not in our database.
-                If you think it should be, please email us at admin@planetterp.com.'''
-            error = ValidationError(error_msg, code='Not Found')
-            self.add_error("course", error)
-        else:
-            self.cleaned_data['course'] = course
-
-        return self.cleaned_data
-
-class ProfessorFormAdd(ProfessorAndReviewForm):
     type_ = ChoiceField(
         required=False,
         widget=RadioSelect,
@@ -325,6 +285,14 @@ class ProfessorFormAdd(ProfessorAndReviewForm):
     def __init__(self, user, **kwargs):
         super().__init__(user, Review.ReviewType.ADD, **kwargs)
         self.fields['type_'].choices = Professor.Type.choices
+
+    def error_message(self, field_name):
+        return f"You must specify the instructor's {field_name}"
+
+    def get_content_styles(self):
+        if self.user.is_authenticated:
+            return "height: 15.8rem; margin: auto; border-bottom-left-radius: 0rem;"
+        return "height: 18rem;"
 
     def left_side_layout(self):
         name = Field('name', placeholder="Instructor Name", id=f"id_name_{self.form_type.value}")
@@ -365,17 +333,45 @@ class ProfessorFormAdd(ProfessorAndReviewForm):
 
     def clean(self):
         super().clean()
-
+        name = self.cleaned_data.get('name')
         type_ = self.cleaned_data.get('type_')
+        course = self.cleaned_data.get('course')
+
+        if name == '' or name.isspace():
+            error = ValidationError(self.error_message('name'), code='Empty')
+            self.add_error("name", error)
 
         if type_ == '' or type_.isspace():
             error = ValidationError(self.error_message('type'), code='Empty')
             self.add_error("type_", error)
 
+        if course and not Course.unfiltered.filter(name=course).exists():
+            error_msg = '''The course you specified is not in our database.
+                If you think it should be, please email us at admin@planetterp.com.'''
+            error = ValidationError(error_msg, code='Not Found')
+            self.add_error("course", error)
+        else:
+            self.cleaned_data['course'] = course
+
         return self.cleaned_data
 
-class EditReviewForm(ProfessorAndReviewForm):
-    review_id = IntegerField(required=True, widget=HiddenInput)
+class EditReviewForm(ProfessorForm):
+    name = CharField(
+        required=False,
+        widget=TextInput,
+        label=False
+    )
+
+    course = CharField(
+        required=False,
+        widget=TextInput,
+        label=False
+    )
+
+    review_id = IntegerField(
+        required=True,
+        widget=HiddenInput
+    )
 
     def __init__(self, user, **kwargs):
         super().__init__(user, Review.ReviewType.EDIT, **kwargs)
@@ -394,6 +390,9 @@ class EditReviewForm(ProfessorAndReviewForm):
         left_side = (name, name_errors, course, crispy_course_errors)
         return left_side
 
+    def get_content_styles(self):
+            return "height: 13.2rem; margin: auto; border-bottom-left-radius: 0rem;"
+
     def generate_layout(self):
         layout = Layout(
             Modal(
@@ -405,3 +404,24 @@ class EditReviewForm(ProfessorAndReviewForm):
             )
         )
         return layout
+
+    def clean(self):
+        super().clean()
+
+        name = self.cleaned_data.get('name')
+        course = self.cleaned_data.get('course')
+
+        if name == '' or name.isspace():
+            msg = "You must specify the instructor's name"
+            error = ValidationError(msg, code='Empty')
+            self.add_error("name", error)
+
+        if course and not Course.unfiltered.filter(name=course).exists():
+            error_msg = '''The course you specified is not in our database.
+                If you think it should be, please email us at admin@planetterp.com.'''
+            error = ValidationError(error_msg, code='Not Found')
+            self.add_error("course", error)
+        else:
+            self.cleaned_data['course'] = course
+
+        return self.cleaned_data
