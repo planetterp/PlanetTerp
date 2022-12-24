@@ -40,6 +40,7 @@ class BaseReviewsTable(tables.Table):
             "exclude": [column.name.lower() for column in ReviewsTableColumn if column not in self.columns],
             "attrs": {"class": "table table-striped reviews-table"},
             "sequence": (column.name.lower() for column in ReviewsTableColumn if column in self.columns),
+            "show_header": False,
             **kwargs
         }
 

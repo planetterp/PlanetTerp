@@ -18,6 +18,7 @@ class ProfessorsTable(tables.Table):
         kwargs = {
             "attrs": {"class": "table table-striped professors-table"},
             "empty_text": mark_safe('<h4 class="text-center">No professors/TAs to verify!</h4>'),
+            "show_header": False
         }
         self.data = self.get_data(self.professors)
 
