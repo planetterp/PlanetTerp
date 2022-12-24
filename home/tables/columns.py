@@ -16,7 +16,6 @@ from home.forms.admin_forms import ReviewUnverifyForm
 class InformationColumn(tables.Column):
     def __init__(self, *args, **kwargs):
         attrs = {
-            "th": {"class": "information"},
             "td": {
                 "class": "information",
                 "style": "white-space: nowrap; width: 11%;"
@@ -130,7 +129,6 @@ class InformationColumn(tables.Column):
 class ReviewColumn(tables.Column):
     def __init__(self, *args, **kwargs):
         attrs = {
-            "th": {"class": "review"},
             "td": {
                 "class": "review",
                 "style": "white-space: pre-line; width: 75%;"
@@ -145,7 +143,6 @@ class ReviewColumn(tables.Column):
 class StatusColumn(tables.Column):
     def __init__(self, *args, **kwargs):
         attrs = {
-            "th": {"class": "status"},
             "td": {"class": "status"}
         }
         super().__init__(verbose_name="Status", orderable=False, attrs=attrs, *args, **kwargs)
@@ -173,7 +170,6 @@ class StatusColumn(tables.Column):
 class ActionColumn(tables.Column):
     def __init__(self, *args, **kwargs):
         attrs = {
-            "th": {"class": "action"},
             "td": {"class": "action"}
         }
         super().__init__(verbose_name="Action", orderable=False, attrs=attrs, *args, **kwargs)
