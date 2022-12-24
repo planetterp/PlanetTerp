@@ -139,7 +139,7 @@ class ProfessorForm(Form):
                     css_class="no_select review-left-wrapper"
                 ),
                 Div(
-                   content,
+                    content,
                     anonymous,
                     content_errors,
                     css_id=f"review-right-wrapper-{self.form_type.value}",
