@@ -82,9 +82,30 @@ function submitProfessorForm(form_id, form_type) {
                     $("#id_type__1").val("TA");
                 }
 
-                if (form_type == "edit")
-                    $("#edit-professor-modal").modal('hide');
+                if (form_type == "edit") {
+                    var review_id = data["id"];
+                    var anon_class = Boolean(data["anonymous"]) ? "fa fa-eye-slash" : "fa fa-eye";
 
+                    $(`#review-${review_id} td.review`).html(data["content"]);
+                    $(`#rating-${review_id}`).html(rating(Number(data["rating"])));
+                    $(`#grade-${review_id}`).html(grade(data["grade"]));
+                    $(`#anonymous-${review_id} i`).attr("class", anon_class);
+
+                    if (Boolean(data["unverify"]))
+                        $(`#status-${review_id}`).attr("css", {"color": "darkgoldenrod"}).html("Under Review");
+
+                    if (data["course"]) {
+                        var el = $(`#course-${review_id}`);
+                        el.html(course(data["course"]["name"]));
+                        if (el.parent().children().length % 2 != 0)
+                            el.after("<br />");
+                    }
+
+                    delete data["unverify"];
+                    delete data["success"];
+                    $(`#update-${review_id}`).attr("onclick", `editReview(${JSON.stringify(data)})`);
+                    $("#edit-professor-modal").modal('hide');
+                }
             }
         },
         error: function () {
@@ -93,3 +114,26 @@ function submitProfessorForm(form_id, form_type) {
         }
     });
 }
+
+function rating(rating) {
+    var rating_html = '';
+    for (let i = 0; i < rating; i++) {
+        rating_html += '<i style="margin-top:4px;" class="fas fa-star"></i>\n'
+        rating_html += '<i class="far fa-star"></i>\n'
+    }
+
+    for (let i = rating; i < 5; i++)
+        rating_html += '<i class="far fa-star"></i>\n'
+
+    return rating_html;
+}
+
+function grade(grade) {
+    var vowel_grades = ["A", "A-", "A+", "F", "XF"];
+    var a_str = (vowel_grades.includes(grade)) ? "an" : "a";
+    return `Expecting ${a_str} ${grade}`;
+ }
+
+ function course(course) {
+    return `<a href=/course/${course}>${course}</a>`;
+ }

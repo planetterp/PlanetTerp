@@ -56,12 +56,18 @@ class EditReview(View):
             review_modified = form.cleaned_data
             review_orig = Review.unfiltered.filter(pk=review_modified['review_id']).select_related("course").first()
 
+            unverify = False
             if review_orig.content != review_modified['content']:
                 review_orig.status = Review.Status.PENDING
                 review_orig.content = review_modified['content']
+                unverify = True
 
-            if review_modified["course"] and (review_orig.course.name != review_modified['course']):
-                new_course = Course.unfiltered.filter(name=review_modified['course']).first()
+            new_course = review_modified["course"]
+            updating_none_course = new_course and not review_orig.course
+            updating_non_none_course = new_course and review_orig.course and (review_orig.course.name != new_course)
+
+            if updating_none_course or updating_non_none_course:
+                new_course = Course.unfiltered.filter(name=new_course).first()
                 review_orig.course = new_course
 
             review_orig.rating = int(review_modified['rating'])
@@ -72,7 +78,15 @@ class EditReview(View):
             send_updates_webhook(request)
 
             context = {
-                "success": True
+                "success": True,
+                "unverify": unverify,
+                "professor": review_orig.professor.name,
+                "rating": review_orig.rating,
+                "anonymous": review_orig.anonymous,
+                "course": {"id" : review_orig.course.pk, "name": review_orig.course.name} if review_orig.course else None,
+                "grade": review_orig.grade,
+                "id": review_orig.pk,
+                "content": review_orig.content
             }
         else:
             context = {
