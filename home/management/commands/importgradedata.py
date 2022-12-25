@@ -10,7 +10,6 @@
 import csv
 from pathlib import Path
 
-from django.db.models import Q
 from django.core.management import BaseCommand, CommandError
 
 from home.models import Professor, Course, Grade, ProfessorAlias
