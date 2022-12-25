@@ -50,22 +50,24 @@ class AddProfessorAndReview(View):
 class EditReview(View):
     def post(self, request):
         user = request.user
-        form = EditReviewForm(user, data=request.POST)
         review = Review.unfiltered.filter(pk=request.POST['review_id']).select_related("course").first()
+        initial = {
+            'content': review.content,
+            'course': review.course.name if review.course else None,
+            'rating': review.rating,
+            'grade': review.grade,
+            'anonymous': review.anonymous,
+            "review_id": review.pk
+        }
+        form = EditReviewForm(user, data=request.POST, initial=initial)
 
         if form.is_valid():
+            if 'content' in form.changed_data:
                 review.status = Review.Status.PENDING
                 review.content = form.cleaned_data['content']
 
-            unverify = False
-            if review_orig.content != review_modified['content']:
-                unverify = True
-
-            updating_none_course = new_course and not review_orig.course
-            updating_non_none_course = new_course and review_orig.course and (review_orig.course.name != new_course)
-
-            if updating_none_course or updating_non_none_course:
-                new_course = Course.unfiltered.filter(name=new_course).first()
+            if 'course' in form.changed_data:
+                new_course = Course.unfiltered.filter(name=form.cleaned_data['course']).first()
                 review.course = new_course
 
             review.rating = int(form.cleaned_data['rating'])
@@ -77,7 +79,8 @@ class EditReview(View):
 
             context = {
                 "success": True,
-                "unverify": unverify,
+                "has_changed": form.has_changed(),
+                "unverify": 'content' in form.changed_data,
                 "professor": review.professor.name,
                 "rating": review.rating,
                 "anonymous": review.anonymous,
