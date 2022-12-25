@@ -186,6 +186,9 @@ class ActionColumn(tables.Column):
         }
         super().__init__(verbose_name="Action", orderable=False, attrs=attrs, *args, **kwargs)
 
+    def header(self):
+        return ''
+
     @abstractmethod
     def render(self, value: dict):
         pass
