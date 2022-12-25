@@ -67,7 +67,8 @@ class Admin(UserPassesTestMixin, View):
         user = request.user
 
         if action_type is AdminAction.REVIEW_VERIFY:
-            verified_status = Review.Status(data["verified"])
+            status = data["verified"]
+            verified_status = status if status == "deleted" else Review.Status(status)
             review_id = int(data["id_"])
             return self.verify_review(review_id, verified_status, user)
 
@@ -252,11 +253,21 @@ class Admin(UserPassesTestMixin, View):
     def not_found_err(self, type_: str):
         return f"{type_} not found"
 
-    def verify_review(self, review_id: int, verified_status: Review.Status, user: User):
+    def verify_review(self, review_id: int, verified_status, user: User):
+        def status():
+            if verified_status == 'deleted':
+                return 'deleted'
+
+            status = Review.Status(verified_status)
+            if status is Review.Status.PENDING:
+                return 'unverified'
+
+            return status.value
+
         review = Review.unfiltered.filter(pk=review_id).first()
         response = {
             "success_msg": None,
-            "verified_status": 'unverified' if verified_status is Review.Status.PENDING else verified_status.value,
+            "verified_status": status(),
             "success": True,
             "review_id": review.pk
         }
@@ -268,7 +279,7 @@ class Admin(UserPassesTestMixin, View):
             }
             return JsonResponse(response)
 
-        if verified_status is Review.Status.DELETED:
+        if verified_status == 'deleted':
             Review.unfiltered.filter(pk=review_id).delete()
             return JsonResponse(response)
 

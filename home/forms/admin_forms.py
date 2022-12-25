@@ -43,7 +43,7 @@ class ActionForm(Form):
 
 class ReviewDeleteForm(Form):
     id_ = IntegerField(required=True, widget=HiddenInput)
-    verified = CharField(required=True, widget=HiddenInput, initial=Review.Status.DELETED.value)
+    verified = CharField(required=True, widget=HiddenInput, initial='deleted')
     action_type = CharField(required=True, widget=HiddenInput, initial=AdminAction.REVIEW_VERIFY.value)
 
     def __init__(self, **kwargs):
