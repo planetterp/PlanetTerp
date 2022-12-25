@@ -103,6 +103,8 @@
 	}
 
 	function editReview(review) {
+		var course_val = review["course"] == null ? '' : review["course"]["name"];
+
 		if (!$("#success-banner-edit").hasClass("d-none"))
 			$("#success-banner-edit").addClass("d-none");
 
@@ -115,8 +117,11 @@
 		$("#id_rating_edit").val(review["rating"]);
 		$("#rateYo_edit").rateYo("option", "rating", review["rating"]);
 
-		if (review["course"])
-			$("#id_course_edit").val(review["course"]["name"]);
+		$("#id_course_edit").val(course_val);
+		if (review["course"] != null)
+			$("#id_course_edit").prop("disabled", true);
+		else
+			$("#id_course_edit").prop("disabled", false);
 
 		$("#edit-professor-modal div.invalid-feedback").hide();
 		$("#edit-professor-modal div.form-group .is-invalid").removeClass("is-invalid");

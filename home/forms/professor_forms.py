@@ -359,7 +359,8 @@ class EditReviewForm(ProfessorForm):
     name = CharField(
         required=False,
         widget=TextInput,
-        label=False
+        label=False,
+        disabled=True
     )
 
     course = CharField(
@@ -377,7 +378,11 @@ class EditReviewForm(ProfessorForm):
         super().__init__(user, Review.ReviewType.EDIT, **kwargs)
 
     def left_side_layout(self):
-        name = Field('name', placeholder="Instructor Name", id=f"id_name_{self.form_type.value}")
+        name = Field(
+            'name',
+            placeholder="Instructor Name",
+            id=f"id_name_{self.form_type.value}"
+        )
         name_errors = self.field_errors["name"]
 
         course = Field(
@@ -408,13 +413,7 @@ class EditReviewForm(ProfessorForm):
     def clean(self):
         super().clean()
 
-        name = self.cleaned_data.get('name')
         course = self.cleaned_data.get('course')
-
-        if name == '' or name.isspace():
-            msg = "You must specify the instructor's name"
-            error = ValidationError(msg, code='Empty')
-            self.add_error("name", error)
 
         if course and not Course.unfiltered.filter(name=course).exists():
             error_msg = '''The course you specified is not in our database.
