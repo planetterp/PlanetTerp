@@ -2,7 +2,7 @@ from django.urls import path, register_converter, reverse
 from django.contrib.sitemaps import Sitemap
 from django.contrib.sitemaps.views import sitemap
 
-from home.views.professor_review import AddProfessorAndReview, EditReview
+from home.views.add_professor import AddProfessorAndReview, EditReview
 from home.views.admin import Admin
 from home.views.authentication import Login, Logout, ForgotPassword, Register
 from home.views.basic import (About, Contact, PrivacyPolicy, TermsOfUse,
