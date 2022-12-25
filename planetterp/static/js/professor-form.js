@@ -65,6 +65,8 @@ function submitProfessorForm(form_id, form_type) {
                 }
 
             } else {
+                var show_banner = (form_type == "edit") ? data["has_changed"] : true;
+
                 if (form_type == "review")
                     $(".anonymous-checkbox > div.form-group").addClass("mb-0");
                 else
@@ -73,7 +75,9 @@ function submitProfessorForm(form_id, form_type) {
                 $(`${form_id} div.invalid-feedback`).hide();
                 $(`${form_id} div.form-group .is-invalid`).removeClass("is-invalid");
 
-                $(`#success-banner-${form_type}`).removeClass("d-none");
+                if (show_banner)
+                    $(`#success-banner-${form_type}`).removeClass("d-none");
+
                 $(':input', form_id).not(':button, :submit, :reset, :hidden').val('').prop('checked', false);
                 $(`#rateYo_${form_type}`).rateYo("option", "rating", 0);
 
