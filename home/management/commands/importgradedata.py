@@ -90,7 +90,7 @@ class Command(BaseCommand):
             return professors.first()
 
         similar_professors = Professor.find_similar(name, 70)
-        if professors.count() > 1 or len(similar_professors):
+        if professors.count() > 1 or similar_professors:
             # if 'name' matches more than one professor or is similar to more
             # than one professor, create a new pending professor for us to
             # manually decide which professor the data belongs to.
