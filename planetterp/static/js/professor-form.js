@@ -88,14 +88,14 @@ function submitProfessorForm(form_id, form_type) {
 
                 if (form_type == "edit") {
                     var review_id = data["id"];
-                    var anon_class = Boolean(data["anonymous"]) ? "fa fa-eye-slash" : "fa fa-eye";
+                    var anon_class = data["anonymous"] ? "fa fa-eye-slash" : "fa fa-eye";
 
                     $(`#review-${review_id} td.review`).html(data["content"]);
                     $(`#rating-${review_id}`).html(rating(Number(data["rating"])));
                     $(`#grade-${review_id}`).html(grade(data["grade"]));
                     $(`#anonymous-${review_id} i`).attr("class", anon_class);
 
-                    if (Boolean(data["unverify"]))
+                    if (data["unverify"])
                         $(`#status-${review_id}`).attr("css", {"color": "darkgoldenrod"}).html("Under Review");
 
                     if (data["course"]) {
@@ -107,6 +107,9 @@ function submitProfessorForm(form_id, form_type) {
 
                     delete data["unverify"];
                     delete data["success"];
+                    delete data["has_changed"];
+                    delete data["is_staff"];
+                    delete data["username"];
                     $(`#update-${review_id}`).attr("onclick", `editReview(${JSON.stringify(data)})`);
                     $("#edit-professor-modal").modal('hide');
                 }
