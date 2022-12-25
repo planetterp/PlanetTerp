@@ -13,8 +13,9 @@
 
 {% block content %}
 
-{% crispy delete_review_modal %}
-
+{% if user.is_staff %}
+	{% crispy delete_review_modal %}
+{% endif %}
 <script type="text/javascript" src="{% static 'js/jquery-toggle.js' %}"></script>
 <br />
 
