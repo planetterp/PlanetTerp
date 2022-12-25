@@ -1,11 +1,16 @@
-# * Only CSV files are allowed!
+# Expected input is a csv file of grade data from umd.
 #
-# * Ensure that the grade data you're importing has the grade cutoffs listed as:
-#   A+, A, A-, B+, B, B-, C+, C, C-, D+, D, D-, F, W, OTHER
+# Before running:
+# * update professors and courses for any new entries
+# * ensure the spreadsheet has only the following grades listed, in this order:
+#   `A+, A, A-, B+, B, B-, C+, C, C-, D+, D, D-, F, W, OTHER`
+# * remove the header row at the top of the spreadsheet and check the data for
+#   invalid entries (at the bottom of the spreadsheet).
 #
-# * Remove column headers and check data for invalid entires (bottom of data)
-#
-# UPDATE COURSES AND PROFESSORS BEFORE RUNNING THIS SCRIPT
+# After running:
+# * go through /admin and deal with any ambiguous professors from the grade data
+#   - ie, determing which professor they actually map to and merge them into
+#   that professor.
 
 import csv
 from pathlib import Path
