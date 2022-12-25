@@ -104,13 +104,13 @@ function submitProfessorForm(form_id, form_type) {
                     }
 
                     if (data["unverify"])
-                        $(`#status-${review_id}`).attr("css", {"color": "darkgoldenrod"}).html("Under Review");
+                        $(`#status-${review_id}`).attr("style", "color: darkgoldenrod").html("Under Review");
 
-                    if (data["course"]) {
-                        var el = $(`#course-${review_id}`);
+                    var el = $(`#course-${review_id}`);
+                    if (data["course"] && el.next("br").length == 0) {
                         el.html(course(data["course"]["name"]));
-                        if (el.parent().children().length % 2 != 0)
-                            el.after("<br />");
+                        el.after("<br>");
+                    }
                     }
 
                     delete data["unverify"];

@@ -66,8 +66,9 @@ class EditReview(View):
                 review.status = Review.Status.PENDING
                 review.content = form.cleaned_data['content']
 
-            if 'course' in form.changed_data:
-                new_course = Course.unfiltered.filter(name=form.cleaned_data['course']).first()
+            course = form.cleaned_data['course']
+            if course != '' and 'course' in form.changed_data:
+                new_course = Course.unfiltered.filter(name=course).first()
                 review.course = new_course
 
             review.rating = int(form.cleaned_data['rating'])
