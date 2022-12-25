@@ -51,42 +51,40 @@ class EditReview(View):
     def post(self, request):
         user = request.user
         form = EditReviewForm(user, data=request.POST)
+        review = Review.unfiltered.filter(pk=request.POST['review_id']).select_related("course").first()
 
         if form.is_valid():
-            review_modified = form.cleaned_data
-            review_orig = Review.unfiltered.filter(pk=review_modified['review_id']).select_related("course").first()
+                review.status = Review.Status.PENDING
+                review.content = form.cleaned_data['content']
 
             unverify = False
             if review_orig.content != review_modified['content']:
-                review_orig.status = Review.Status.PENDING
-                review_orig.content = review_modified['content']
                 unverify = True
 
-            new_course = review_modified["course"]
             updating_none_course = new_course and not review_orig.course
             updating_non_none_course = new_course and review_orig.course and (review_orig.course.name != new_course)
 
             if updating_none_course or updating_non_none_course:
                 new_course = Course.unfiltered.filter(name=new_course).first()
-                review_orig.course = new_course
+                review.course = new_course
 
-            review_orig.rating = int(review_modified['rating'])
-            review_orig.grade = review_modified['grade']
-            review_orig.anonymous = review_modified['anonymous']
+            review.rating = int(form.cleaned_data['rating'])
+            review.grade = form.cleaned_data['grade']
+            review.anonymous = form.cleaned_data['anonymous']
 
-            review_orig.save()
+            review.save()
             send_updates_webhook(request)
 
             context = {
                 "success": True,
                 "unverify": unverify,
-                "professor": review_orig.professor.name,
-                "rating": review_orig.rating,
-                "anonymous": review_orig.anonymous,
-                "course": {"id" : review_orig.course.pk, "name": review_orig.course.name} if review_orig.course else None,
-                "grade": review_orig.grade,
-                "id": review_orig.pk,
-                "content": review_orig.content
+                "professor": review.professor.name,
+                "rating": review.rating,
+                "anonymous": review.anonymous,
+                "course": {"id" : review.course.pk, "name": review.course.name} if review.course else None,
+                "grade": review.grade,
+                "id": review.pk,
+                "content": review.content
             }
         else:
             context = {
