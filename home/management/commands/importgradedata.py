@@ -74,23 +74,25 @@ class Command(BaseCommand):
         if name is None or name == "":
             return None
 
+        name = name.strip()
+
         # .first() is ok here because at most one record will be returned
-        alias = ProfessorAlias.objects.filter(alias=name.strip()).first()
+        alias = ProfessorAlias.objects.filter(alias=name).first()
         if alias:
             return alias.professor
 
-        professors = Professor.verified.filter(name=name.strip())
+        professors = Professor.verified.filter(name=name)
         if professors.count() == 1:
             return professors.first()
 
-        similar_professors = Professor.find_similar(name.strip(), 70)
+        similar_professors = Professor.find_similar(name, 70)
         if professors.count() > 1 or len(similar_professors):
             # if 'name' matches more than one professor or
             # is similar to more than one professor, create a new
             # unverified professor for us to manually decide
             # which professor the data belongs to.
             new_professor = Professor(
-                name=name.strip(),
+                name=name,
                 type=Professor.Type.PROFESSOR
             )
             new_professor.save()
