@@ -586,30 +586,6 @@ class ProfessorInfoModal(Form):
             }
             return format_html(row, **kwargs)
 
-        def create_row(professor: Professor):
-            row = '''
-                <tr>
-                    <td><a href="{absolute_url}" target="_blank">{verified_name}</a></td>
-                    <td>{verified_courses}</td>
-                    <td><button class="btn btn-primary" onclick="mergeProfessor({merge_args})">Merge</button></td>
-                </tr>
-            '''
-
-            merge_data = {
-                "merge_subject": self.unverified_professor.name,
-                "subject_id": self.unverified_professor.pk,
-                "merge_target": professor.name,
-                "target_id": professor.pk
-            }
-
-            kwargs = {
-                "absolute_url": professor.get_absolute_url(),
-                "verified_name": professor.name,
-                "verified_courses": get_courses(professor),
-                "merge_args": merge_data
-            }
-            return format_html(row, **kwargs)
-
         table_str = '''
             <table class="table">
                 <tbody>
