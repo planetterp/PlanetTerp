@@ -12,7 +12,7 @@ from django.utils.safestring import mark_safe
 from crispy_forms.utils import render_crispy_form
 from discord_webhook import DiscordWebhook, DiscordEmbed
 
-from home.models import Review, Professor, ProfessorCourse, ProfessorAlias, Grade, User
+from home.models import Review, Professor, ProfessorAlias, ProfessorCourse, Grade, User
 from home.utils import AdminAction
 from home.tables.reviews_table import UnverifiedReviewsTable
 from home.tables.basic import ProfessorsTable
