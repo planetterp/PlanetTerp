@@ -81,6 +81,8 @@ class EditReview(View):
                 "success": True,
                 "has_changed": form.has_changed(),
                 "unverify": 'content' in form.changed_data,
+                "is_staff": request.user.is_staff,
+                "username": request.user.username,
                 "professor": review.professor.name,
                 "rating": review.rating,
                 "anonymous": review.anonymous,

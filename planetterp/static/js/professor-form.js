@@ -78,7 +78,8 @@ function submitProfessorForm(form_id, form_type) {
                 if (show_banner)
                     $(`#success-banner-${form_type}`).removeClass("d-none");
 
-                $(':input', form_id).not(':button, :submit, :reset, :hidden').val('').prop('checked', false);
+                $(':input', form_id).not(':button, :submit, :reset, :hidden, :checkbox').val('');
+                $(`${form_id} :input[type=checkbox]`).prop('checked', false);
                 $(`#rateYo_${form_type}`).rateYo("option", "rating", 0);
 
                 if (form_type == "add") {
@@ -94,6 +95,13 @@ function submitProfessorForm(form_id, form_type) {
                     $(`#rating-${review_id}`).html(rating(Number(data["rating"])));
                     $(`#grade-${review_id}`).html(grade(data["grade"]));
                     $(`#anonymous-${review_id} i`).attr("class", anon_class);
+
+                    if (!data["is_staff"]) {
+                        if (data["anonymous"])
+                            $(`#anonymous-${review_id}`).html("Anonymous");
+                        else
+                            $(`#anonymous-${review_id}`).html(data["username"]);
+                    }
 
                     if (data["unverify"])
                         $(`#status-${review_id}`).attr("css", {"color": "darkgoldenrod"}).html("Under Review");
