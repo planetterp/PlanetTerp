@@ -25,8 +25,8 @@ class InformationColumn(tables.Column):
         }
         super().__init__(verbose_name="Information", orderable=False, attrs=attrs, *args, **kwargs)
 
-    def rating_to_element(self, rating: int):
-        rating_html = '<span class="rating">'
+    def rating_to_element(self, rating, review_id):
+        rating_html = f'<span id="rating-{review_id}" class="rating">'
 
         for _ in range(rating): # filled stars
             rating_html += '<i style="margin-top:4px;" class="fas fa-star"></i>\n'
@@ -38,13 +38,14 @@ class InformationColumn(tables.Column):
         rating_html += '</span> <br />'
         return mark_safe(rating_html)
 
-    def grade_to_element(self, grade):
+    def grade_to_element(self, grade, review_id):
         a_str = "an" if grade in Grade.VOWEL_GRADES else "a"
         kwargs = {
             "a_str": a_str,
-            "grade": grade
+            "grade": grade,
+            "review_id": review_id
         }
-        return format_html('<span class="grade">Expecting {a_str} {grade}</span> <br />', **kwargs)
+        return format_html('<span id="grade-{review_id}" class="grade">Expecting {a_str} {grade}</span> <br />', **kwargs)
 
     def render(self, value: dict):
         review = value.pop("review")
@@ -53,7 +54,7 @@ class InformationColumn(tables.Column):
         column_html = ""
         if review.professor.slug:
             column_html += '''
-                <span>
+                <span id="professor-{review_id}" class="professor">
                     <a href="/professor/{professor_slug}">
                         <strong>{professor_name}</strong>
                     </a>
@@ -62,7 +63,7 @@ class InformationColumn(tables.Column):
             '''
         else:
             column_html += '''
-                <span>
+                <span id="professor-{review_id}" class="professor">
                     <strong>{professor_name}</strong>
                 </span>
                 <br />
@@ -70,19 +71,24 @@ class InformationColumn(tables.Column):
 
         if review.course:
             column_html += '''
-                <span class="course">
+                <span id="course-{review_id}" class="course">
                     <a href="/course/{course_name}">{course_name}</a>
                 </span>
                 <br />
             '''
+        else:
+            column_html += '''
+                <span id="course-{review_id}" class="course">
+                </span>
+            '''
 
-        column_html += self.rating_to_element(review.rating)
+        column_html += self.rating_to_element(review.rating, review.pk)
 
         if review.grade:
-            column_html += self.grade_to_element(review.grade)
+            column_html += self.grade_to_element(review.grade, review.pk)
 
         # wrap long usernames to avoid increasing the information column width
-        column_html += '<span style="white-space: normal; word-break: break-all;">'
+        column_html += '<span id="anonymous-{review_id}" style="white-space: normal; word-break: break-all;">'
         if is_staff and review.user:
             if review.anonymous:
                 column_html += '''
@@ -123,7 +129,8 @@ class InformationColumn(tables.Column):
             "professor_name": review.professor.name,
             "course_name": review.course.name if review.course else None,
             "username": username,
-            "created_at": review.created_at.date().strftime(DATE_FORMAT)
+            "created_at": review.created_at.date().strftime(DATE_FORMAT),
+            "review_id": review.pk
         }
 
         return format_html(column_html, **kwargs)
@@ -157,14 +164,14 @@ class StatusColumn(tables.Column):
         column_html = ''
 
         if review_status is Review.Status.PENDING:
-            column_html += '<p style="color: darkgoldenrod;">Under Review</p>'
+            column_html += f'<p id="status-{review.pk}" style="color: darkgoldenrod;">Under Review</p>'
         elif review_status is Review.Status.REJECTED:
-            column_html += '''
-                <p style="color: red; display: inline;">Rejected</p>
+            column_html += f'''
+                <p id="status-{review.pk}" style="color: red; display: inline;">Rejected</p>
                 <i class="fas fa-info-circle" data-toggle="tooltip" data-placement="right" title="Check the about page to see our standards for accepting reviews."></i>
             '''
         elif review_status is Review.Status.VERIFIED:
-            column_html += '<p style="color: green;">Accepted</p>'
+            column_html += f'<p id="status-{review.pk}" style="color: green;">Accepted</p>'
         else:
             # For testing only; Will be removed after testing
             raise ValueError("Invalid status!")
@@ -277,5 +284,5 @@ class ProfileReviewsActionColumn(ActionColumn):
             "id": model_obj.pk
         }
 
-        column_html = f'''<button class="btn btn-primary" onclick='editReview({json.dumps(review)})'>Edit</button>'''
+        column_html = f'''<button id="update-{model_obj.pk}" class="btn btn-primary" onclick='editReview({json.dumps(review)})'>Edit</button>'''
         return mark_safe(column_html)
