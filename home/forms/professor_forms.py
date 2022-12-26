@@ -270,6 +270,7 @@ class ProfessorFormReview(ProfessorForm):
 
         return self.cleaned_data
 
+# The add professor/TA form that contains fields specific to the add professor/TA form
 class ProfessorFormAdd(ProfessorForm):
     name = CharField(
         required=False,
