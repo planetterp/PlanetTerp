@@ -102,8 +102,12 @@ function submitProfessorForm(form_id, form_type) {
                             $(`#anonymous-${review_id}`).html(data["username"]);
                     }
 
-                    if (data["unverify"])
-                        $(`#status-${review_id}`).attr("style", "color: darkgoldenrod").html("Under Review");
+                    if (data["unverify"]) {
+                        var status_el = $(`#status-${review_id}`);
+                        status_el.attr("style", "color: darkgoldenrod").html("Under Review");
+                        if (status_el.next("i").length != 0)
+                            status_el.next("i").remove();
+                    }
 
                     var el = $(`#course-${review_id}`);
                     if (data["course"] && el.next("br").length == 0) {
