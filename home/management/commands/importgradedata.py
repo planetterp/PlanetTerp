@@ -79,6 +79,8 @@ class Command(BaseCommand):
             return None
 
         name = name.strip()
+        lastname, firstname = name.split(", ")
+        name = f"{firstname.strip()} {lastname.strip()}"
 
         # .first() is ok here because at most one record will be returned
         alias = ProfessorAlias.objects.filter(alias=name).first()
