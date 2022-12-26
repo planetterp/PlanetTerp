@@ -58,7 +58,7 @@ class ReviewDeleteForm(Form):
         modal_title = mark_safe('''
             <b>Are you sure you want to delete this review?</b>
             <br>
-            <small>This action is irriversable</small>
+            <small>This action is irreversible</small>
         ''')
 
         return Layout(
