@@ -93,7 +93,6 @@ function submitProfessorForm(form_id, form_type) {
 
                     $(`#review-${review_id} td.review`).html(data["content"]);
                     $(`#rating-${review_id}`).html(rating(Number(data["rating"])));
-                    $(`#grade-${review_id}`).html(grade(data["grade"]));
                     $(`#anonymous-${review_id} i`).attr("class", anon_class);
 
                     if (!data["is_staff"]) {
@@ -111,6 +110,11 @@ function submitProfessorForm(form_id, form_type) {
                         el.html(course(data["course"]["name"]));
                         el.after("<br>");
                     }
+
+                    var grade_el = $(`#grade-${review_id}`);
+                    if (data["grade"] && grade_el.next("br").length == 0) {
+                        $(`#grade-${review_id}`).html(grade(data["grade"]));
+                        grade_el.after("<br>");
                     }
 
                     delete data["unverify"];

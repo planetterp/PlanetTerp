@@ -39,6 +39,9 @@ class InformationColumn(tables.Column):
         return mark_safe(rating_html)
 
     def grade_to_element(self, grade, review_id):
+        if not grade:
+            return f'<span id="grade-{review_id}" class="grade"></span>'
+
         a_str = "an" if grade in Grade.VOWEL_GRADES else "a"
         kwargs = {
             "a_str": a_str,
@@ -83,9 +86,7 @@ class InformationColumn(tables.Column):
             '''
 
         column_html += self.rating_to_element(review.rating, review.pk)
-
-        if review.grade:
-            column_html += self.grade_to_element(review.grade, review.pk)
+        column_html += self.grade_to_element(review.grade, review.pk)
 
         # wrap long usernames to avoid increasing the information column width
         column_html += '<span id="anonymous-{review_id}" style="white-space: normal; word-break: break-all;">'
