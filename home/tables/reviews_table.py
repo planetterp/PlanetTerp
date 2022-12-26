@@ -63,13 +63,13 @@ class BaseReviewsTable(tables.Table):
                 }
             if ReviewsTableColumn.REVIEW in self.columns:
                 formatted_data['review'] = {"review": review}
+            if ReviewsTableColumn.STATUS in self.columns:
+                formatted_data['status'] = {"review": review}
             if ReviewsTableColumn.ACTION in self.columns:
                 formatted_data['action'] = {
                     "request": self.request,
                     "model_obj": review
                 }
-            if ReviewsTableColumn.STATUS in self.columns:
-                formatted_data['status'] = {"review": review}
 
             data.append(formatted_data)
         return data
