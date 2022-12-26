@@ -26,8 +26,8 @@ class Command(BaseCommand):
         self.semester = None
 
     def add_arguments(self, parser):
-        parser.add_argument("-s", "--semester")
-        parser.add_argument("-f", "--file")
+        parser.add_argument("-s", "--semester", required=True)
+        parser.add_argument("-f", "--file", required=True)
 
     def handle(self, *args, **options):
         self.semester = Semester(options["semester"])
