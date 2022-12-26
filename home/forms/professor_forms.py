@@ -11,9 +11,13 @@ from django.utils.html import format_html
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Fieldset, Layout, Div, Field, HTML, Button
 from crispy_forms.bootstrap import FormActions, Alert, InlineRadios, Modal
+from discord_webhook import DiscordWebhook
+from discord_webhook.webhook import DiscordEmbed
 
 from home.models import Review, Professor, Course
+from planetterp import config
 
+# Base form that contains common form fields
 class ProfessorForm(Form):
     grade = ChoiceField(
         choices=[('', 'Expected Grade')] + Review.Grades.choices,
@@ -74,6 +78,8 @@ class ProfessorForm(Form):
     def get_content_styles(self):
         pass
 
+    # Ordering the fields/elements and assigning css styles
+    # https://django-crispy-forms.readthedocs.io/en/latest/layouts.html#universal-layout-objects
     def generate_layout(self):
         btn_name = ("submit", "Submit")
         if self.form_type is Review.ReviewType.EDIT:
@@ -174,6 +180,7 @@ class ProfessorForm(Form):
 
         return cleaned_data
 
+# The review form that contains fields specific to the review form
 class ProfessorFormReview(ProfessorForm):
     course = ChoiceField(
         required=False,
