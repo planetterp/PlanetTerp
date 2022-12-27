@@ -2,7 +2,7 @@
 
 <https://planetterp.com/>
 
-Feel free to join our discord for developer assistance! https://discord.gg/Utd4jyBzek
+Feel free to join our discord if you have any questions! https://discord.gg/Utd4jyBzek
 
 PlanetTerp is a website designed to help students at the University of Maryland — College Park (UMD) make informed decisions. We have a professor review system, grades for each course and professor, and tools to provide information related to UMD.
 
