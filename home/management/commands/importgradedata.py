@@ -71,7 +71,7 @@ class Command(BaseCommand):
         name = name.strip()
         courses = Course.unfiltered.filter(name=name)
         if not courses.exists():
-            raise ValidationError("Course doesn't exist")
+            raise ValidationError(f"Course {name} doesn't exist")
         return courses.get()
 
     def parse_professor(self, name: str):
@@ -105,7 +105,7 @@ class Command(BaseCommand):
             new_professor.save()
             return new_professor
 
-        raise ValidationError("Professor doesn't exist")
+        raise ValidationError(f"Professor {name} doesn't exist")
 
 
     def add_grade(self, row):
