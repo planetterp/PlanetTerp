@@ -1,17 +1,23 @@
-# * Only CSV files are allowed!
+# Expected input is a csv file of grade data from umd.
 #
-# * Ensure that the grade data you're importing has the grade cutoffs listed as:
-#   A+, A, A-, B+, B, B-, C+, C, C-, D+, D, D-, F, W, OTHER
+# Before running:
+# * update professors and courses for any new entries
+# * ensure the spreadsheet has only the following grades listed, in this order:
+#   `A+, A, A-, B+, B, B-, C+, C, C-, D+, D, D-, F, W, OTHER`
+# * remove the header row at the top of the spreadsheet and check the data for
+#   invalid entries (at the bottom of the spreadsheet).
 #
-# * Remove column headers and check data for invalid entires (bottom of data)
+# After running:
+# * go through /admin and deal with any ambiguous professors from the grade data
+#   - ie, determing which professor they actually map to and merge them into
+#   that professor.
 
 import csv
 from pathlib import Path
 
-from django.db.models import Q
 from django.core.management import BaseCommand, CommandError
 
-from home.models import Professor, Course, Grade
+from home.models import Professor, Course, Grade, ProfessorAlias
 from home.utils import Semester
 
 class ValidationError(Exception):
@@ -26,8 +32,8 @@ class Command(BaseCommand):
         self.semester = None
 
     def add_arguments(self, parser):
-        parser.add_argument("-s", "--semester")
-        parser.add_argument("-f", "--file")
+        parser.add_argument("-s", "--semester", required=True)
+        parser.add_argument("-f", "--file", required=True)
 
     def handle(self, *args, **options):
         self.semester = Semester(options["semester"])
@@ -65,23 +71,41 @@ class Command(BaseCommand):
         name = name.strip()
         courses = Course.unfiltered.filter(name=name)
         if not courses.exists():
-            raise ValidationError("Course doesn't exist")
+            raise ValidationError(f"Course {name} doesn't exist")
         return courses.get()
 
     def parse_professor(self, name: str):
         if name is None or name == "":
             return None
 
-        names = name.strip().split(",")
-        lastname = names[0]
-        firstname = names[-1].strip().split()[0]
-        professors = Professor.unfiltered.filter(
-            Q(name__istartswith=firstname) & Q(name__iendswith=lastname)
-        )
-        if professors.exists():
+        name = name.strip()
+        lastname, firstname = name.split(", ")
+        name = f"{firstname.strip()} {lastname.strip()}"
+
+        # .first() is ok here because at most one record will be returned
+        alias = ProfessorAlias.objects.filter(alias=name).first()
+        if alias:
+            return alias.professor
+
+        professors = Professor.verified.filter(name=name)
+        if professors.count() == 1:
             return professors.first()
 
-        raise ValidationError("Professor doesn't exist")
+        similar_professors = Professor.find_similar(name, 70)
+        if professors.count() > 1 or similar_professors:
+            # if 'name' matches more than one professor or is similar to more
+            # than one professor, create a new pending professor for us to
+            # manually decide which professor the data belongs to.
+            # We'll go through the admin panel right after running this script
+            # to deal with any ambiguous professors.
+            new_professor = Professor(
+                name=name,
+                type=Professor.Type.PROFESSOR
+            )
+            new_professor.save()
+            return new_professor
+
+        raise ValidationError(f"Professor {name} doesn't exist")
 
 
     def add_grade(self, row):
