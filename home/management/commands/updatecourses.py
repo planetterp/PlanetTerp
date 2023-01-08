@@ -71,8 +71,11 @@ class Command(BaseCommand):
                 continue
 
             professors = Professor.verified.all()
+            professor = professors.filter(name=umdio_professor['name'])
 
-            if not professors.filter(name=umdio_professor['name']).first():
+            if professor.count() == 1:
+                professor = professor.first()
+            else:
                 # To make our lives easier, attempt to automatically verify the professor
                 # following a similar process to that in admin.py
                 professor = Professor(name=umdio_professor['name'], type=Professor.Type.PROFESSOR)
