@@ -1,3 +1,4 @@
+import re
 import requests
 from datetime import datetime
 
@@ -67,7 +68,7 @@ class Command(BaseCommand):
             return
 
         for umdio_professor in umdio_professors:
-            if "instructor" in umdio_professor['name'].lower():
+            if re.search("instructor:?\s*tba", umdio_professor['name'].lower()):
                 continue
 
             professors = Professor.verified.all()
