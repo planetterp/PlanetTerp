@@ -87,7 +87,7 @@ class Command(BaseCommand):
                 continue
 
             professors = Professor.verified.all()
-            professor = professors.filter(name=umdio_professor['name'])
+            professor = Professor.unfiltered.exclude(status=Professor.Status.REJECTED).filter(name=umdio_professor['name'])
 
             if professor.count() == 1:
                 professor = professor.first()
