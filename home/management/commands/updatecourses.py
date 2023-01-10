@@ -5,7 +5,7 @@ from datetime import datetime
 from django.core.management import BaseCommand
 from argparse import RawTextHelpFormatter
 
-from home.models import Course, Professor, ProfessorCourse
+from home.models import Course, Professor, ProfessorCourse, ProfessorAlias
 from home.utils import Semester
 
 class Command(BaseCommand):
@@ -92,25 +92,29 @@ class Command(BaseCommand):
             if professor.count() == 1:
                 professor = professor.first()
             else:
-                # To make our lives easier, attempt to automatically verify the professor
-                # following a similar process to that in admin.py
-                professor = Professor(name=umdio_professor['name'], type=Professor.Type.PROFESSOR)
-                similar_professors = Professor.find_similar(professor.name, 70)
-                split_name = professor.name.strip().split()
-                new_slug = split_name[-1].lower()
-                valid_slug = True
+                aliases = ProfessorAlias.objects.filter(alias=umdio_professor['name'])
+                if professor.count() > 1 and aliases.count() == 1:
+                    professor = aliases.first()
+                else:
+                    # To make our lives easier, attempt to automatically verify the professor
+                    # following a similar process to that in admin.py
+                    professor = Professor(name=umdio_professor['name'], type=Professor.Type.PROFESSOR)
+                    similar_professors = Professor.find_similar(professor.name, 70)
+                    split_name = professor.name.strip().split()
+                    new_slug = split_name[-1].lower()
+                    valid_slug = True
 
-                if professors.filter(slug=new_slug).exists():
-                    new_slug = f"{split_name[-1]}_{split_name[0]}".lower()
                     if professors.filter(slug=new_slug).exists():
-                        valid_slug = False
+                        new_slug = f"{split_name[-1]}_{split_name[0]}".lower()
+                        if professors.filter(slug=new_slug).exists():
+                            valid_slug = False
 
-                if len(similar_professors) == 0 and valid_slug:
-                    professor.slug = new_slug
-                    professor.status = Professor.Status.VERIFIED
+                    if len(similar_professors) == 0 and valid_slug:
+                        professor.slug = new_slug
+                        professor.status = Professor.Status.VERIFIED
 
-                professor.save()
-                self.total_num_new_professors += 1
+                    professor.save()
+                    self.total_num_new_professors += 1
 
             for entry in umdio_professor['taught']:
                 if entry['course_id'] == course.name and Semester(entry['semester']) == semester:
