@@ -118,5 +118,14 @@ class Command(BaseCommand):
 
             for entry in umdio_professor['taught']:
                 if entry['course_id'] == course.name and Semester(entry['semester']) == semester:
-                    ProfessorCourse.objects.create(course=course, professor=professor, recent_semester=semester)
+                    professorcourse = ProfessorCourse.objects.filter(
+                        course=course,
+                        professor=professor,
+                        recent_semester=semester
+                    ).first()
+
+                    if not professorcourse:
+                        ProfessorCourse.objects.create(course=course, professor=professor, recent_semester=semester)
+                    elif professorcourse and not professorcourse.recent_semester:
+                        professorcourse.recent_semester = semester
                     break
