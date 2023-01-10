@@ -62,8 +62,8 @@ class Command(BaseCommand):
                         course.save()
                         self.total_num_new_courses += 1
 
-                    self._professors(course, semester)
                     print(course)
+                    self._professors(course, semester)
 
                 kwargs["page"] += 1
                 course_data = requests.get("https://api.umd.io/v1/courses", params=kwargs).json()
