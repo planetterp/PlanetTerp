@@ -10,13 +10,16 @@ from home.utils import Semester
 
 class Command(BaseCommand):
     requires_migrations_checks = True
-    help = '''* NOTE: Updates the database with new courses and professors during the provided semester. The semester argument must be in the numerical form YEAR+SEASON.
-        See below for the season codes:
-            Spring -> 01
-            Summer -> 05
-            Fall -> 08
-            Winter -> 12
-        EXAMPLE: Spring 2023 = 202301
+    help = '''Updates the database with new courses and professors during the provided semester.
+    The semester argument must be in the numerical form YEAR+SEASON (see ** for exception).
+    The season codes are as follows:
+        Spring -> 01
+        Summer -> 05
+         Fall  -> 08
+        Winter -> 12
+    EXAMPLE: Spring 2023 = 202301
+
+    ** NOTE: Starting from Winter 2021, the values for winter semesters are off by one year. Winter 2021 is actually 202012, not 202112
    '''
 
     def __init__(self):
