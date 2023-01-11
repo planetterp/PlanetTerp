@@ -26,6 +26,11 @@ class Command(BaseCommand):
         super().__init__()
         self.total_num_new_courses = 0
         self.total_num_new_professors = 0
+        self.courses = Course.unfiltered.all()
+        self.verified_professors = Professor.verified.all()
+        self.non_rejected_professors = Professor.unfiltered.exclude(status=Professor.Status.REJECTED)
+        self.aliases = ProfessorAlias.objects.all()
+        self.professor_courses = ProfessorCourse.objects.all()
 
     def create_parser(self, *args, **kwargs):
         parser = super(Command, self).create_parser(*args, **kwargs)
@@ -52,7 +57,7 @@ class Command(BaseCommand):
 
             while course_data:
                 for umdio_course in course_data:
-                    course = Course.unfiltered.filter(name=umdio_course['course_id']).first()
+                    course = self.courses.filter(name=umdio_course['course_id']).first()
                     if not course:
                         course = Course(
                             name=umdio_course['course_id'],
@@ -90,15 +95,14 @@ class Command(BaseCommand):
             if re.search("instructor:?\s*tba", umdio_professor['name'].lower()):
                 continue
 
-            professors = Professor.verified.all()
-            professor = Professor.unfiltered.exclude(status=Professor.Status.REJECTED).filter(name=umdio_professor['name'])
+            professor = self.non_rejected_professors.filter(name=umdio_professor['name'])
 
             if professor.count() == 1:
                 professor = professor.first()
             else:
-                aliases = ProfessorAlias.objects.filter(alias=umdio_professor['name'])
-                if professor.count() > 1 and aliases.count() == 1:
-                    professor = aliases.first()
+                alias = self.aliases.filter(alias=umdio_professor['name'])
+                if professor.count() > 1 and alias.count() == 1:
+                    professor = alias.first()
                 else:
                     # To make our lives easier, attempt to automatically verify the professor
                     # following a similar process to that in admin.py
@@ -108,9 +112,9 @@ class Command(BaseCommand):
                     new_slug = split_name[-1].lower()
                     valid_slug = True
 
-                    if professors.filter(slug=new_slug).exists():
+                    if self.verified_professors.filter(slug=new_slug).exists():
                         new_slug = f"{split_name[-1]}_{split_name[0]}".lower()
-                        if professors.filter(slug=new_slug).exists():
+                        if self.verified_professors.filter(slug=new_slug).exists():
                             valid_slug = False
 
                     if len(similar_professors) == 0 and valid_slug:
@@ -122,7 +126,7 @@ class Command(BaseCommand):
 
             for entry in umdio_professor['taught']:
                 if entry['course_id'] == course.name and Semester(entry['semester']) == semester:
-                    professorcourse = ProfessorCourse.objects.filter(
+                    professorcourse = self.professor_courses.filter(
                         course=course,
                         professor=professor
                     )
