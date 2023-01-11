@@ -124,12 +124,11 @@ class Command(BaseCommand):
                 if entry['course_id'] == course.name and Semester(entry['semester']) == semester:
                     professorcourse = ProfessorCourse.objects.filter(
                         course=course,
-                        professor=professor,
-                        recent_semester=semester
-                    ).first()
+                        professor=professor
+                    )
 
-                    if not professorcourse:
+                    if professorcourse.count() == 1 and not professorcourse.first().recent_semester:
+                        professorcourse.update(recent_semester=semester)
+                    elif professorcourse.count() == 0 or not professorcourse.filter(recent_semester=semester).exists():
                         ProfessorCourse.objects.create(course=course, professor=professor, recent_semester=semester)
-                    elif professorcourse and not professorcourse.recent_semester:
-                        professorcourse.recent_semester = semester
                     break
