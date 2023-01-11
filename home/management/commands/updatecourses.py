@@ -57,15 +57,15 @@ class Command(BaseCommand):
 
             while course_data:
                 for umdio_course in course_data:
-                    course = self.courses.filter(name=umdio_course['course_id']).first()
+                    course = self.courses.filter(name=umdio_course['course_id'].strip("\n\t\r ")).first()
                     if not course:
                         course = Course(
-                            name=umdio_course['course_id'],
-                            department=umdio_course['dept_id'],
-                            course_number=umdio_course['course_id'][4:],
-                            title=umdio_course['name'],
-                            credits=umdio_course['credits'],
-                            description=umdio_course["description"]
+                            name=umdio_course['course_id'].strip("\n\t\r "),
+                            department=umdio_course['dept_id'].strip("\n\t\r "),
+                            course_number=umdio_course['course_id'].strip("\n\t\r ")[4:],
+                            title=umdio_course['name'].strip("\n\t\r "),
+                            credits=umdio_course['credits'].strip("\n\t\r "),
+                            description=umdio_course["description"].strip("\n\t\r ")
                         )
 
                         course.save()
@@ -92,21 +92,22 @@ class Command(BaseCommand):
             return
 
         for umdio_professor in umdio_professors:
-            if re.search("instructor:?\s*tba", umdio_professor['name'].lower()):
+            professor_name = umdio_professor['name'].strip("\n\t\r ")
+            if re.search("instructor:?\s*tba", professor_name.lower()):
                 continue
 
-            professor = self.non_rejected_professors.filter(name=umdio_professor['name'])
+            professor = self.non_rejected_professors.filter(name=professor_name)
 
             if professor.count() == 1:
                 professor = professor.first()
             else:
-                alias = self.aliases.filter(alias=umdio_professor['name'])
+                alias = self.aliases.filter(alias=professor_name)
                 if professor.count() > 1 and alias.count() == 1:
                     professor = alias.first()
                 else:
                     # To make our lives easier, attempt to automatically verify the professor
                     # following a similar process to that in admin.py
-                    professor = Professor(name=umdio_professor['name'], type=Professor.Type.PROFESSOR)
+                    professor = Professor(name=professor_name, type=Professor.Type.PROFESSOR)
                     similar_professors = Professor.find_similar(professor.name, 70)
                     split_name = professor.name.strip().split()
                     new_slug = split_name[-1].lower()
