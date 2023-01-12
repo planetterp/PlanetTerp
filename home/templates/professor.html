@@ -210,8 +210,9 @@
 		$("#professor-stats").html(stats);
 	}
 
-	function unverifyReview(form) {
-		sendResponse($(form).serialize(), 'review_verify', {"count" : --num_reviews});
+	function unverifyReview(review_id) {
+		$("#unverify_review_id").val(review_id);
+		sendResponse($("#unverify_review_form").serialize(), 'review_verify', {"count" : --num_reviews});
 	}
 
 	function fixReviewsTableStyle() {
