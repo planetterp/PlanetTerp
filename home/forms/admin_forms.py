@@ -47,28 +47,20 @@ class ReviewUnverifyForm(Form):
     verified = CharField(required=True, widget=HiddenInput, initial=Review.Status.PENDING.value)
     action_type = CharField(required=True, widget=HiddenInput, initial=AdminAction.REVIEW_VERIFY.value)
 
-    def __init__(self, review_id, **kwargs):
+    def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.fields['id_'].initial = review_id
 
         self.helper = FormHelper()
-        self.helper.form_id = f"unverify_review_{review_id}"
+        self.helper.form_id = "unverify_review_form"
         self.helper.form_class = "unverify_review"
         self.helper.form_show_errors = False
         self.helper.layout = self.generate_layout()
 
     def generate_layout(self):
-        submit_button = Button(
-            "unverify",
-            "Unverify",
-            css_class="btn-danger btn-lg",
-            onClick=f"unverifyReview('#{self.helper.form_id}')"
-        )
         return Layout(
-            'id_',
+            Field('id_', id="unverify_review_id"),
             'verified',
-            'action_type',
-            FormActions(submit_button)
+            'action_type'
         )
 
 # For deleting unverified professors. This action cannot be undone.
