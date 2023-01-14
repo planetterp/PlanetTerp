@@ -48,6 +48,7 @@ class Command(BaseCommand):
             kwargs = {"semester": semester, "per_page": 100, "page": 1}
             course_data = requests.get("https://api.umd.io/v1/courses", params=kwargs).json()
 
+            # if no courses were found during semester, skip.
             if "error_code" in course_data[0].keys():
                 print(f"umd.io doesn't have data for {semester.name()}!")
                 continue
@@ -55,8 +56,11 @@ class Command(BaseCommand):
             print(f"Working on courses for {semester.name()}...")
 
             while course_data:
+                # for every course taught during `semester`...
                 for umdio_course in course_data:
                     course = self.courses.filter(name=umdio_course['course_id'].strip("\n\t\r ")).first()
+
+                    # if we don't have the course, create it.
                     if not course:
                         course = Course(
                             name=umdio_course['course_id'].strip("\n\t\r "),
@@ -71,6 +75,7 @@ class Command(BaseCommand):
                         self.total_num_new_courses += 1
 
                     print(course)
+                    # collect all the professors that taught this course during `semester`
                     self._professors(course, semester)
 
                 kwargs["page"] += 1
@@ -86,10 +91,11 @@ class Command(BaseCommand):
         kwargs = {"course_id": course.name}
         umdio_professors = requests.get("https://api.umd.io/v1/professors", params=kwargs).json()
 
-        # if no professors were found for `course` during `semester`
+        # if no professors were found for `course`, exit function.
         if isinstance(umdio_professors, dict) and 'error_code' in umdio_professors.keys():
             return
 
+        # for every professor that taught `course`...
         for umdio_professor in umdio_professors:
             professor_name = umdio_professor['name'].strip("\n\t\r ")
             if re.search("instructor:?\s*tba", professor_name.lower()):
@@ -97,15 +103,22 @@ class Command(BaseCommand):
 
             professor = self.non_rejected_professors.filter(name=professor_name)
 
+            # if there's only one matching professor, use that professor.
             if professor.count() == 1:
                 professor = professor.first()
             else:
                 alias = self.aliases.filter(alias=professor_name)
+
+                # if there's more than one matching professor but
+                # we have an alias that narrows the query down to one,
+                # use the professor associated with that alias.
                 if professor.count() > 1 and alias.count() == 1:
                     professor = alias.first()
                 else:
-                    # To make our lives easier, attempt to automatically verify the professor
-                    # following a similar process to that in admin.py
+                    # Otherwise, we either don't have this professor or we couldn't
+                    # narrow down the query enough. So, create a new professor and
+                    # attempt to automatically verify it following a process similar
+                    # to that in admin.py.
                     professor = Professor(name=professor_name, type=Professor.Type.PROFESSOR)
                     similar_professors = Professor.find_similar(professor.name, 70)
                     split_name = professor.name.strip().split()
@@ -117,6 +130,8 @@ class Command(BaseCommand):
                         if self.verified_professors.filter(slug=new_slug).exists():
                             valid_slug = False
 
+                    # if there are no similarly named professors and there's no
+                    # issues with the auto generated slug, verify the professor.
                     if len(similar_professors) == 0 and valid_slug:
                         professor.slug = new_slug
                         professor.status = Professor.Status.VERIFIED
@@ -124,15 +139,24 @@ class Command(BaseCommand):
                     professor.save()
                     self.total_num_new_professors += 1
 
+            # for every course taught by `professor`...
             for entry in umdio_professor['taught']:
+                # we only care about `course` taught during `semester`.
                 if entry['course_id'] == course.name and Semester(entry['semester']) == semester:
                     professorcourse = self.professor_courses.filter(
                         course=course,
                         professor=professor
                     )
 
+                    # if only one professorcourse record and it doesn't
+                    # have a recent semester, update that one record.
                     if professorcourse.count() == 1 and not professorcourse.first().recent_semester:
                         professorcourse.update(recent_semester=semester)
+
+                    # if there's no professorcourse entries at all that match
+                    # the prof/course combo or if there are matching records but
+                    # none of them have recent semester = `semester`, create a new
+                    # professor course entry.
                     elif professorcourse.count() == 0 or not professorcourse.filter(recent_semester=semester).exists():
                         ProfessorCourse.objects.create(course=course, professor=professor, recent_semester=semester)
                     break
