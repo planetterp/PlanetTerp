@@ -9,7 +9,6 @@ from home.models import Course, Professor, ProfessorCourse, ProfessorAlias
 from home.utils import Semester
 
 class Command(BaseCommand):
-    requires_migrations_checks = True
     help = '''Updates the database with new courses and professors during the provided semester.
     The semester argument must be in the numerical form YEAR+SEASON (see ** for exception).
     The season codes are as follows:
