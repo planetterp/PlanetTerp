@@ -13,25 +13,30 @@ def forwards_func(apps, schema_editor):
         unique_courses = p_courses.values_list("course", flat=True).distinct()
 
         for cid in unique_courses:
+            # order by recent semester so all records where recent semester
+            # is null are first.
             records = p_courses.filter(course__pk=cid).order_by("recent_semester")
 
             # there can't be any duplicates with just one record for this
-            # professor/course
+            # professor/course combination, so skip this record. 
             if records.count() <= 1:
                 continue
 
             # if there are any non-null recent semesters...
             if records.exclude(recent_semester=None).exists():
-                # ...check every record...
+                # ...for every record...
                 for record in records:
                     similar_records = records.filter(recent_semester=record.recent_semester)
-                    # ...if any are null, get rid of it: we have a non-null
-                    # record for this course/prof combination already as above.
+
+                    # ...if recent semester is null, delete the record: a record
+                    # with a non-null recent semester for this course/prof combination
+                    # is gaurenteed to exist.
                     if not record.recent_semester:
                         records_to_delete.append(record.pk)
+
                     # ...otherwise, if there are any exact duplicates
-                    # (semester + course + professor all match), get rid of all
-                    # but one.
+                    # (semester + course + professor all match), delete all
+                    # but the fist one.
                     elif similar_records.count() > 1:
                         records_to_delete += list(similar_records[1:].values_list("pk", flat=True))
             else:
