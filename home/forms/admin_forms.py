@@ -94,19 +94,18 @@ class ReviewActionForm(Form):
     verified = CharField(required=True, widget=HiddenInput)
     action_type = CharField(required=True, widget=HiddenInput, initial=AdminAction.REVIEW_VERIFY.value)
 
-    def __init__(self, review_id, **kwargs):
+    def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.fields['id_'].initial = review_id
-        self.review_id = review_id
+
         self.helper = FormHelper()
-        self.helper.form_id = f"review_action_{review_id}"
-        self.helper.form_class = "review_action"
+        self.helper.form_id = "unverify_review_form"
+        self.helper.form_class = "unverify_review"
         self.helper.form_show_errors = False
         self.helper.layout = self.generate_layout()
 
     def generate_layout(self):
         return Layout(
-            'id_',
+            Field('id_', id="unverify_review_id"),
             'verified',
             'action_type',
             Div(

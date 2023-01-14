@@ -6,12 +6,10 @@ from django.utils.safestring import mark_safe
 from django.template.context_processors import csrf
 from django.urls import reverse
 
-from crispy_forms.utils import render_crispy_form
 import django_tables2 as tables
 
 from planetterp.settings import DATE_FORMAT
 from home.models import Review, Grade
-from home.forms.admin_forms import ReviewActionForm
 
 class InformationColumn(tables.Column):
     def __init__(self, *args, **kwargs):
@@ -185,15 +183,9 @@ class ActionColumn(tables.Column):
 # Admin actions for verified reviews
 class VerifiedReviewsActionColumn(ActionColumn):
     def render(self, value: dict):
-        request = value.pop("request")
         model_obj = value.pop("model_obj")
-
-        ctx = {}
-        ctx.update(csrf(request))
-
-        form = ReviewActionForm(model_obj.pk)
-        column_html = render_crispy_form(form, form.helper, context=ctx)
-        return mark_safe(column_html)
+        column_html = '''<button id="unverify-{review_id}" class="btn btn-lg btn-danger" onclick="unverifyReview('{review_id}')">Unverify</button>'''
+        return format_html(column_html, review_id=model_obj.pk)
 
 # Admin actions for unverified reviews
 class UnverifiedReviewsActionColumn(ActionColumn):

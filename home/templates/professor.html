@@ -32,7 +32,7 @@
 						<div class="input-group-append"><i class="fas fa-people-arrows pl-3 pt-2 admin-tool-icon" onclick="mergeProfessor({'merge_subject':'{{ professor.name}}', 'subject_id':'{{professor.pk}}'})"></i></div>
 					</h1>
 				</div>
-
+				{% crispy review_unverify_form %}
 				{% crispy edit_professor_form %}
 				{% crispy unverify_professor_form %}
 
@@ -219,9 +219,9 @@
 		$("#professor-stats").html(stats);
 	}
 
-	function reviewAction(form, verified_status) {
-		$(`${form} input[name="verified"]`).val(verified_status);
-		sendResponse($(form).serialize(), 'review_verify', {"count" : --num_reviews});
+	function unverifyReview(review_id) {
+		$("#unverify_review_id").val(review_id);
+		sendResponse($("#unverify_review_form").serialize(), 'review_verify', {"count" : --num_reviews});
 	}
 
 	function fixReviewsTableStyle() {
