@@ -87,7 +87,6 @@ class ReviewDeleteForm(Form):
             )
         )
 
-
 # For unverifying or deleting a verified review. Currently used on /professor
 class ReviewActionForm(Form):
     id_ = IntegerField(required=True, widget=HiddenInput)

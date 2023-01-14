@@ -13,9 +13,6 @@
 
 {% block content %}
 
-{% if user.is_staff %}
-	{% crispy delete_review_modal %}
-{% endif %}
 <script type="text/javascript" src="{% static 'js/jquery-toggle.js' %}"></script>
 <br />
 
@@ -35,6 +32,7 @@
 				{% crispy review_unverify_form %}
 				{% crispy edit_professor_form %}
 				{% crispy unverify_professor_form %}
+				{% crispy delete_review_modal %}
 
 				<div id="merge-container">
 					{% crispy merge_professor_form %}
