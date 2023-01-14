@@ -88,9 +88,9 @@ class ReviewDeleteForm(Form):
         )
 
 # For unverifying or deleting a verified review. Currently used on /professor
-class ReviewActionForm(Form):
+class ReviewUnverifyForm(Form):
     id_ = IntegerField(required=True, widget=HiddenInput)
-    verified = CharField(required=True, widget=HiddenInput)
+    verified = CharField(required=True, widget=HiddenInput, initial=Review.Status.PENDING.value)
     action_type = CharField(required=True, widget=HiddenInput, initial=AdminAction.REVIEW_VERIFY.value)
 
     def __init__(self, **kwargs):
@@ -106,22 +106,7 @@ class ReviewActionForm(Form):
         return Layout(
             Field('id_', id="unverify_review_id"),
             'verified',
-            'action_type',
-            Div(
-                Button(
-                    "unverify",
-                    "Unverify",
-                    onClick=f"reviewAction('#{self.helper.form_id}', '{Review.Status.PENDING.value}')",
-                    css_class="btn-danger btn-lg"
-                ),
-                Button(
-                    "delete",
-                    "Delete",
-                    onClick=f"triggerDeleteModal('{self.review_id}')",
-                    css_class="btn-dark btn-lg"
-                ),
-                css_class="btn-group"
-            )
+            'action_type'
         )
 
 # For deleting unverified professors. This action cannot be undone.

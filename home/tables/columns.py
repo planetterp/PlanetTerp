@@ -184,7 +184,12 @@ class ActionColumn(tables.Column):
 class VerifiedReviewsActionColumn(ActionColumn):
     def render(self, value: dict):
         model_obj = value.pop("model_obj")
-        column_html = '''<button id="unverify-{review_id}" class="btn btn-lg btn-danger" onclick="unverifyReview('{review_id}')">Unverify</button>'''
+        column_html = '''
+        <div class="btn-group">
+            <button id="unverify-{review_id}" class="btn btn-lg btn-danger" onclick="unverifyReview('{review_id}')">Unverify</button>
+            <button id="delete-{review_id}" class="btn btn-lg btn-dark" onclick="triggerDeleteModal('{review_id}')">Delete</button>
+        </div>
+        '''
         return format_html(column_html, review_id=model_obj.pk)
 
 # Admin actions for unverified reviews
