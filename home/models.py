@@ -373,18 +373,6 @@ class User(AbstractUser):
         super().save(*args, **kwargs)
 
 
-class AuditLog(Model):
-    class Meta:
-        db_table = "home_audit_log"
-
-    username = TextField()
-    summary = TextField()
-    created_at = DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return f"{self.summary} (action by {self.username})"
-
-
 class Gened(Model):
     GENEDS = [
         "FSAW", "FSAR", "FSMA", "FSOC", "FSPW", "DSHS", "DSHU", "DSNS", "DSNL",
