@@ -102,42 +102,42 @@ class Command(BaseCommand):
                 continue
 
             professor = self.non_rejected_professors.filter(name=professor_name)
+            alias = self.aliases.filter(alias=professor_name)
 
             # if there's only one matching professor, use that professor.
             if professor.count() == 1:
                 professor = professor.first()
+
+            # if there's more than one matching professor but
+            # we have an alias that narrows the query down to one,
+            # use the professor associated with that alias.
+            elif professor.count() > 1 and alias.count() == 1:
+                professor = alias.first()
+
+            # Otherwise, we either don't have this professor or we couldn't
+            # narrow down the query enough. So, create a new professor and
+            # attempt to automatically verify it following a process similar
+            # to that in admin.py.
             else:
-                alias = self.aliases.filter(alias=professor_name)
+                professor = Professor(name=professor_name, type=Professor.Type.PROFESSOR)
+                similar_professors = Professor.find_similar(professor.name, 70)
+                split_name = professor.name.strip().split()
+                new_slug = split_name[-1].lower()
+                valid_slug = True
 
-                # if there's more than one matching professor but
-                # we have an alias that narrows the query down to one,
-                # use the professor associated with that alias.
-                if professor.count() > 1 and alias.count() == 1:
-                    professor = alias.first()
-                else:
-                    # Otherwise, we either don't have this professor or we couldn't
-                    # narrow down the query enough. So, create a new professor and
-                    # attempt to automatically verify it following a process similar
-                    # to that in admin.py.
-                    professor = Professor(name=professor_name, type=Professor.Type.PROFESSOR)
-                    similar_professors = Professor.find_similar(professor.name, 70)
-                    split_name = professor.name.strip().split()
-                    new_slug = split_name[-1].lower()
-                    valid_slug = True
-
+                if self.verified_professors.filter(slug=new_slug).exists():
+                    new_slug = f"{split_name[-1]}_{split_name[0]}".lower()
                     if self.verified_professors.filter(slug=new_slug).exists():
-                        new_slug = f"{split_name[-1]}_{split_name[0]}".lower()
-                        if self.verified_professors.filter(slug=new_slug).exists():
-                            valid_slug = False
+                        valid_slug = False
 
-                    # if there are no similarly named professors and there's no
-                    # issues with the auto generated slug, verify the professor.
-                    if len(similar_professors) == 0 and valid_slug:
-                        professor.slug = new_slug
-                        professor.status = Professor.Status.VERIFIED
+                # if there are no similarly named professors and there's no
+                # issues with the auto generated slug, verify the professor.
+                if len(similar_professors) == 0 and valid_slug:
+                    professor.slug = new_slug
+                    professor.status = Professor.Status.VERIFIED
 
-                    professor.save()
-                    self.total_num_new_professors += 1
+                professor.save()
+                self.total_num_new_professors += 1
 
             # for every course taught by `professor`...
             for entry in umdio_professor['taught']:
