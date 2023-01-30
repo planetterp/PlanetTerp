@@ -108,9 +108,9 @@ class Command(BaseCommand):
             if professor.count() == 1:
                 professor = professor.first()
 
-            # if we have an alias for this name, use
-            # the professor associated with that alias.
-            elif professor.count() > 1 and alias.exists():
+            # if there are no matching professors but we have an alias
+            # for this name, use the professor associated with that alias.
+            elif professor.count() == 0 and alias.exists():
                 professor = alias.first()
 
             # Otherwise, we don't recognize this professor. So we
