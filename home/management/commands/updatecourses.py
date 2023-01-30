@@ -1,40 +1,66 @@
+import re
 import requests
 from datetime import datetime
 
 from django.core.management import BaseCommand
-from django.db.models import Q
+from argparse import RawTextHelpFormatter
 
-from home.models import Course, Professor, ProfessorCourse
+from home.models import Course, Professor, ProfessorCourse, ProfessorAlias
 from home.utils import Semester
 
 class Command(BaseCommand):
+    help = '''Updates the database with new courses and professors during the provided semester.
+    The semester argument must be in the numerical form YEAR+SEASON (see ** for exception).
+    The season codes are as follows:
+        Spring -> 01
+        Summer -> 05
+         Fall  -> 08
+        Winter -> 12
+    EXAMPLE: Spring 2023 = 202301
+
+    ** NOTE: Starting from Winter 2021, the values for winter semesters are off by one year. Winter 2021 is actually 202012, not 202112
+   '''
+
     def __init__(self):
         super().__init__()
         self.total_num_new_courses = 0
         self.total_num_new_professors = 0
+        self.courses = Course.unfiltered.all()
+        self.verified_professors = Professor.verified.all()
+        self.non_rejected_professors = Professor.unfiltered.exclude(status=Professor.Status.REJECTED)
+        self.aliases = ProfessorAlias.objects.all()
+        self.professor_courses = ProfessorCourse.objects.all()
+
+    def create_parser(self, *args, **kwargs):
+        parser = super(Command, self).create_parser(*args, **kwargs)
+        parser.formatter_class = RawTextHelpFormatter
+        return parser
 
     def add_arguments(self, parser):
         parser.add_argument("semesters", nargs='+')
 
     def handle(self, *args, **options):
         t_start = datetime.now()
-        inputted_semesters = [Semester(s).name() for s in options['semesters']]
-        print(f"Inputted Semesters: {', '.join(inputted_semesters)}")
+        semesters = [Semester(s) for s in options['semesters']]
+        print(f"Inputted Semesters: {', '.join(s.name() for s in semesters)}")
 
-        for semester in options['semesters']:
-            s = Semester(semester)
+        for semester in semesters:
             kwargs = {"semester": semester, "per_page": 100, "page": 1}
             course_data = requests.get("https://api.umd.io/v1/courses", params=kwargs).json()
 
+            # if no courses were found during semester, skip.
             if "error_code" in course_data[0].keys():
-                print(f"umd.io doesn't have data for {s.name()}!")
+                print(f"umd.io doesn't have data for {semester.name()}!")
                 continue
 
-            print(f"Working on courses for {s.name()}...")
+            print(f"Working on courses for {semester.name()}...")
 
             while course_data:
+                # for every course taught during `semester`...
                 for umdio_course in course_data:
-                    course = Course.unfiltered.filter(name=umdio_course['course_id']).first()
+                    course = self.courses.filter(name=umdio_course['course_id'].strip("\n\t\r ")).first()
+
+                    # if we don't have the course, create it.
                     if not course:
                         course = Course(
                             name=umdio_course['course_id'],
@@ -57,8 +83,9 @@ class Command(BaseCommand):
                         course.save()
                         self.total_num_new_courses += 1
 
-                    self._professors(course, s)
                     print(course)
+                    # collect all the professors that taught this course during `semester`
+                    self._professors(course, semester)
 
                 kwargs["page"] += 1
                 course_data = requests.get("https://api.umd.io/v1/courses", params=kwargs).json()
@@ -73,41 +100,72 @@ class Command(BaseCommand):
         kwargs = {"course_id": course.name}
         umdio_professors = requests.get("https://api.umd.io/v1/professors", params=kwargs).json()
 
+        # if no professors were found for `course`, exit function.
+        if isinstance(umdio_professors, dict) and 'error_code' in umdio_professors.keys():
+            return
+
+        # for every professor that taught `course`...
         for umdio_professor in umdio_professors:
-            try:
-                professor = Professor.unfiltered.filter(name=umdio_professor['name']).first()
-            except TypeError:
+            professor_name = umdio_professor['name'].strip("\n\t\r ")
+            if re.search("instructor:?\s*tba", professor_name.lower()):
                 continue
 
-            if umdio_professor['name'] == "Instructor: TBA":
-                continue
+            professor = self.non_rejected_professors.filter(name=professor_name)
 
-            if not professor:
-                # To make our lives easier, attempt to automatically verify the professor
-                # following the same criteria in admin.py
-                split_name = umdio_professor['name'].strip().split()
-                first_name = split_name[0].lower().strip()
-                last_name = split_name[-1].lower().strip()
-                query = Professor.verified.filter(
-                    (
-                        Q(name__istartswith=first_name) &
-                        Q(name__iendswith=last_name)
-                    ) |
-                    Q(slug="_".join(reversed(split_name)).lower())
-                )
+            # if there's only one matching professor, use that professor.
+            if professor.count() == 1:
+                professor = professor.first()
+            else:
+                alias = self.aliases.filter(alias=professor_name)
 
-                prof_name = " ".join([name.capitalize() for name in umdio_professor['name'].split()])
-                professor = Professor(name=prof_name, type=Professor.Type.PROFESSOR)
+                # if there's more than one matching professor but
+                # we have an alias that narrows the query down to one,
+                # use the professor associated with that alias.
+                if professor.count() > 1 and alias.count() == 1:
+                    professor = alias.first()
+                else:
+                    # Otherwise, we either don't have this professor or we couldn't
+                    # narrow down the query enough. So, create a new professor and
+                    # attempt to automatically verify it following a process similar
+                    # to that in admin.py.
+                    professor = Professor(name=professor_name, type=Professor.Type.PROFESSOR)
+                    similar_professors = Professor.find_similar(professor.name, 70)
+                    split_name = professor.name.strip().split()
+                    new_slug = split_name[-1].lower()
+                    valid_slug = True
 
-                if not query.exists():
-                    professor.slug = "_".join(reversed(split_name)).lower()
-                    professor.status = Professor.Status.VERIFIED
+                    if self.verified_professors.filter(slug=new_slug).exists():
+                        new_slug = f"{split_name[-1]}_{split_name[0]}".lower()
+                        if self.verified_professors.filter(slug=new_slug).exists():
+                            valid_slug = False
 
-                professor.save()
-                self.total_num_new_professors += 1
+                    # if there are no similarly named professors and there's no
+                    # issues with the auto generated slug, verify the professor.
+                    if len(similar_professors) == 0 and valid_slug:
+                        professor.slug = new_slug
+                        professor.status = Professor.Status.VERIFIED
 
+                    professor.save()
+                    self.total_num_new_professors += 1
+
+            # for every course taught by `professor`...
             for entry in umdio_professor['taught']:
-                c, s = entry.values()
-                if c == course.name and Semester(s) == semester:
-                    ProfessorCourse.objects.create(course=course, professor=professor, recent_semester=semester)
+                # we only care about `course` taught during `semester`.
+                if entry['course_id'] == course.name and Semester(entry['semester']) == semester:
+                    professorcourse = self.professor_courses.filter(
+                        course=course,
+                        professor=professor
+                    )
+
+                    # if only one professorcourse record and it doesn't
+                    # have a recent semester, update that one record.
+                    if professorcourse.count() == 1 and not professorcourse.first().recent_semester:
+                        professorcourse.update(recent_semester=semester)
+
+                    # if there's no professorcourse entries at all that match
+                    # the prof/course combo or if there are matching records but
+                    # none of them have recent semester = `semester`, create a new
+                    # professor course entry.
+                    elif professorcourse.count() == 0 or not professorcourse.filter(recent_semester=semester).exists():
+                        ProfessorCourse.objects.create(course=course, professor=professor, recent_semester=semester)
                     break
