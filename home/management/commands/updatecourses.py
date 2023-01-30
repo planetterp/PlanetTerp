@@ -49,7 +49,7 @@ class Command(BaseCommand):
             course_data = requests.get("https://api.umd.io/v1/courses", params=kwargs).json()
 
             # if no courses were found during semester, skip.
-            if "error_code" in course_data.keys():
+            if isinstance(course_data, dict) and 'error_code' in course_data.keys():
                 print(f"umd.io doesn't have data for {semester.name()}!")
                 continue
 
