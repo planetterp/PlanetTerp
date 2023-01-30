@@ -111,7 +111,7 @@ class Command(BaseCommand):
             # if there are no matching professors but we have an alias
             # for this name, use the professor associated with that alias.
             elif professor.count() == 0 and alias.exists():
-                professor = alias.first()
+                professor = alias.first().professor
 
             # Otherwise, we don't recognize this professor. So we
             # create a new professor and attempt to automatically
