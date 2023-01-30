@@ -65,7 +65,7 @@ class Command(BaseCommand):
                         course = Course(
                             name=umdio_course['course_id'].strip("\n\t\r "),
                             department=umdio_course['dept_id'].strip("\n\t\r "),
-                            course_number=umdio_course['course_id'][4:].strip("\n\t\r "),
+                            course_number=umdio_course['course_id'].strip("\n\t\r ")[4:],
                             title=umdio_course['name'].strip("\n\t\r "),
                             credits=umdio_course['credits'].strip("\n\t\r "),
                             additional_info=umdio_course['relationships']['additional_info'].strip("\n\t\r "),
