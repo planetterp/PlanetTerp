@@ -108,10 +108,9 @@ class Command(BaseCommand):
             if professor.count() == 1:
                 professor = professor.first()
 
-            # if there's more than one matching professor but
-            # we have an alias that narrows the query down to one,
-            # use the professor associated with that alias.
-            elif professor.count() > 1 and alias.count() == 1:
+            # if we have an alias for this name, use
+            # the professor associated with that alias.
+            elif professor.count() > 1 and alias.exists():
                 professor = alias.first()
 
             # Otherwise, we don't recognize this professor. So we
