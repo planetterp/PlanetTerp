@@ -114,10 +114,9 @@ class Command(BaseCommand):
             elif professor.count() > 1 and alias.count() == 1:
                 professor = alias.first()
 
-            # Otherwise, we either don't have this professor or we couldn't
-            # narrow down the query enough. So, create a new professor and
-            # attempt to automatically verify it following a process similar
-            # to that in admin.py.
+            # Otherwise, we don't recognize this professor. So we
+            # create a new professor and attempt to automatically
+            # verify it following a process similar to that in admin.py.
             else:
                 professor = Professor(name=professor_name, type=Professor.Type.PROFESSOR)
                 similar_professors = Professor.find_similar(professor.name, 70)
