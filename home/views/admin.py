@@ -175,7 +175,7 @@ class Admin(UserPassesTestMixin, View):
                 professor_aliases.filter(professor=merge_subject).update(professor=merge_target)
 
                 aliases = professor_aliases.filter(alias=merge_subject.name)
-                if not aliases.exists():
+                if not (aliases.exists() or professors.filter(name=merge_subject.name).count() > 1):
                     ProfessorAlias(alias=merge_subject.name, professor=merge_target).save()
 
                 context['success'] = True
