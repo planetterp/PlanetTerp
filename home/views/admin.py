@@ -174,7 +174,7 @@ class Admin(UserPassesTestMixin, View):
                 grades.filter(professor__id=subject_id).update(professor=merge_target)
                 professor_aliases.filter(professor=merge_subject).update(professor=merge_target)
 
-                aliases = professor_aliases.filter(alias=merge_subject.name, professor=merge_target)
+                aliases = professor_aliases.filter(alias=merge_subject.name)
                 if not aliases.exists():
                     ProfessorAlias(alias=merge_subject.name, professor=merge_target).save()
 
