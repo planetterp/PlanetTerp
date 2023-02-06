@@ -190,7 +190,7 @@ class Course(Model):
     # indices?). Since recency changes so infrequently, we'll cache it and
     # update it manually with a custom management command (`updaterecency`).
     is_recent = BooleanField(default=False)
-
+    geneds = TextField(null=True)
     professors = ManyToManyField("Professor", blank=True,
         through="ProfessorCourse")
 
