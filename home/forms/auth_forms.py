@@ -42,12 +42,12 @@ class LoginForm(ModelForm):
     def generate_layout(self):
         return Layout(
             Div(
-                Field('username', placeholder="Username", wrapper_class='mb-0', id="id_login_username"),
+                Field('username', placeholder="Username", wrapper_class='mb-0', id="login_username"),
                 self.field_errors['username'],
                 css_class="username-container mb-1"
             ),
             Div(
-                Field('password', placeholder="Password", wrapper_class='mb-0', id="id_login_password"),
+                Field('password', placeholder="Password", wrapper_class='mb-0', id="login_password"),
                 self.field_errors['password'],
                 css_class="password-container mb-1"
             ),
@@ -61,7 +61,7 @@ class LoginForm(ModelForm):
                 "submit",
                 "Login",
                 css_class="btn-primary",
-                css_id="id_submit_login",
+                css_id="submit_login",
                 onclick="submitLoginForm(event)"
             )
         )
@@ -149,17 +149,17 @@ class RegisterForm(ModelForm):
     def generate_layout(self):
         return Layout(
             Div(
-                Field('username', placeholder="Username", wrapper_class='mb-0', id="id_register_username"),
+                Field('username', placeholder="Username", wrapper_class='mb-0', id="register_username"),
                 self.field_errors['username'],
                 css_class="username-container mb-1"
             ),
             Div(
-                Field('email', placeholder="Email (optional)", wrapper_class='mb-0', id="id_register_email"),
+                Field('email', placeholder="Email (optional)", wrapper_class='mb-0', id="register_email"),
                 self.field_errors['email'],
                 css_class="email-container mb-1"
             ),
             Div(
-                Field('password', placeholder="Password", wrapper_class='mb-0', id="id_register_password"),
+                Field('password', placeholder="Password", wrapper_class='mb-0', id="register_password"),
                 self.field_errors['password'],
                 css_class="password-container mb-1"
             ),
@@ -167,7 +167,7 @@ class RegisterForm(ModelForm):
                 "submit",
                 "Register",
                 css_class="btn-primary mt-2",
-                css_id="id_submit_register",
+                css_id="submit_register",
                 onclick="submitRegisterForm(event)"
             )
         )
@@ -209,7 +209,7 @@ class ForgotPasswordForm(Form):
                     "submit",
                     "Send Reset Email",
                     css_class="btn-primary mt-3",
-                    css_id="id_submit_forgot_password",
+                    css_id="submit_forgot_password",
                     onclick="submitPasswordResetForm(event)"
                 ),
                 css_id="password-reset-modal",
