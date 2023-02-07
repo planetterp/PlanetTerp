@@ -219,6 +219,19 @@ class Course(Model):
     def get_absolute_url(self):
         return reverse("course", kwargs={"name": self.name})
 
+    def gened_str(self):
+        gened_str = []
+        for item in list(self.geneds):
+            add_parens = len(item) > 1 and len(self.geneds) > 1
+            and_str = "(" if add_parens else ""
+            and_str += " and ".join(item)
+            and_str += ")" if add_parens else ""
+
+            # special umdio case. EX: https://api.umd.io/v1/courses/CHEM131
+            and_str = and_str.replace("|", " if taken with ")
+            gened_str.append(and_str)
+        return " or ".join(gened_str)
+
     def __str__(self):
         return self.name
 
