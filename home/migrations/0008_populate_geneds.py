@@ -15,6 +15,7 @@ def forwards_func(apps, schema_editor):
     num_updated_courses = 0
     num_courses_skipped = 0
 
+    # to format the printing to start after the migration dialog
     print()
     kwargs = {"per_page": 100, "page": 1}
     umdio_courses = requests.get("https://api.umd.io/v1/courses", params=kwargs).json()
@@ -33,20 +34,15 @@ def forwards_func(apps, schema_editor):
 
             print(pt_course.name)
 
-            umdio_gened_str = umdio_course['gen_ed']
-
-            # if umdio doesn't have any geneds for this course,
-            # make sure our records indicate this too, but using NULL
-            # instead of an empty list.
-            if not umdio_gened_str:
-                pt_course.geneds = None
-                pt_course.save()
-                num_updated_courses += 1
-                continue
-
+            umdio_gened_json = umdio_course['gen_ed']
             # if course.geneds isn't up to date with umdio, update it.
-            if pt_course.geneds != umdio_gened_str:
-                pt_course.geneds = umdio_gened_str
+            if pt_course.geneds != umdio_gened_json:
+                # umdio uses an empty list if a course has no geneds but
+                # we want to use NULL.
+                if not umdio_gened_json:
+                    pt_course.geneds = None
+                else:
+                    pt_course.geneds = umdio_gened_json
                 pt_course.save()
                 num_updated_courses += 1
 
