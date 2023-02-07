@@ -255,7 +255,7 @@ class GenedData(View):
             average_gpa = f"{average_gpa:.2f}" if average_gpa else "No grade data available"
             course_name = f"<a href='{course.get_absolute_url()}'>{course.name}</a>"
             entry = [course_name, course.title, course.credits, average_gpa,
-                geneds]
+                course.gened_str()]
             data.append(entry)
 
         return JsonResponse({"data": data})
