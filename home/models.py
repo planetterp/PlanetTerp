@@ -9,7 +9,7 @@ from django.core import validators
 from django.db.models import (Model, CharField, DateTimeField, TextField,
     IntegerField, BooleanField, ForeignKey, PositiveIntegerField, EmailField,
     CASCADE, ManyToManyField, SlugField, TextChoices, FloatField, Manager,
-    QuerySet, Sum, UniqueConstraint, Index, Count)
+    QuerySet, Sum, UniqueConstraint, Index, Count, JSONField)
 
 from fuzzywuzzy import fuzz
 
@@ -190,7 +190,7 @@ class Course(Model):
     # indices?). Since recency changes so infrequently, we'll cache it and
     # update it manually with a custom management command (`updaterecency`).
     is_recent = BooleanField(default=False)
-    geneds = TextField(null=True)
+    geneds = JSONField(null=True)
     professors = ManyToManyField("Professor", blank=True,
         through="ProfessorCourse")
 
@@ -221,7 +221,7 @@ class Course(Model):
 
     def gened_str(self):
         gened_str = []
-        for item in list(self.geneds):
+        for item in self.geneds:
             add_parens = len(item) > 1 and len(self.geneds) > 1
             and_str = "(" if add_parens else ""
             and_str += " and ".join(item)
