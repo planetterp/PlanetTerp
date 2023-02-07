@@ -40,7 +40,6 @@ def forwards_func(apps, schema_editor):
             if not umdio_gened_json:
                 pt_course.geneds = None
                 pt_course.save()
-                num_updated_courses += 1
                 continue
 
             # if course.geneds isn't up to date with umdio, update it.
