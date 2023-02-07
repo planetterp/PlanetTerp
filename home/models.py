@@ -287,7 +287,7 @@ class ProfessorAlias(Model):
     class Meta:
         db_table = "home_professor_alias"
 
-    alias = CharField(max_length=100)
+    alias = CharField(max_length=100, unique=True)
     professor = ForeignKey(Professor, CASCADE)
 
 
@@ -373,18 +373,6 @@ class User(AbstractUser):
         super().save(*args, **kwargs)
 
 
-class AuditLog(Model):
-    class Meta:
-        db_table = "home_audit_log"
-
-    username = TextField()
-    summary = TextField()
-    created_at = DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return f"{self.summary} (action by {self.username})"
-
-
 class Gened(Model):
     GENEDS = [
         "FSAW", "FSAR", "FSMA", "FSOC", "FSPW", "DSHS", "DSHU", "DSNS", "DSNL",
@@ -459,7 +447,7 @@ class Review(Model):
 
 class Grade(Model):
     POSSIBLE_GRADES = [choice[0] for choice in Review.Grades.choices]
-    VOWEL_GRADES = ["A", "A-", "A+", "F"]
+    VOWEL_GRADES = ["A", "A-", "A+", "F", "XF"]
 
     course = ForeignKey(Course, CASCADE)
     professor = ForeignKey(Professor, CASCADE, null=True)

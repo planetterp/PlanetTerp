@@ -151,7 +151,8 @@ class Admin(UserPassesTestMixin, View):
 
         elif action_type is AdminAction.PROFESSOR_MERGE:
             subject_id = request.POST['subject_id']
-            merge_subject = Professor.unfiltered.get(pk=subject_id)
+            professors = Professor.unfiltered.exclude(staus=Professor.Status.REJECTED)
+            merge_subject = professors.get(pk=subject_id)
             form = ProfessorMergeForm(request, data=request.POST)
 
             ctx = {}
@@ -162,14 +163,19 @@ class Admin(UserPassesTestMixin, View):
 
             if form.is_valid():
                 target_id = form.cleaned_data['target_id']
-                merge_target = Professor.unfiltered.get(pk=target_id)
+                merge_target = professors.get(pk=target_id)
+                professor_courses = ProfessorCourse.objects.all()
+                reviews = Review.unfiltered.all()
+                grades = Grade.unfiltered.all()
+                professor_aliases = ProfessorAlias.objects.all()
 
-                ProfessorCourse.objects.filter(professor__id=subject_id).update(professor=merge_target)
-                Review.unfiltered.filter(professor__id=subject_id).update(professor=merge_target)
-                Grade.unfiltered.filter(professor__id=subject_id).update(professor=merge_target)
+                professor_courses.filter(professor__id=subject_id).update(professor=merge_target)
+                reviews.filter(professor__id=subject_id).update(professor=merge_target)
+                grades.filter(professor__id=subject_id).update(professor=merge_target)
+                professor_aliases.filter(professor=merge_subject).update(professor=merge_target)
 
-                aliases = ProfessorAlias.objects.filter(alias=merge_subject.name, professor=merge_target)
-                if not aliases.exists():
+                aliases = professor_aliases.filter(alias=merge_subject.name)
+                if not (aliases.exists() or professors.filter(name=merge_subject.name).count() > 1):
                     ProfessorAlias(alias=merge_subject.name, professor=merge_target).save()
 
                 context['success'] = True
@@ -313,17 +319,20 @@ class Admin(UserPassesTestMixin, View):
                     return JsonResponse(response)
 
                 split_name = str(professor.name).strip().split(" ")
-                new_slug = "_".join(reversed(split_name)).lower()
+                new_slug = split_name[-1].lower()
                 modal_msg = None
 
-                if Professor.verified.filter(slug=new_slug).exists():
-                    modal_msg = mark_safe(f"The slug <b>{new_slug}</b> already belongs to a professor. Please enter a slug below.")
+                professors = Professor.verified.all()
+                if professors.filter(slug=new_slug).exists():
+                    new_slug = "_".join(reversed(split_name)).lower()
+                    if professors.filter(slug=new_slug).exists():
+                        modal_msg = mark_safe(f"The slug <b>{new_slug}</b> already belongs to a professor. Please enter a slug below.")
 
-                if len(split_name) > 2:
-                    modal_msg = (
-                        f"The name '{professor.name}' is too long and "
-                        "can't be slugged automatcially. Please enter a slug below."
-                    )
+                    if len(split_name) > 2:
+                        modal_msg = (
+                            f"The name '{professor.name}' is too long and "
+                            "can't be slugged automatcially. Please enter a slug below."
+                        )
 
                 if modal_msg:
                     # Create the modal form to manualy enter a slug and add it

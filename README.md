@@ -2,6 +2,8 @@
 
 <https://planetterp.com/>
 
+Feel free to join our discord if you have any questions! https://discord.gg/Utd4jyBzek
+
 PlanetTerp is a website designed to help students at the University of Maryland — College Park (UMD) make informed decisions. We have a professor review system, grades for each course and professor, and tools to provide information related to UMD.
 
 This is the second version of PlanetTerp. The first version was written in [web.py](https://github.com/webpy/webpy), and was closed source. It was rewritten in [django](https://github.com/django/django) at the beginning of 2022, which is the version you see here.
@@ -31,17 +33,26 @@ At this point, you should open `planetterp/config.py` (not `planetterp/config.py
 
 ```python
 DB_ENGINE = 'django.db.backends.mysql'
-DB_NAME = "planetterp"
-DB_HOST = "127.0.0.1"
+DB_NAME = 'planetterp'
+DB_HOST = '127.0.0.1'
 USER = 'root'
 PASSWORD = ''
 SECRET_KEY = 'django-insecure-zt7yxn++)bh)j#wzb)ofgd0^scu9rwr85%=3l%6g1zt(cx!t)_'
+ALLOWED_HOSTS = [
+    "localhost",
+    "127.0.0.1",
+]
 
-WEBHOOK_URL_HELP = None
-WEBHOOK_URL_UPDATE = None
-
+STATIC_ROOT = None
+ADS_ENABLED = False
+ADMINS = []
+DEBUG = True
 EMAIL_HOST_USER = None
 EMAIL_HOST_PASSWORD = None
+EMAIL_SERVICE_ACCOUNT_CREDENTIALS = None
+WEBHOOK_URL_HELP = None
+WEBHOOK_URL_UPDATE = None
+WEBHOOK_FREQUENCY = 20
 ```
 
 If you named your database something other than `planetterp`, you'll need to edit `DB_NAME`. If you would like to use a different user than `root` to access mysql, you'll need to edit `USER`, and if the password for your user is not the empty string, you'll need to edit `PASSWORD`.
