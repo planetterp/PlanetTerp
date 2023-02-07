@@ -15,6 +15,7 @@ def forwards_func(apps, schema_editor):
     num_updated_courses = 0
     num_courses_skipped = 0
 
+    # to format the printing to start after the migration dialog
     print()
     kwargs = {"per_page": 100, "page": 1}
     umdio_courses = requests.get("https://api.umd.io/v1/courses", params=kwargs).json()
