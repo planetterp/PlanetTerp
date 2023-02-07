@@ -31,8 +31,18 @@ def forwards_func(apps, schema_editor):
 
             print(pt_course.name)
 
-            # if course.geneds isn't up to date with umdio, update it.
             umdio_gened_str = str(umdio_course['gen_ed'])
+
+            # if umdio doesn't have any geneds for this course,
+            # make sure our records indicate this too, but using NULL
+            # instead of an empty list.
+            if umdio_gened_str == '[]':
+                pt_course.geneds = None
+                pt_course.save()
+                num_updated_courses += 1
+                continue
+
+            # if course.geneds isn't up to date with umdio, update it.
             if pt_course.geneds != umdio_gened_str:
                 pt_course.geneds = umdio_gened_str
                 pt_course.save()
