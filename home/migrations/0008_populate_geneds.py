@@ -34,17 +34,14 @@ def forwards_func(apps, schema_editor):
             print(pt_course.name)
 
             umdio_gened_json = umdio_course['gen_ed']
-            # if umdio doesn't have any geneds for this course,
-            # make sure our records indicate this too, but using NULL
-            # instead of an empty list.
-            if not umdio_gened_json:
-                pt_course.geneds = None
-                pt_course.save()
-                continue
-
             # if course.geneds isn't up to date with umdio, update it.
             if pt_course.geneds != umdio_gened_json:
-                pt_course.geneds = umdio_gened_json
+                # umdio uses an empty list if a course has no geneds but
+                # we want to use NULL.
+                if not umdio_gened_json:
+                    pt_course.geneds = None
+                else:
+                    pt_course.geneds = umdio_gened_json
                 pt_course.save()
                 num_updated_courses += 1
 
