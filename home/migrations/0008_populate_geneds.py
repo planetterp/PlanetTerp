@@ -25,6 +25,8 @@ def forwards_func(apps, schema_editor):
             pt_course = courses.filter(name=umdio_course['course_id'].strip("\n\t\r ")).first()
 
             # if we doesn't have record of this course, skip it.
+            # if num_courses_skipped > 1 you should run the course update script then
+            # run this script again.
             if not pt_course:
                 num_courses_skipped += 1
                 continue
