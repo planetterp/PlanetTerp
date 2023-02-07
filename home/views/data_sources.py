@@ -252,7 +252,7 @@ class GenedData(View):
         for course in courses:
             geneds = course.geneds.replace(",", ", ")
             average_gpa = course.average_gpa()
-            average_gpa = f"{average_gpa:.2f}" if average_gpa else "No grade data available"
+            average_gpa = f"{average_gpa:.2f}" if average_gpa else "N/A"
             course_name = f"<a href='{course.get_absolute_url()}'>{course.name}</a>"
             entry = [course_name, course.title, course.credits, average_gpa,
                 course.gened_str()]
