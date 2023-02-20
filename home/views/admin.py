@@ -151,7 +151,8 @@ class Admin(UserPassesTestMixin, View):
 
         elif action_type is AdminAction.PROFESSOR_MERGE:
             subject_id = request.POST['subject_id']
-            merge_subject = Professor.unfiltered.get(pk=subject_id)
+            professors = Professor.unfiltered.exclude(staus=Professor.Status.REJECTED)
+            merge_subject = professors.get(pk=subject_id)
             form = ProfessorMergeForm(request, data=request.POST)
 
             ctx = {}
@@ -162,15 +163,19 @@ class Admin(UserPassesTestMixin, View):
 
             if form.is_valid():
                 target_id = form.cleaned_data['target_id']
-                merge_target = Professor.unfiltered.get(pk=target_id)
+                merge_target = professors.get(pk=target_id)
+                professor_courses = ProfessorCourse.objects.all()
+                reviews = Review.unfiltered.all()
+                grades = Grade.unfiltered.all()
+                professor_aliases = ProfessorAlias.objects.all()
 
-                ProfessorCourse.objects.filter(professor__id=subject_id).update(professor=merge_target)
-                Review.unfiltered.filter(professor__id=subject_id).update(professor=merge_target)
-                Grade.unfiltered.filter(professor__id=subject_id).update(professor=merge_target)
-                ProfessorAlias.objects.filter(professor=merge_subject).update(professor=merge_target)
+                professor_courses.filter(professor__id=subject_id).update(professor=merge_target)
+                reviews.filter(professor__id=subject_id).update(professor=merge_target)
+                grades.filter(professor__id=subject_id).update(professor=merge_target)
+                professor_aliases.filter(professor=merge_subject).update(professor=merge_target)
 
-                aliases = ProfessorAlias.objects.filter(alias=merge_subject.name, professor=merge_target)
-                if not aliases.exists():
+                aliases = professor_aliases.filter(alias=merge_subject.name)
+                if not (aliases.exists() or professors.filter(name=merge_subject.name).count() > 1):
                     ProfessorAlias(alias=merge_subject.name, professor=merge_target).save()
 
                 context['success'] = True
