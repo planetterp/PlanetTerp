@@ -300,7 +300,7 @@ class ProfessorAlias(Model):
     class Meta:
         db_table = "home_professor_alias"
 
-    alias = CharField(max_length=100)
+    alias = CharField(max_length=100, unique=True)
     professor = ForeignKey(Professor, CASCADE)
 
 
