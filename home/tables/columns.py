@@ -115,12 +115,21 @@ class InformationColumn(tables.Column):
         else:
             username = review.user.username
 
+        if is_staff:
+            column_html += '''
+                <br/ >
+                <span>
+                    ID: {review_id}
+                </span>
+            '''
+
         kwargs = {
             "professor_slug": review.professor.slug,
             "professor_name": review.professor.name,
             "course_name": review.course.name if review.course else None,
             "username": username,
-            "created_at": review.created_at.date().strftime(DATE_FORMAT)
+            "created_at": review.created_at.date().strftime(DATE_FORMAT),
+            "review_id": review.id
         }
 
         return format_html(column_html, **kwargs)
