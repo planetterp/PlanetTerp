@@ -20,8 +20,14 @@
 		margin: 0 auto;
 	}
 
+	@media (min-width: 768px) {
 	.dataTables_filter {
 		float: left !important;
+	}
+
+	.dataTables_length {
+		float: right !important;
+	}
 	}
 
 	#header-name    { width: 10%; }
@@ -167,7 +173,7 @@
 		var DataTable = $.fn.dataTable;
 		$.extend(true, DataTable.defaults, {
 			dom:
-				"<'row'<'col-sm-12 col-md-6'f>>" +
+				"<'row'<'col-sm-12 col-md-6'f><'col-sm-12 col-md-6'l>>" +
 				"<'row'<'col-sm-12'tr>>" +
 				"<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
 			renderer: 'bootstrap'
@@ -185,7 +191,11 @@
 			},
 			language: {
 				emptyTable: "No available course matches those geneds"
-			}
+			},
+			lengthMenu: [
+				[10,20,50,-1],
+				[10,20,50,"No limit"]
+			]
 		}
 		var table;
 
