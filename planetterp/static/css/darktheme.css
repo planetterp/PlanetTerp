@@ -16,7 +16,13 @@ i.fas.fa-star.professor-rating:after,
 
 .navbar {
 	/* necessary to override bootstrap's .bg-primary */
-	background-color: black !important;
+	background-color: transparent !important;
+}
+
+@media(max-width: 992px) {
+	#site-navbar {
+		background-color: black !important;
+	}
 }
 
 #page-footer {
@@ -141,4 +147,12 @@ hr {
 .bootstrap-datetimepicker-widget table td.second:hover,
 .bootstrap-datetimepicker-widget table td span:hover {
 	background-color: lightblue;
+}
+
+#site-navbar{
+	margin-left: -1rem;
+	padding-left: 1rem;
+	margin-right: -1rem;
+	padding-bottom: 0.5rem;
+	margin-top: 0.5rem;
 }
