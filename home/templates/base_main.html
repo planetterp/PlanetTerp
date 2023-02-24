@@ -159,11 +159,11 @@
                                         <div class="dropdown-menu" aria-labelledby="dropdown-menu-button" role="menu">
                                             <a class="dropdown-item" href="{% url 'profile' %}">Your Reviews</a>
                                             <a class="dropdown-item" onClick="onProfileSettingsClick()" href="{% url 'profile' %}#settings">Settings</a>
-                                            <a class="dropdown-item" href="{% url 'logout' %}">Logout</a>
+                                            <a class="dropdown-item" href="{% url 'logout' %}?next={{ request.path | urlencode }}">Logout</a>
                                         </div>
                                     </div>
                                 {% else %}
-                                    <a class="nav-link" href="{% url 'login' %}" title="Login / Register">Login / Register</a>
+                                    <a class="nav-link" href="{% url 'login' %}?next={{ request.path | urlencode }}" title="Login / Register">Login / Register</a>
                                 {% endif %}
                             </li>
 
