@@ -51,8 +51,6 @@ class Login(View):
 
 
 class Logout(LoginRequiredMixin, View):
-    redirect_field_name = "index"
-
     def get(self, request):
         logout(request)
         return redirect(request.GET.get("next", "/"))
