@@ -27,7 +27,7 @@ class Login(View):
             "login_form": LoginForm(),
             "register_form": RegisterForm(),
             "password_reset_form": ForgotPasswordForm(),
-            "next": request.GET.get("next")
+            "next": request.GET.get("next", "/profile")
         }
 
         return render(request, self.template, context=context)
