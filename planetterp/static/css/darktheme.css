@@ -149,6 +149,12 @@ hr {
 	background-color: lightblue;
 }
 
+/* Having to do manual adjustment here isn't great, but it's the only way */
+/* to account for having made the parent navbar element transparent. This */
+/* slightly enlarges the size of the dropdown to go into where the parent */
+/* is in order to match the style of the lightmode dropdown while keeping */
+/* all the text in the same place. The whole thing is slightly lower than */
+/* the original, but this is unavoidable. */
 #site-navbar{
 	margin-left: -1rem;
 	padding-left: 1rem;
