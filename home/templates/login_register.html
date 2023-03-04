@@ -36,7 +36,7 @@
 			data: $("#login-form").serialize(),
 			success: function(data) {
 				if (data['success']) {
-					location.assign('/profile');
+					location.assign("{{ next }}");
 				} else {
 					$("#login-form-container").html(data['login_form']);
 					$("div.login-error").show();
