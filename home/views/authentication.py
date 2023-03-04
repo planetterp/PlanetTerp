@@ -26,7 +26,8 @@ class Login(View):
         context = {
             "login_form": LoginForm(),
             "register_form": RegisterForm(),
-            "password_reset_form": ForgotPasswordForm()
+            "password_reset_form": ForgotPasswordForm(),
+            "next": request.GET.get("next", "/profile")
         }
 
         return render(request, self.template, context=context)
@@ -50,11 +51,9 @@ class Login(View):
 
 
 class Logout(LoginRequiredMixin, View):
-    redirect_field_name = "index"
-
     def get(self, request):
         logout(request)
-        return redirect("/")
+        return redirect(request.GET.get("next", "/"))
 
 class ForgotPassword(View):
     RESET_LINK_LENGTH = 80
