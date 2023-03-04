@@ -55,8 +55,7 @@ class Logout(LoginRequiredMixin, View):
 
     def get(self, request):
         logout(request)
-        redirect_page = request.GET.get("next")
-        return redirect(redirect_page if redirect_page is not None else "/")
+        return redirect(request.GET.get("next", "/"))
 
 class ForgotPassword(View):
     RESET_LINK_LENGTH = 80
