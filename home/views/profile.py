@@ -17,7 +17,6 @@ from planetterp.settings import DATE_FORMAT
 #   https://stackoverflow.com/a/47250953
 class Profile(LoginRequiredMixin, View):
     template = "profile.html"
-    redirect_field_name = 'profile'
 
     def get(self, request):
         reviews = request.user.review_set.order_by("created_at")

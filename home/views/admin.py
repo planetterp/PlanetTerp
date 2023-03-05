@@ -151,7 +151,7 @@ class Admin(UserPassesTestMixin, View):
 
         elif action_type is AdminAction.PROFESSOR_MERGE:
             subject_id = request.POST['subject_id']
-            professors = Professor.unfiltered.exclude(staus=Professor.Status.REJECTED)
+            professors = Professor.unfiltered.exclude(status=Professor.Status.REJECTED)
             merge_subject = professors.get(pk=subject_id)
             form = ProfessorMergeForm(request, data=request.POST)
 
