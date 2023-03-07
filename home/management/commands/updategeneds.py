@@ -31,7 +31,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         start = datetime.now()
-        pt_courses = Course.unfiltered.all()
+        pt_courses = Course.unfiltered.all().order_by('name')
 
         # for each of our courses...
         for pt_course in pt_courses:
