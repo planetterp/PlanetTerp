@@ -40,7 +40,6 @@ class Command(BaseCommand):
 
             # if umdio does not have this course continue to the next course
             if isinstance(umdio_course, dict) and 'error_code' in umdio_course.keys():
-                print(f"umd.io doesn't have {pt_course.name}")
                 continue
 
             print(pt_course.name)
