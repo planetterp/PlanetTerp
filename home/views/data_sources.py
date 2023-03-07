@@ -234,19 +234,20 @@ class CourseDifficultyData(View):
 
 class GenedData(View):
     def get(self, request):
-        geneds = request.GET["geneds"].replace("&", "").split("=on")
+        form_data = request.GET["geneds"].replace("&", "").split("=on")
+        geneds = form_data[:-1]
+        anyall = form_data[-1]
         geneds = set(gened for gened in geneds if gened in Gened.GENEDS)
-
         if not geneds:
             return JsonResponse({"data": []})
 
         geneds = tuple(geneds)
-        courses = (
-            Gened.objects
-            .filter(name__in=geneds, course__is_recent=True)
-            .exclude(course__geneds=None)
-            .select_related('course')
-        )
+
+        courses = Gened.objects.select_related('course').exclude(course__geneds=None).filter(name__in=geneds)
+        if anyall == "all":
+            for gened in geneds:
+                courses = courses.filter(name=gened)
+
         courses = [c.course for c in courses]
         data = []
         for course in courses:
