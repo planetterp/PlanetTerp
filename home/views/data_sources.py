@@ -1,5 +1,6 @@
 from django.http import JsonResponse
 from django.db.models import Sum
+from django.db import connection
 from django.views import View
 from django.urls import reverse
 
@@ -236,26 +237,32 @@ class GenedData(View):
     def get(self, request):
         form_data = request.GET["geneds"].replace("&", "").split("=on")
         geneds = form_data[:-1]
-        anyall = form_data[-1]
+        anyall = form_data[-1].split("=")[1]
         geneds = set(gened for gened in geneds if gened in Gened.GENEDS)
         if not geneds:
             return JsonResponse({"data": []})
 
         geneds = tuple(geneds)
+        if anyall == "ALL":
+            courses = Course.recent.raw("""
+                    SELECT GROUP_CONCAT(name) AS gened, course_id AS id
+                    FROM home_gened
+                    GROUP BY course_id
+                    HAVING SUM(name IN %s) = %s
+                    """, [geneds, len(geneds)]
+                )
+        else:
+            geneds = Gened.objects.select_related('course').exclude(course__geneds=None).filter(name__in=geneds)
+            courses = [g.course for g in geneds]
 
-        courses = Gened.objects.select_related('course').exclude(course__geneds=None).filter(name__in=geneds)
-        if anyall == "all":
-            for gened in geneds:
-                courses = courses.filter(name=gened)
-
-        courses = [c.course for c in courses]
         data = []
         for course in courses:
-            average_gpa = course.average_gpa()
-            average_gpa = f"{average_gpa:.2f}" if average_gpa else "N/A"
-            course_name = f"<a href='{course.get_absolute_url()}'>{course.name}</a>"
-            entry = [course_name, course.title, course.credits, average_gpa,
-                course.gened_str()]
-            data.append(entry)
+            if course.geneds:
+                average_gpa = course.average_gpa()
+                average_gpa = f"{average_gpa:.2f}" if average_gpa else "N/A"
+                course_name = f"<a href='{course.get_absolute_url()}'>{course.name}</a>"
+                entry = [course_name, course.title, course.credits, average_gpa,
+                    course.gened_str()]
+                data.append(entry)
 
         return JsonResponse({"data": data})
