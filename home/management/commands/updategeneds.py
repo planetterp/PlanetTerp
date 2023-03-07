@@ -44,8 +44,8 @@ class Command(BaseCommand):
                 continue
 
             print(pt_course.name)
-            self.update_course_table(pt_course, umdio_course)
-            self.update_geneds_table(pt_course, umdio_course)
+            self.update_course_table(pt_course, umdio_course[0])
+            self.update_geneds_table(pt_course, umdio_course[0])
 
         runtime = datetime.now() - start
         print(f"number of geneds updated: {self.num_geneds_updated}")
