@@ -16,13 +16,7 @@ i.fas.fa-star.professor-rating:after,
 
 .navbar {
 	/* necessary to override bootstrap's .bg-primary */
-	background-color: transparent !important;
-}
-
-@media(max-width: 992px) {
-	#site-navbar {
-		background-color: black !important;
-	}
+	background-color: transparent !important
 }
 
 #page-footer {
@@ -149,16 +143,18 @@ hr {
 	background-color: lightblue;
 }
 
-/* Having to do manual adjustment here isn't great, but it's the only way */
-/* to account for having made the parent navbar element transparent. This */
-/* slightly enlarges the size of the dropdown to go into where the parent */
-/* is in order to match the style of the lightmode dropdown while keeping */
-/* all the text in the same place. The whole thing is slightly lower than */
-/* the original, but this is unavoidable. */
-#site-navbar{
-	margin-left: -1rem;
-	padding-left: 1rem;
-	margin-right: -1rem;
-	padding-bottom: 0.5rem;
-	margin-top: 0.5rem;
+/* bootstrap's lg breakpoint */
+@media(max-width: 992px) {
+	#site-navbar {
+		background-color: black;
+		/* since we made the navbar transparent, the sides of the site-navbar dropdown
+		which would normally take on the navbar color now take on the background color (grey).
+		We'll manually adjust the location of the navbar to align and cover up this space to get
+		the desired pure black tone. */
+		margin-left: -1rem;
+		padding-left: 1rem;
+		margin-right: -1rem;
+		padding-bottom: 0.5rem;
+		margin-top: 0.5rem;
+	}
 }
