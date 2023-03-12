@@ -16,7 +16,7 @@ i.fas.fa-star.professor-rating:after,
 
 .navbar {
 	/* necessary to override bootstrap's .bg-primary */
-	background-color: transparent !important
+	background-color: transparent !important;
 }
 
 #page-footer {
