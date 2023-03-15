@@ -91,7 +91,7 @@ class RecentCourseManager(Manager):
         # A course could be matched by the first, but not the second, condition
         # if the course has grade data more recent than 201201, but hasn't been
         # taught in the past ~1 year, which would cause it to appear in
-        # professorcourse_recent_semester, which tracks which professors to
+        # professorcourse_semester_taught, which tracks which professors to
         # display on course pages as "previously taught this course".
         #
         # The reason these two are not identical conditions is because the time
@@ -526,15 +526,15 @@ class Organization(Model):
 class ProfessorCourse(Model):
     class Meta:
         db_table = "home_professor_course"
-        # we need fast lookups on recent_semester, eg for our
+        # we need fast lookups on semester_taught, eg for our
         # `RecentCourseManager`
         indexes = [
-            Index(fields=["recent_semester"])
+            Index(fields=["semester_taught"])
         ]
 
     professor = ForeignKey(Professor, CASCADE)
     course = ForeignKey(Course, CASCADE)
-    recent_semester = SemesterField(null=True, blank=True)
+    semester_taught = SemesterField(null=True, blank=True)
     created_at = DateTimeField(auto_now_add=True)
 
     def __str__(self):
