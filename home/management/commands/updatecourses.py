@@ -149,13 +149,13 @@ class Command(BaseCommand):
 
                     # if only one professorcourse record and it doesn't
                     # have a recent semester, update that one record.
-                    if professorcourse.count() == 1 and not professorcourse.first().recent_semester:
-                        professorcourse.update(recent_semester=semester)
+                    if professorcourse.count() == 1 and not professorcourse.first().semester_taught:
+                        professorcourse.update(semester_taught=semester)
 
                     # if there's no professorcourse entries at all that match
                     # the prof/course combo or if there are matching records but
                     # none of them have recent semester = `semester`, create a new
                     # professor course entry.
-                    elif professorcourse.count() == 0 or not professorcourse.filter(recent_semester=semester).exists():
-                        ProfessorCourse.objects.create(course=course, professor=professor, recent_semester=semester)
+                    elif professorcourse.count() == 0 or not professorcourse.filter(semester_taught=semester).exists():
+                        ProfessorCourse.objects.create(course=course, professor=professor, semester_taught=semester)
                     break
