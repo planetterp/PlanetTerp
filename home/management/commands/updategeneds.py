@@ -68,10 +68,11 @@ class Command(BaseCommand):
         umdio_geneds = []
         for gened_lst in umdio_course['gen_ed']:
             for gened in gened_lst:
-                # To account for cases that have a pipe |, take the first 4
-                # characters of the gened value because geneds only have 4
-                # characters in their name
-                umdio_geneds.append(gened[:4])
+                # To account for cases that have a pipe |, split the gened
+                # on the pipe and take the first part. If there is no
+                # pipe, the gened will be unmodified.
+                gened_name= gened.split("|")[0]
+                umdio_geneds.append(gened_name)
 
         # if we have a gened linked to a course but umdio doesn't agree,
         # assume our records are outdated and delete this link.
