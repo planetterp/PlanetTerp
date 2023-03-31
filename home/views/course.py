@@ -57,17 +57,17 @@ class Course(View):
                 )
             )
             .annotate(
-                recent_semester=F("professorcourse__recent_semester")
+                semester_taught=F("professorcourse__semester_taught")
             )
         )
 
         grouped_professors = defaultdict(list)
         past_professors = []
         for professor in professors:
-            recent_semester = professor.recent_semester
+            semester_taught = professor.semester_taught
 
-            if recent_semester and recent_semester.recent:
-                grouped_professors[recent_semester].append(professor)
+            if semester_taught and semester_taught.recent:
+                grouped_professors[semester_taught].append(professor)
             else:
                 past_professors.append(professor)
 
