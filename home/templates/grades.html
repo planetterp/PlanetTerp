@@ -393,7 +393,7 @@
 					$("#grades-information").html(`<h1><strong><a href="/professor/${slug}" target="_blank"> ${name} </a></strong></h1> <h4>Average GPA: ${averageGpa.toFixed(2)} between ${numStudents.toLocaleString()} students</h4>`);
 					$("#grades-information").append(`<em> ${name} grade distribution for ${Object.keys(grade_data).length} course(s):</em>`);
 
-					var graphRowDiv = $('<div class="row"></div>');
+					var graphRowDiv = $('<div class="row d-flex"></div>');
                 	$("#grades-information").append(graphRowDiv);
 
                 	var count = 0;
@@ -404,7 +404,7 @@
                     	count++;
                     
                     	if (count % 2 === 0) {
-                        	graphRowDiv = $('<div class="row"></div>');
+                        	graphRowDiv = $('<div class="row d-flex"></div>');
                         	$("#grades-information").append(graphRowDiv);
                     	}
                 	}
