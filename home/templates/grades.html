@@ -392,24 +392,22 @@
 					var grade_data = data.professor_data.data
 					$("#grades-information").html(`<h1><strong><a href="/professor/${slug}" target="_blank"> ${name} </a></strong></h1> <h4>Average GPA: ${averageGpa.toFixed(2)} between ${numStudents.toLocaleString()} students</h4>`);
 					$("#grades-information").append(`<em> ${name} grade distribution for ${Object.keys(grade_data).length} course(s):</em>`);
-					
-					var graphOneOrZero = 0;
-					for (var [course_name, course_data] of Object.entries(grade_data)) {
-						var graphWrapper = $("<div>").addClass("graph-wrapper");
-						generate_graph(course_data, course_name);
-						graphContainer.append(graphWrapper);
-						
-						graphOneOrZero++;
-        				if (graphOneOrZero % 2 === 0) {
-            			$("#grades-information").append(graphContainer);
-            			graphContainer = $("<div>").addClass("graph-container");
-        				}
-					}
 
-					// if there are an odd number of graphs, append the remaining one(s)
-    				if (i % 2 !== 0) {
-        				$("#grades-information").append(graphContainer);
-    				}
+					var graphRowDiv = $('<div class="row"></div>');
+                	$("#grades-information").append(graphRowDiv);
+
+                	var count = 0;
+                	for (var [course_name, course_data] of Object.entries(grade_data)) {
+                    	var graphDiv = $('<div class="col-md-6 graph-wrapper"></div>');
+                    	graphRowDiv.append(graphDiv);
+                    	generate_graph(course_data, course_name, graphDiv);
+                    	count++;
+                    
+                    	if (count % 2 === 0) {
+                        	graphRowDiv = $('<div class="row"></div>');
+                        	$("#grades-information").append(graphRowDiv);
+                    	}
+                	}
 
 					$("#includePFSemesters-input").show();
 				} else {
