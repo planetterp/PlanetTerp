@@ -47,7 +47,6 @@ class Semester:
         return hash((self.year, self.season_number))
 
     def __eq__(self, other):
-        return False
         return (self.year == other.year and
             self.season_number == other.season_number)
 
