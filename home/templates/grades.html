@@ -342,6 +342,7 @@
 			success: function(data) {
 				$("html").find('.graph-wrapper').remove(); // Remove all previously created graphs
 				$("html").find('.grades-info').remove(); // Remove all previously created course information
+				$("#grades-graphs").find('.row').remove(); // Remove previously created rows
 				$("#grades-information").html("");
 				$("#course-lookup-form-container").html(data.course_form);
 				$("#professor-search").val("");
