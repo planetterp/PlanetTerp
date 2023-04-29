@@ -11,11 +11,8 @@ from django.utils.html import format_html
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Fieldset, Layout, Div, Field, HTML, Button
 from crispy_forms.bootstrap import FormActions, Alert, InlineRadios, Modal
-from discord_webhook import DiscordWebhook
-from discord_webhook.webhook import DiscordEmbed
 
 from home.models import Review, Professor, Course
-from planetterp import config
 
 # Base form that contains common form fields
 class ProfessorForm(Form):
