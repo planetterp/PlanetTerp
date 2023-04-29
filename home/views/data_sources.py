@@ -1,6 +1,7 @@
+from urllib.parse import parse_qs
+
 from django.http import JsonResponse
 from django.db.models import Sum
-from django.db import connection
 from django.views import View
 from django.urls import reverse
 
@@ -235,15 +236,17 @@ class CourseDifficultyData(View):
 
 class GenedData(View):
     def get(self, request):
-        form_data = request.GET["geneds"].replace("&", "").split("=on")
-        geneds = form_data[:-1]
-        anyall = form_data[-1].split("=")[1]
+        form_data = parse_qs(request.GET["geneds"])
+        # make sure to pop off any options such as mode, so all we're left with
+        # is the gened queries.
+        mode = form_data.pop("mode")[0]
+        geneds = form_data.keys()
         geneds = set(gened for gened in geneds if gened in Gened.GENEDS)
         if not geneds:
             return JsonResponse({"data": []})
 
         geneds = tuple(geneds)
-        if anyall == "ALL":
+        if mode == "all":
             courses = Course.recent.raw("""
                     SELECT GROUP_CONCAT(name) AS gened, course_id AS id
                     FROM home_gened
