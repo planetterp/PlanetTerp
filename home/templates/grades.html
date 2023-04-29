@@ -389,7 +389,7 @@
 				initalizeKeypressEvent("#course-search");
 				initalizeKeypressEvent("#professor-search");
 				initializeProfessorSearchAutoComplete();
-				canvasCount = 0;
+				canvasCount = 0; 
 				if (data['professor_search_success'] && Object.keys(data.professor_data.data).length > 0) {
 					$(".lookup-error").hide();
 					var name = $("#professor-search").val();
@@ -399,7 +399,7 @@
 					var grade_data = data.professor_data.data
 					$("#grades-information").html(`<h1><strong><a href="/professor/${slug}" target="_blank"> ${name} </a></strong></h1> <h4>Average GPA: ${averageGpa.toFixed(2)} between ${numStudents.toLocaleString()} students</h4>`);
 					$("#grades-information").append(`<em> ${name} grade distribution for ${Object.keys(grade_data).length} course(s):</em>`);
-					$("#grades-information").find('.row').remove(); // Remove previously created rows
+					$("#grades-graphs").find('.row').remove(); // Remove previously created rows
 					for (var [course_name, course_data] of Object.entries(grade_data)) {
 						generate_graph(course_data, course_name);
 					}
