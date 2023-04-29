@@ -57,7 +57,14 @@
                 }
             }
         </style>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-61QKXSX5JG"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
 
+          gtag('config', 'G-61QKXSX5JG');
+        </script>
         <script>
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
@@ -159,11 +166,11 @@
                                         <div class="dropdown-menu" aria-labelledby="dropdown-menu-button" role="menu">
                                             <a class="dropdown-item" href="{% url 'profile' %}">Your Reviews</a>
                                             <a class="dropdown-item" onClick="onProfileSettingsClick()" href="{% url 'profile' %}#settings">Settings</a>
-                                            <a class="dropdown-item" href="{% url 'logout' %}">Logout</a>
+                                            <a class="dropdown-item" href="{% url 'logout' %}?next={{ request.path | urlencode }}">Logout</a>
                                         </div>
                                     </div>
                                 {% else %}
-                                    <a class="nav-link" href="{% url 'login' %}" title="Login / Register">Login / Register</a>
+                                    <a class="nav-link" href="{% url 'login' %}?next={{ request.path | urlencode }}" title="Login / Register">Login / Register</a>
                                 {% endif %}
                             </li>
 
@@ -182,8 +189,7 @@
 
             {% comment %} TODO rewrite star generation so this isn't necessary {% endcomment %}
             {% if request.session.color_scheme == "dark" %}
-                <!-- make sure we're above bootstrap's navbar -->
-                <canvas id="navbar-canvas" style="z-index: 1100"></canvas>
+                <canvas id="navbar-canvas"></canvas>
             {% endif %}
         </div>
 

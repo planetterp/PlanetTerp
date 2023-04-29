@@ -49,7 +49,7 @@ class Command(BaseCommand):
             course_data = requests.get("https://api.umd.io/v1/courses", params=kwargs).json()
 
             # if no courses were found during semester, skip.
-            if "error_code" in course_data[0].keys():
+            if isinstance(course_data, dict) and 'error_code' in course_data.keys():
                 print(f"umd.io doesn't have data for {semester.name()}!")
                 continue
 
@@ -102,42 +102,41 @@ class Command(BaseCommand):
                 continue
 
             professor = self.non_rejected_professors.filter(name=professor_name)
+            alias = self.aliases.filter(alias=professor_name)
 
             # if there's only one matching professor, use that professor.
             if professor.count() == 1:
                 professor = professor.first()
+
+            # if there are no matching professors but we have an alias
+            # for this name, use the professor associated with that alias.
+            elif professor.count() == 0 and alias.exists():
+                professor = alias.first().professor
+
+            # Otherwise, we either don't recognize this professor or there is
+            # more than one professor with this exact same name. So we create a
+            # new professor and attempt to automatically verify it following
+            # a process similar to that in admin.py.
             else:
-                alias = self.aliases.filter(alias=professor_name)
+                professor = Professor(name=professor_name, type=Professor.Type.PROFESSOR)
+                similar_professors = Professor.find_similar(professor.name, 70)
+                split_name = professor.name.strip().split()
+                new_slug = split_name[-1].lower()
+                valid_slug = True
 
-                # if there's more than one matching professor but
-                # we have an alias that narrows the query down to one,
-                # use the professor associated with that alias.
-                if professor.count() > 1 and alias.count() == 1:
-                    professor = alias.first()
-                else:
-                    # Otherwise, we either don't have this professor or we couldn't
-                    # narrow down the query enough. So, create a new professor and
-                    # attempt to automatically verify it following a process similar
-                    # to that in admin.py.
-                    professor = Professor(name=professor_name, type=Professor.Type.PROFESSOR)
-                    similar_professors = Professor.find_similar(professor.name, 70)
-                    split_name = professor.name.strip().split()
-                    new_slug = split_name[-1].lower()
-                    valid_slug = True
-
+                if self.verified_professors.filter(slug=new_slug).exists():
+                    new_slug = f"{split_name[-1]}_{split_name[0]}".lower()
                     if self.verified_professors.filter(slug=new_slug).exists():
-                        new_slug = f"{split_name[-1]}_{split_name[0]}".lower()
-                        if self.verified_professors.filter(slug=new_slug).exists():
-                            valid_slug = False
+                        valid_slug = False
 
-                    # if there are no similarly named professors and there's no
-                    # issues with the auto generated slug, verify the professor.
-                    if len(similar_professors) == 0 and valid_slug:
-                        professor.slug = new_slug
-                        professor.status = Professor.Status.VERIFIED
+                # if there are no similarly named professors and there's no
+                # issues with the auto generated slug, verify the professor.
+                if len(similar_professors) == 0 and valid_slug:
+                    professor.slug = new_slug
+                    professor.status = Professor.Status.VERIFIED
 
-                    professor.save()
-                    self.total_num_new_professors += 1
+                professor.save()
+                self.total_num_new_professors += 1
 
             # for every course taught by `professor`...
             for entry in umdio_professor['taught']:
@@ -150,13 +149,13 @@ class Command(BaseCommand):
 
                     # if only one professorcourse record and it doesn't
                     # have a recent semester, update that one record.
-                    if professorcourse.count() == 1 and not professorcourse.first().recent_semester:
-                        professorcourse.update(recent_semester=semester)
+                    if professorcourse.count() == 1 and not professorcourse.first().semester_taught:
+                        professorcourse.update(semester_taught=semester)
 
                     # if there's no professorcourse entries at all that match
                     # the prof/course combo or if there are matching records but
                     # none of them have recent semester = `semester`, create a new
                     # professor course entry.
-                    elif professorcourse.count() == 0 or not professorcourse.filter(recent_semester=semester).exists():
-                        ProfessorCourse.objects.create(course=course, professor=professor, recent_semester=semester)
+                    elif professorcourse.count() == 0 or not professorcourse.filter(semester_taught=semester).exists():
+                        ProfessorCourse.objects.create(course=course, professor=professor, semester_taught=semester)
                     break

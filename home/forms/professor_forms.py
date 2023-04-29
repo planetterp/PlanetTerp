@@ -150,8 +150,9 @@ class ProfessorForm(Form):
                     css_class="no_select review-left-wrapper"
                 ),
                 Div(
-                   content,
+                    content,
                     anonymous,
+                    HTML(f'<a href="{reverse("about")}#tips" style="float:right; font-size:15px">Not sure what to write?</a>'),
                     content_errors,
                     css_id=f"review-right-wrapper-{self.form_type.value}",
                     css_class="review-right-wrapper"

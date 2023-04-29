@@ -9,7 +9,7 @@ from django.core import validators
 from django.db.models import (Model, CharField, DateTimeField, TextField,
     IntegerField, BooleanField, ForeignKey, PositiveIntegerField, EmailField,
     CASCADE, ManyToManyField, SlugField, TextChoices, FloatField, Manager,
-    QuerySet, Sum, UniqueConstraint, Index, Count)
+    QuerySet, Sum, UniqueConstraint, Index, Count, JSONField)
 
 from fuzzywuzzy import fuzz
 
@@ -91,7 +91,7 @@ class RecentCourseManager(Manager):
         # A course could be matched by the first, but not the second, condition
         # if the course has grade data more recent than 201201, but hasn't been
         # taught in the past ~1 year, which would cause it to appear in
-        # professorcourse_recent_semester, which tracks which professors to
+        # professorcourse_semester_taught, which tracks which professors to
         # display on course pages as "previously taught this course".
         #
         # The reason these two are not identical conditions is because the time
@@ -190,7 +190,7 @@ class Course(Model):
     # indices?). Since recency changes so infrequently, we'll cache it and
     # update it manually with a custom management command (`updaterecency`).
     is_recent = BooleanField(default=False)
-
+    geneds = JSONField(null=True)
     professors = ManyToManyField("Professor", blank=True,
         through="ProfessorCourse")
 
@@ -218,6 +218,19 @@ class Course(Model):
 
     def get_absolute_url(self):
         return reverse("course", kwargs={"name": self.name})
+
+    def gened_str(self):
+        gened_str = []
+        for item in self.geneds:
+            add_parens = len(item) > 1 and len(self.geneds) > 1
+            and_str = "(" if add_parens else ""
+            and_str += " and ".join(item)
+            and_str += ")" if add_parens else ""
+
+            # special umdio case. EX: https://api.umd.io/v1/courses/CHEM131
+            and_str = and_str.replace("|", " if taken with ")
+            gened_str.append(and_str)
+        return " or ".join(gened_str)
 
     def __str__(self):
         return self.name
@@ -287,7 +300,7 @@ class ProfessorAlias(Model):
     class Meta:
         db_table = "home_professor_alias"
 
-    alias = CharField(max_length=100)
+    alias = CharField(max_length=100, unique=True)
     professor = ForeignKey(Professor, CASCADE)
 
 
@@ -371,18 +384,6 @@ class User(AbstractUser):
             self.email = None
 
         super().save(*args, **kwargs)
-
-
-class AuditLog(Model):
-    class Meta:
-        db_table = "home_audit_log"
-
-    username = TextField()
-    summary = TextField()
-    created_at = DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return f"{self.summary} (action by {self.username})"
 
 
 class Gened(Model):
@@ -525,15 +526,15 @@ class Organization(Model):
 class ProfessorCourse(Model):
     class Meta:
         db_table = "home_professor_course"
-        # we need fast lookups on recent_semester, eg for our
+        # we need fast lookups on semester_taught, eg for our
         # `RecentCourseManager`
         indexes = [
-            Index(fields=["recent_semester"])
+            Index(fields=["semester_taught"])
         ]
 
     professor = ForeignKey(Professor, CASCADE)
     course = ForeignKey(Course, CASCADE)
-    recent_semester = SemesterField(null=True, blank=True)
+    semester_taught = SemesterField(null=True, blank=True)
     created_at = DateTimeField(auto_now_add=True)
 
     def __str__(self):
