@@ -71,12 +71,14 @@ class Command(BaseCommand):
 
     def threaded_approach(self):
         start = datetime.now()
+
+        print("Collecting courses...")
         courses_to_process = self.get_umdio_courses()
 
         t1 = datetime.now() - start
         print(f"Threads took {round(t1.seconds/60, 2)} minutes")
 
-        print("starting to update courses...")
+        print("Updating courses...")
         for pt_course, umdio_course in courses_to_process:
             print(pt_course.name)
             self.update_course_table(pt_course, umdio_course)
