@@ -165,8 +165,6 @@ class Command(BaseCommand):
         pt_course.save()
 
     def update_geneds_table(self, pt_course, umdio_course):
-        pt_geneds = Gened.objects.all()
-
         # create a list of all the umdio geneds for this course.
         # This list is considered the "correct" geneds for this course.
         umdio_geneds = []
@@ -180,7 +178,7 @@ class Command(BaseCommand):
 
         # if we have a gened linked to a course but umdio doesn't agree,
         # assume our records are outdated and delete this link.
-        for gened in pt_geneds.filter(course=pt_course):
+        for gened in pt_course.gened_set.all():
             if gened.name not in umdio_geneds:
                 self.num_geneds_updated += 1
                 gened.delete()
@@ -188,6 +186,6 @@ class Command(BaseCommand):
         # if we don't have a gened for this course that umdio does have,
         # add it to our records.
         for gened in umdio_geneds:
-            if not pt_geneds.filter(name=gened, course=pt_course).exists():
+            if not pt_course.gened_set.filter(name=gened).exists():
                 self.num_geneds_updated += 1
                 Gened(name=gened, course=pt_course).save()
