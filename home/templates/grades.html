@@ -192,7 +192,7 @@
 			}
 		});
 	}
-	
+
 	function generate_graph(grade_data, course, semester=null, section=null) {
 		course = course.toUpperCase();
 		// Create a new row for every third graph
@@ -218,7 +218,7 @@
 		grades_text += `<br>Average GPA: ${grade_data.average_gpa.toFixed(2)} between ${grade_data.num_students.toLocaleString()} students`
 		$("#grades-text" + canvasCount).html(grades_text);
 		canvasCount++;
-		
+
 		let graph = document.getElementById('grades' + (canvasCount - 1)).getContext("2d");
 		gradesGraph = new Chart(graph, {
 			type: 'bar',
@@ -390,7 +390,7 @@
 				initalizeKeypressEvent("#course-search");
 				initalizeKeypressEvent("#professor-search");
 				initializeProfessorSearchAutoComplete();
-				canvasCount = 0; 
+				canvasCount = 0;
 				if (data['professor_search_success'] && Object.keys(data.professor_data.data).length > 0) {
 					$(".lookup-error").hide();
 					var name = $("#professor-search").val();
