@@ -340,9 +340,7 @@
 				}
 			},
 			success: function(data) {
-				$("html").find('.graph-wrapper').remove(); // Remove all previously created graphs
-				$("html").find('.grades-info').remove(); // Remove all previously created course information
-				$("#grades-graphs").find('.row').remove(); // Remove previously created rows
+				$("#grades-graphs").html("")
 				$("#grades-information").html("");
 				$("#course-lookup-form-container").html(data.course_form);
 				$("#professor-search").val("");
@@ -381,9 +379,8 @@
 				'pf_semesters': $('#includePFSemesters').is(':checked')
 			},
 			success: function(data) {
+				$("#grades-graphs").html("")
 				clearCourseSearchForm()
-				$("#grades-information").html("");
-				$("#grades-information-error").html("");
 				$("html").find('.graph-wrapper').remove(); // Remove all previously created graphs
 				$("html").find('.grades-info').remove(); // Remove all previously created course information
 				$("#professor-lookup-form-container").html(data.professor_form);
@@ -400,7 +397,6 @@
 					var grade_data = data.professor_data.data
 					$("#grades-information").html(`<h1><strong><a href="/professor/${slug}" target="_blank"> ${name} </a></strong></h1> <h4>Average GPA: ${averageGpa.toFixed(2)} between ${numStudents.toLocaleString()} students</h4>`);
 					$("#grades-information").append(`<em> ${name} grade distribution for ${Object.keys(grade_data).length} course(s):</em>`);
-					$("#grades-graphs").find('.row').remove(); // Remove previously created rows
 					for (var [course_name, course_data] of Object.entries(grade_data)) {
 						generate_graph(course_data, course_name);
 					}
