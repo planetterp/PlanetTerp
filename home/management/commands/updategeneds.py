@@ -36,7 +36,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         start = datetime.now()
         # I don't know which approach will actually be used so for now
-        # they live in separate functions and one will move here when I decide
+        # they live in separate functions and one will move here once we decide
         #self.comparator_approach()
         #self.threaded_approach()
 
