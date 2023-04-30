@@ -62,14 +62,9 @@ The other fields can be left alone for now. We'll discuss the `WEBHOOK_*` and `E
 Once you're satisfied with your config, continue with your setup:
 
 ```bash
+# this command will take a while to run because it imports some
+# initial data.
 python manage.py migrate
-# for testing, we provide some initial data, including all grades,
-# professors, courses, and reviews on the live site (as of 01/20/2022).
-# If you'd prefer to start from scratch with a fresh database, you can
-# safely skip this step, but we recommend it for anyone looking to develop
-# planetterp.
-# This command will take a while (about 15 minutes) to run.
-python manage.py loaddata home/fixtures/initial
 # courses which have been taught in the past 10 years are considered "recent".
 # courses which are not recent are hidden from some displays like search
 # and courses taught. Calculating whether a course is recent can be very
