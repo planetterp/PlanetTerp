@@ -50,7 +50,7 @@ class AddProfessorAndReview(View):
 class EditReview(View):
     def post(self, request):
         user = request.user
-        review = Review.unfiltered.filter(pk=request.POST['review_id']).select_related("course").first()
+        review = Review.unfiltered.get(pk=request.POST['review_id'])
         initial = {
             'content': review.content,
             'course': review.course.name if review.course else None,
