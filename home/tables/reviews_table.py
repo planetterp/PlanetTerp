@@ -108,7 +108,7 @@ class ProfileReviewsTable(BaseReviewsTable):
 
     def __init__(self, reviews, request, *args, **kwargs):
         empty_text = mark_safe('<h4 class="text-center">You haven\'t written any reviews! Why not start now?</h4>')
-        self.columns = [ReviewsTableColumn.INFORMATION, ReviewsTableColumn.REVIEW, ReviewsTableColumn.ACTION, ReviewsTableColumn.STATUS]
+        self.columns = [ReviewsTableColumn.INFORMATION, ReviewsTableColumn.REVIEW, ReviewsTableColumn.STATUS, ReviewsTableColumn.ACTION]
 
         kwargs = {"empty_text": empty_text}
         super().__init__(self.columns, reviews, request, *args, **kwargs)
