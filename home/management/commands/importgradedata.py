@@ -87,7 +87,7 @@ class Command(BaseCommand):
         if alias:
             return alias.professor
 
-        professors = Professor.verified.filter(name=name)
+        professors = Professor.unfiltered.exclude(status=Professor.Status.REJECTED).filter(name=name)
         if professors.count() == 1:
             return professors.first()
 

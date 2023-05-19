@@ -17,7 +17,7 @@ class Command(BaseCommand):
         # A course could be matched by the first, but not the second, condition
         # if the course has grade data more recent than 201201, but hasn't been
         # taught in the past ~1 year, which would cause it to appear in
-        # professorcourse_recent_semester, which tracks which professors to
+        # professorcourse_semester_taught, which tracks which professors to
         # display on course pages as "previously taught this course".
         #
         # The reason these two are not identical conditions is because the time
@@ -37,7 +37,7 @@ class Command(BaseCommand):
             Course.unfiltered
             .annotate(max_semester=Max("grade__semester"))
             .annotate(most_recent_semester=Max(
-                "professorcourse__recent_semester")
+                "professorcourse__semester_taught")
             )
             .filter(
                 Q(max_semester__gte=Semester(201201)) |
