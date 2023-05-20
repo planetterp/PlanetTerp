@@ -1,7 +1,13 @@
+import sys
 import requests
+from requests import adapters
 from datetime import datetime
 from time import sleep
 import threading
+import concurrent.futures
+from urllib3.util.retry import Retry
+from urllib3.exceptions import MaxRetryError
+from requests.exceptions import SSLError
 
 from django.core.management import BaseCommand
 from argparse import RawTextHelpFormatter
@@ -25,6 +31,7 @@ class Command(BaseCommand):
     def __init__(self, *args, **kwargs):
         super().__init__()
         self.num_geneds_updated = 0
+        self.num_courses_processed = 0
         self._lock = threading.Lock()
 
     def create_parser(self, *args, **kwargs):
@@ -38,7 +45,7 @@ class Command(BaseCommand):
         # I don't know which approach will actually be used so for now
         # they live in separate functions and one will move here once we decide
         #self.comparator_approach()
-        #self.threaded_approach()
+        self.threaded_approach()
 
 
         runtime = datetime.now() - start
@@ -70,19 +77,78 @@ class Command(BaseCommand):
             umdio_courses  = requests.get("https://api.umd.io/v1/courses", params=kwargs).json()
 
     def threaded_approach(self):
-        start = datetime.now()
+        failed_courses = []
+        pt_courses = Course.recent.all().order_by('name')
+        num_total_courses = pt_courses.count()
 
-        print("Collecting courses...")
-        courses_to_process = self.get_umdio_courses()
+        # necessary to overcome errors related to exceeding maximum retires for a url
+        retry = Retry(total=1)
+        adapter = adapters.HTTPAdapter(max_retries=retry)
+        session = requests.Session()
+        session.mount('https://', adapter)
 
-        t1 = datetime.now() - start
-        print(f"Threads took {round(t1.seconds/60, 2)} minutes")
+        # Each thread will be reponsible for querying umdio for a particular course.
+        # If something happens and the course cannot be retrieved, return None
+        def thread_task(pt_course):
+            # query umdio for this course.
+            res = session.get(f"https://api.umd.io/v1/courses/{pt_course.name}")
 
-        print("Updating courses...")
-        for pt_course, umdio_course in courses_to_process:
+            # TODO: figure out why some courses cause a code 500 error
+            # In the mean time, return None
+            if res.status_code == 500:
+                failed_courses.append(pt_course.name)
+                return None
+
+            umdio_course = res.json()
+
+            # if umdio does not have this course, return None
+            if isinstance(umdio_course, dict) and 'error_code' in umdio_course.keys():
+                return None
+
+            with self._lock:
+                self.num_courses_processed += 1
+                sys.stdout.write("\r" + f"Collecting courses from umdio ({self.num_courses_processed}/{num_total_courses})")
+
+            # otherwise, this thread completed its job, so return the result
+            return (pt_course, umdio_course[0])
+
+        print("Setting up thread pool...")
+
+        # The expensive part of this script is querying umdio for each of our courses so we create
+        # a thread pool that will break the task up into min(32, os.cpu_count() + 4) threads.
+        # Wait for all the courses to be collected before moving on to updating the database.
+        # We use submit() instead of map() because wait() expects a list of futures.
+        # This part takes a long while (make sure your computer's auto-sleep feature is disabled).
+        with concurrent.futures.ThreadPoolExecutor() as executor_:
+            futures = [executor_.submit(thread_task, course) for course in pt_courses]
+            concurrent.futures.wait(futures, return_when="ALL_COMPLETED")
+
+        print("Updating planetterp courses...")
+
+        # go through the courses collected by the thread pool and update our database
+        for future in futures:
+            res = future.result()
+
+            if not res:
+                continue
+
+            pt_course, umdio_course = res
+
             print(pt_course.name)
             self.update_course_table(pt_course, umdio_course)
             self.update_geneds_table(pt_course, umdio_course)
+
+        # sort the list of courses that caused an error, if there are any, by
+        # their planetterp name so that the courses print in alphabetical order (A->Z)
+        def keyfn(e):
+            return e[0]
+
+        failed_courses.sort(key=keyfn)
+
+        if len(failed_courses):
+            print(f"{len(failed_courses)}/{Course.recent.count()} courses failed to retrieve from umdio")
+            print(failed_courses)
+
 
     # Go through all of umdio's courses by delegating smaller chunks of our
     # courses to threads that will each search umdio and combine their results
