@@ -81,9 +81,12 @@ class Command(BaseCommand):
                     new_slug = split_name[-1].lower()
                     valid_slug = True
 
+                    # Try the lastname
                     if self.verified_professors.filter(slug=new_slug).exists():
+                        # If that exists, try lastname_firstname
                         new_slug = f"{split_name[-1]}_{split_name[0]}".lower()
                         if self.verified_professors.filter(slug=new_slug).exists():
+                            # If that exists, this professor will be waiting for us in the admin panel
                             valid_slug = False
 
                     # if there are no similarly named professors and there's no
