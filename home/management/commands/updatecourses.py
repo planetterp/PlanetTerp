@@ -51,6 +51,8 @@ class Command(BaseCommand):
         while umdio_professors:
             for umdio_professor in umdio_professors:
                 professor_name = umdio_professor['name'].strip("\n\t\r ")
+
+                # skip placeholder professors
                 if re.search("instructor:?\s*tba", professor_name.lower()):
                     continue
 
