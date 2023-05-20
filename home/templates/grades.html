@@ -195,10 +195,16 @@
 
 	function generate_graph(grade_data, course, semester=null, section=null) {
 		course = course.toUpperCase();
-		$("#grades-graphs").append('<p id="grades-text' + canvasCount + '" class="text-center grades-info"></p>')
-		$("#grades-graphs").append('<div class="graph-wrapper"><canvas id="grades' + canvasCount + '" width="500px" height="500px" style="margin: 0 auto;"></canvas></div>')
-
-		var graph = document.getElementById('grades' + canvasCount).getContext("2d");
+		// Create a new row for every third graph
+		if (canvasCount % 2 == 0) {
+			$("#grades-graphs").append('<div class="row"></div>');
+		}
+		// Create a new column to hold the graph and append to the rows
+		let $graphColumn = $('<div class="col"></div>');
+		$("#grades-graphs .row:last-child").append($graphColumn);
+		// Add the canvas and text elements to the column
+		$graphColumn.append('<p id="grades-text' + canvasCount + '" class="text-center grades-info"></p>');
+		$graphColumn.append('<div class="graph-wrapper"><canvas id="grades' + canvasCount + '" width="500px" height="500px" style="margin: 0 auto;"></canvas></div>');
 		var grades_text = `Showing data for <a href="/course/${course}" target="_blank">${course}</a>`
 
 		if ($("#semester-search").is(':visible')) {
@@ -213,6 +219,7 @@
 		$("#grades-text" + canvasCount).html(grades_text);
 		canvasCount++;
 
+		let graph = document.getElementById('grades' + (canvasCount - 1)).getContext("2d");
 		gradesGraph = new Chart(graph, {
 			type: 'bar',
 			data: {
@@ -333,8 +340,7 @@
 				}
 			},
 			success: function(data) {
-				$("html").find('.graph-wrapper').remove(); // Remove all previously created graphs
-				$("html").find('.grades-info').remove(); // Remove all previously created course information
+				$("#grades-graphs").html("")
 				$("#grades-information").html("");
 				$("#course-lookup-form-container").html(data.course_form);
 				$("#professor-search").val("");
@@ -352,7 +358,7 @@
 					if ($("#semester-search").val()) {
 						$("#section-search-input").show();
 					}
-
+					canvasCount = 0;
 					generate_graph(data.course_data, course, semester, section);
 				} else {
 					$(".lookup-error").show();
@@ -373,16 +379,15 @@
 				'pf_semesters': $('#includePFSemesters').is(':checked')
 			},
 			success: function(data) {
+				$("#grades-graphs").html("")
 				clearCourseSearchForm()
-				$("#grades-information").html("");
-				$("#grades-information-error").html("");
 				$("html").find('.graph-wrapper').remove(); // Remove all previously created graphs
 				$("html").find('.grades-info').remove(); // Remove all previously created course information
 				$("#professor-lookup-form-container").html(data.professor_form);
 				initalizeKeypressEvent("#course-search");
 				initalizeKeypressEvent("#professor-search");
 				initializeProfessorSearchAutoComplete();
-
+				canvasCount = 0;
 				if (data['professor_search_success'] && Object.keys(data.professor_data.data).length > 0) {
 					$(".lookup-error").hide();
 					var name = $("#professor-search").val();
@@ -392,7 +397,6 @@
 					var grade_data = data.professor_data.data
 					$("#grades-information").html(`<h1><strong><a href="/professor/${slug}" target="_blank"> ${name} </a></strong></h1> <h4>Average GPA: ${averageGpa.toFixed(2)} between ${numStudents.toLocaleString()} students</h4>`);
 					$("#grades-information").append(`<em> ${name} grade distribution for ${Object.keys(grade_data).length} course(s):</em>`);
-
 					for (var [course_name, course_data] of Object.entries(grade_data)) {
 						generate_graph(course_data, course_name);
 					}

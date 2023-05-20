@@ -107,15 +107,15 @@ class Command(BaseCommand):
 
                     # if only one professorcourse record and it doesn't
                     # have a recent semester, update that one record.
-                    if professorcourse.count() == 1 and not professorcourse.first().recent_semester:
-                        professorcourse.update(recent_semester=semester_taught)
+                    if professorcourse.count() == 1 and not professorcourse.first().semester_taught:
+                        professorcourse.update(semester_taught=semester_taught)
 
                     # if there's no professorcourse entries at all that match
                     # the prof/course combo or if there are matching records but
                     # none of them have recent semester = `semester`, create a new
                     # professor course entry.
-                    elif professorcourse.count() == 0 or not professorcourse.filter(recent_semester=semester_taught).exists():
-                        ProfessorCourse.objects.create(course=course, professor=professor, recent_semester=semester_taught)
+                    elif professorcourse.count() == 0 or not professorcourse.filter(semester_taught=semester_taught).exists():
+                        ProfessorCourse.objects.create(course=course, professor=professor, semester_taught=semester_taught)
 
             kwargs["page"] += 1
             umdio_professors = requests.get("https://api.umd.io/v1/professors", params=kwargs).json()
