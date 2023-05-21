@@ -102,7 +102,7 @@ class Command(BaseCommand):
                 for entry in umdio_professor['taught']:
                     semester_taught = Semester(entry['semester'])
                     clean_course_name = entry['course_id'].strip("\n\t\r ")
-                    course = self.get_or_create_course(clean_course_name)
+                    course = self.get_or_create_course(clean_course_name, entry['semester'])
 
                     # get all professorcourse entries that match the professor and course
                     professorcourse = self.professor_courses.filter(
@@ -125,14 +125,15 @@ class Command(BaseCommand):
             kwargs["page"] += 1
             umdio_professors = requests.get("https://api.umd.io/v1/professors", params=kwargs).json()
 
-    def get_or_create_course(self, course_name):
+    def get_or_create_course(self, course_name, semester):
         # get the course if we have the course
         course = Course.unfiltered.filter(name=course_name).first()
 
         # if we don't have the course...
         if not course:
             # create a new course using the course info from umdio
-            umdio_course = requests.get(f"https://api.umd.io/v1/courses/{course_name}").json()[0]
+            request_url = f"https://api.umd.io/v1/courses/{course_name}"
+            umdio_course = requests.get(request_url, params={"semester": semester}).json()[0]
 
             course = Course.unfiltered.create(
                 name=course_name,
