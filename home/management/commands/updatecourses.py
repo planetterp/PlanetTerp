@@ -141,7 +141,16 @@ class Command(BaseCommand):
                 course_number=umdio_course['course_id'].strip("\n\t\r ")[4:],
                 title=umdio_course['name'].strip("\n\t\r "),
                 credits=umdio_course['credits'].strip("\n\t\r "),
-                description=umdio_course["description"].strip("\n\t\r ")
+                description=umdio_course["description"].strip("\n\t\r "),
+                additional_info=umdio_course['relationships']['additional_info'].strip("\n\t\r "),
+                cross_listed_with=umdio_course['relationships']['also_offered_as'].strip("\n\t\r "),
+                credit_granted_for=umdio_course['relationships']['credit_granted_for'].strip("\n\t\r "),
+                formerly=umdio_course['relationships']['formerly'].strip("\n\t\r "),
+                prereqs=umdio_course['relationships']['prereqs'].strip("\n\t\r "),
+                #recs=umdio_course['relationships']['recs'], # TODO: check name after umdio gets updated
+                coreqs=umdio_course['relationships']['coreqs'].strip("\n\t\r "),
+                restrictions=umdio_course['relationships']['restrictions'].strip("\n\t\r "),
+                # TODO: Add new field when umdio gets updated
             )
 
             self.total_num_new_courses += 1
