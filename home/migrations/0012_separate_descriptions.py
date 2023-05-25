@@ -30,14 +30,14 @@ def forwards_func(apps, schema_editor):
         ("restrictions", "(Restricted to ([^.]+\.))|(Restriction: ([^.]+\.))", 2),
         ("cross_listed_with", "(Also offered as: ([^.]+\.))|(Cross-listed with: ([^.]+\.))", 2),
         ("formerly", "Formerly: ([^.]+\.)", 1),
-        ("additional_info", "Additional information: ([^.]+\.)", 1)
+        ("additional_info", "Additional information: ([^.]+\.)", 1),
         ("credit_granted_for", "(Credit only granted for: ([^.]+\.)) | (Credit will be granted for: ([^.]+\.)) | (Credit only granted for one of the following ([^.]+\.)) | (Credit will be granted for one of the following: ([^.]+\.))", 2),
     ]
 
     # for each of our courses...
     for course in courses:
         # shallow copy the description so we can progressively modify it
-        desc = course.description
+        desc = str(course.description)
 
         # remove the italics and/or bold font from the description
         desc = re.sub("(<i>)|(<\/i>)|(<b>)|(<\/b>)", '', desc)
