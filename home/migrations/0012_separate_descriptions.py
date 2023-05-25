@@ -37,7 +37,7 @@ def forwards_func(apps, schema_editor):
     # for each of our courses...
     for course in courses:
         # shallow copy the description so we can progressively modify it
-        desc = course.description
+        desc = str(course.description)
 
         # remove the italics and/or bold font from the description
         desc = re.sub("(<i>)|(<\/i>)|(<b>)|(<\/b>)", '', desc)
