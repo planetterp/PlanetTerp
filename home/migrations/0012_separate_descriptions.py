@@ -24,14 +24,14 @@ def forwards_func(apps, schema_editor):
     # the regex group index to obtain the piece of the matched expression we're
     # interested in [2].
     regex = [
-        ("prereqs", "Prerequisite: ([^.]+\. (Or permission of [^.]+\.)?)", 1),
+        ("prereqs", "(Prerequisite: ([^.]+\.))|(Pre-requisite: ([^.]+\.))", 2),
         ("coreqs", "Corequisite: ([^.]+\.)", 1),
         ("reqs", "Recommended: ([^.]+\.)", 1),
         ("restrictions", "(Restricted to ([^.]+\.))|(Restriction: ([^.]+\.))", 2),
         ("cross_listed_with", "(Also offered as: ([^.]+\.))|(Cross-listed with: ([^.]+\.))", 2),
         ("formerly", "Formerly: ([^.]+\.)", 1),
         ("additional_info", "Additional information: ([^.]+\.)", 1),
-        ("credit_granted_for", "(Credit only granted for: ([^.]+\.)) | (Credit will be granted for: ([^.]+\.)) | (Credit only granted for one of the following ([^.]+\.)) | (Credit will be granted for one of the following: ([^.]+\.))", 2),
+        ("credit_granted_for", "(Credit only granted for: ([^.]+\.))|(Credit will be granted for: ([^.]+\.))|(Credit only granted for one of the following ([^.]+\.))|(Credit will be granted for one of the following: ([^.]+\.))|(Credit granted for ([^.]+\.))", 2),
     ]
 
     # for each of our courses...
