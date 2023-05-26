@@ -31,43 +31,43 @@
 			<div class="row">
 				<div class="col">
 					{% if course.description %}
-						<p style="white-space: pre-line;"><i><b>Course Description:</b> {{ course.description }}</i></p>
+						<p style="white-space: pre-line;"><b>Course Description:</b> {{ course.description }}</p>
 					{% endif %}
 
 					{% if course.prereqs %}
-						<p style="white-space: pre-line;"><i><b>Prerequisites:</b> {{ course.prereqs }}</i></p>
+						<p style="white-space: pre-line;"><b>Prerequisites:</b> {{ course.prereqs }}</p>
 					{% endif %}
 
 					{% if course.coreqs %}
-						<p style="white-space: pre-line;"><i><b>Corequisites:</b> {{ course.coreqs }}</i></p>
+						<p style="white-space: pre-line;"><b>Corequisites:</b> {{ course.coreqs }}</p>
 					{% endif %}
 
 					{% if course.recs %}
-						<p style="white-space: pre-line;"><i><b>Recommendations:</b> {{ course.recs }}</i></p>
+						<p style="white-space: pre-line;"><b>Recommendations:</b> {{ course.recs }}</p>
 					{% endif %}
 
 					{% if course.restrictions %}
-						<p style="white-space: pre-line;"><i><b>Restrictions:</b> {{ course.restrictions }}</i></p>
+						<p style="white-space: pre-line;"><b>Restrictions:</b> {{ course.restrictions }}</p>
 					{% endif %}
 
 					{% if course.formerly %}
-						<p style="white-space: pre-line;"><i><b>Formerly:</b> {{ course.formerly }}</i></p>
+						<p style="white-space: pre-line;"><b>Formerly:</b> {{ course.formerly }}</p>
 					{% endif %}
 
 					{% if course.cross_listed_with %}
-						<p style="white-space: pre-line;"><i><b>Cross-Listed With:</b> {{ course.cross_listed_with }}</i></p>
+						<p style="white-space: pre-line;"><b>Cross-Listed With:</b> {{ course.cross_listed_with }}</p>
 					{% endif %}
 
 					{% if course.credit_granted_for %}
-						<p style="white-space: pre-line;"><i><b>Credit Only Granted For:</b> {{ course.credit_granted_for }}</i></p>
+						<p style="white-space: pre-line;"><b>Credit Only Granted For:</b> {{ course.credit_granted_for }}</p>
 					{% endif %}
 
 					{% if course.additional_info %}
-						<p style="white-space: pre-line;"><i><b>Additional Information:</b> {{ course.additional_info }}</i></p>
+						<p style="white-space: pre-line;"><b>Additional Information:</b> {{ course.additional_info }}</p>
 					{% endif %}
 				</div>
 			</div>
-			
+
 			{% if sister_courses %}
 				<p>
 					<b>Sister Courses: </b>
