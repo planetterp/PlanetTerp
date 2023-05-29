@@ -3,23 +3,15 @@ import requests
 from datetime import datetime
 
 from django.core.management import BaseCommand
-from argparse import RawTextHelpFormatter
 
 from home.models import Course, Professor, ProfessorCourse, ProfessorAlias
 from home.utils import Semester
 
 class Command(BaseCommand):
-    help = '''Updates the database with new courses and professors during the provided semester.
-    The semester argument must be in the numerical form YEAR+SEASON (see ** for exception).
-    The season codes are as follows:
-        Spring -> 01
-        Summer -> 05
-         Fall  -> 08
-        Winter -> 12
-    EXAMPLE: Spring 2023 = 202301
-
-    ** NOTE: Starting from Winter 2021, the values for winter semesters are off by one year. Winter 2021 is actually 202012, not 202112
-   '''
+    help = (
+        "Updates the database with any new professors, courses, and "
+        "ProfessorCourse relations."
+    )
 
     def __init__(self):
         super().__init__()
@@ -29,11 +21,6 @@ class Command(BaseCommand):
         self.non_rejected_professors = Professor.unfiltered.exclude(status=Professor.Status.REJECTED)
         self.aliases = ProfessorAlias.objects.all()
         self.professor_courses = ProfessorCourse.objects.all()
-
-    def create_parser(self, *args, **kwargs):
-        parser = super(Command, self).create_parser(*args, **kwargs)
-        parser.formatter_class = RawTextHelpFormatter
-        return parser
 
     def handle(self, *args, **options):
         t_start = datetime.now()
