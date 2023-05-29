@@ -405,7 +405,7 @@ class EditReviewForm(ProfessorForm):
         return left_side
 
     def get_content_styles(self):
-            return "height: 13.2rem; margin: auto; border-bottom-left-radius: 0rem;"
+        return "height: 13.2rem; margin: auto; border-bottom-left-radius: 0rem;"
 
     def generate_layout(self):
         layout = Layout(
