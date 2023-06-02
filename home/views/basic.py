@@ -157,4 +157,9 @@ class UserProfile(UserPassesTestMixin, View):
             "profile_owner": user.username
         }
 
+        # if a user clicks on a link to their own profile, redirect them to their
+        # view of their profile
+        if user_id == request.user.id:
+            return redirect('profile')
+
         return render(request, "profile_view.html", context)
