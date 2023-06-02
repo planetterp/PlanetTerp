@@ -158,7 +158,8 @@ class UserProfile(UserPassesTestMixin, View):
 
         context = {
             "reviews_table": ProfileReviewsTable(reviews, request),
-            "form": ProfileForm(instance=user, allow_edits=False)
+            "form": ProfileForm(instance=user, allow_edits=False),
+            "edit_form": None
         }
 
         return render(request, "profile.html", context)

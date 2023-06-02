@@ -7,7 +7,9 @@
 
 {% block content %}
 
-{% crispy edit_form %}
+{% if edit_form %}
+	{% crispy edit_form %}
+{% endif %}
 
 <br />
 <div id="success-banner-edit"  class="container fixed-top d-none" style="margin-top: 5rem;">
