@@ -146,6 +146,11 @@ class UserProfile(UserPassesTestMixin, View):
         return self.request.user.is_staff
 
     def get(self, request, user_id):
+        # if a user clicks on a link to their own profile, redirect them to their
+        # view of their profile
+        if user_id == request.user.id:
+            return redirect('profile')
+
         user = User.objects.filter(pk=user_id).first()
         if not user:
             raise Http404()
@@ -156,10 +161,5 @@ class UserProfile(UserPassesTestMixin, View):
             "reviews_table": ProfileReviewsTable(reviews, request),
             "profile_owner": user.username
         }
-
-        # if a user clicks on a link to their own profile, redirect them to their
-        # view of their profile
-        if user_id == request.user.id:
-            return redirect('profile')
 
         return render(request, "profile_view.html", context)
