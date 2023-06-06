@@ -86,10 +86,10 @@ class Command(BaseCommand):
                     self.total_num_new_professors += 1
 
                 # for every course taught by `professor`...
-                for entry in umdio_professor['taught']:
-                    semester_taught = Semester(entry['semester'])
-                    clean_course_name = entry['course_id'].strip("\n\t\r ")
-                    pt_course = self.get_or_create_course(clean_course_name, entry['semester'])
+                for course in umdio_professor['taught']:
+                    semester_taught = Semester(course['semester'])
+                    clean_course_name = course['course_id'].strip("\n\t\r ")
+                    pt_course = self.get_or_create_course(clean_course_name, course['semester'])
 
                     # get all professorcourse entries that match the professor and course
                     professorcourse = self.professor_courses.filter(
