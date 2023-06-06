@@ -35,6 +35,7 @@ class Command(BaseCommand):
         kwargs = {"per_page": 100, "page": 1}
         umdio_professors = requests.get("https://api.umd.io/v1/professors", params=kwargs).json()
 
+        last_professor = ""
         while umdio_professors:
             for umdio_professor in umdio_professors:
                 professor_name = umdio_professor['name'].strip("\n\t\r ")
@@ -43,7 +44,9 @@ class Command(BaseCommand):
                 if re.search("instructor:?\s*tba", professor_name.lower()):
                     continue
 
-                print(professor_name)
+                print(" "*len(last_professor), end='\r')
+                print(professor_name, end='\r')
+                last_professor = professor_name
 
                 professor = self.non_rejected_professors.filter(name=professor_name)
                 alias = self.aliases.filter(alias=professor_name)
