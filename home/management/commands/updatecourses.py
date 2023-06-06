@@ -88,7 +88,6 @@ class Command(BaseCommand):
                 # for every course taught by `professor`...
                 for course in umdio_professor['taught']:
                     clean_semester = course['semester'].strip("\n\t\r ")
-                    semester_taught = Semester(clean_semester)
                     clean_course_name = course['course_id'].strip("\n\t\r ")
                     pt_course = self.get_or_create_course(clean_course_name, clean_semester)
 
@@ -98,6 +97,7 @@ class Command(BaseCommand):
                         professor=professor
                     )
 
+                    semester_taught = Semester(clean_semester)
                     # if only one professorcourse record and it doesn't
                     # have a recent semester, update that one record.
                     if professorcourse.count() == 1 and not professorcourse.first().semester_taught:
