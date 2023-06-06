@@ -89,11 +89,11 @@ class Command(BaseCommand):
                 for entry in umdio_professor['taught']:
                     semester_taught = Semester(entry['semester'])
                     clean_course_name = entry['course_id'].strip("\n\t\r ")
-                    course = self.get_or_create_course(clean_course_name, entry['semester'])
+                    pt_course = self.get_or_create_course(clean_course_name, entry['semester'])
 
                     # get all professorcourse entries that match the professor and course
                     professorcourse = self.professor_courses.filter(
-                        course=course,
+                        course=pt_course,
                         professor=professor
                     )
 
@@ -107,7 +107,7 @@ class Command(BaseCommand):
                     # none of them have recent semester = `semester`, create a new
                     # professor course entry.
                     elif professorcourse.count() == 0 or not professorcourse.filter(semester_taught=semester_taught).exists():
-                        ProfessorCourse.objects.create(course=course, professor=professor, semester_taught=semester_taught)
+                        ProfessorCourse.objects.create(course=pt_course, professor=professor, semester_taught=semester_taught)
 
             kwargs["page"] += 1
             umdio_professors = requests.get("https://api.umd.io/v1/professors", params=kwargs).json()
