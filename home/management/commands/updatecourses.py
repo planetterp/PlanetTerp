@@ -69,10 +69,10 @@ class Command(BaseCommand):
         last_professor = ""
         while umdio_professors:
             for umdio_professor in umdio_professors:
-                professor_name = umdio_professor['name'].strip("\n\t\r ")
+                professor_name = umdio_professor['name'].strip("\n\t\r ").lower()
 
                 # skip placeholder professors
-                if re.search("instructor:?\s*tba", professor_name.lower()):
+                if re.search("instructor:?\s*tba", professor_name):
                     continue
 
                 print(" "*len(last_professor), end='\r')
