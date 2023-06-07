@@ -59,6 +59,7 @@ class Command(BaseCommand):
         self.total_num_new_courses += len(courses_created)
 
     def update_and_link_professors(self):
+        print("Updating professors...")
         kwargs = {"per_page": 100, "page": 1}
         umdio_professors = requests.get("https://api.umd.io/v1/professors", params=kwargs).json()
 
