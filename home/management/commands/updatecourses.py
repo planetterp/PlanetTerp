@@ -88,30 +88,7 @@ class Command(BaseCommand):
                     professor.save()
                     self.total_num_new_professors += 1
 
-                # for every course taught by `professor`...
-                for course in umdio_professor['taught']:
-                    clean_semester = course['semester'].strip("\n\t\r ")
-                    clean_course_name = course['course_id'].strip("\n\t\r ")
-                    pt_course = self.get_or_create_course(clean_course_name, clean_semester)
-
-                    # get all professorcourse entries that match the professor and course
-                    professorcourse = self.professor_courses.filter(
-                        course=pt_course,
-                        professor=professor
-                    )
-
-                    semester_taught = Semester(clean_semester)
-                    # if only one professorcourse record and it doesn't
-                    # have a recent semester, update that one record.
-                    if professorcourse.count() == 1 and not professorcourse.first().semester_taught:
-                        professorcourse.update(semester_taught=semester_taught)
-
-                    # if there's no professorcourse entries at all that match
-                    # the prof/course combo or if there are matching records but
-                    # none of them have recent semester = `semester`, create a new
-                    # professor course entry.
-                    elif professorcourse.count() == 0 or not professorcourse.filter(semester_taught=semester_taught).exists():
-                        ProfessorCourse.objects.create(course=pt_course, professor=professor, semester_taught=semester_taught)
+                self.link_professor_to_courses(professor, umdio_professor['taught'])
 
             kwargs["page"] += 1
             umdio_professors = requests.get("https://api.umd.io/v1/professors", params=kwargs).json()
@@ -143,3 +120,33 @@ class Command(BaseCommand):
             self.total_num_new_courses += 1
 
         return course
+
+    def link_professor_to_courses(self, professor, courses):
+        for course in courses:
+            semester = course['semester'].strip("\n\t\r ")
+            course_name = course['course_id'].strip("\n\t\r ")
+
+            pt_course = self.get_or_create_course(course_name, semester)
+
+            # get all professorcourse entries that match the professor and course
+            professorcourse = self.professor_courses.filter(
+                course=pt_course,
+                professor=professor
+            )
+
+            semester_taught = Semester(semester)
+            # if only one professorcourse record and it doesn't
+            # have a recent semester, update that one record.
+            if professorcourse.count() == 1 and not professorcourse.first().semester_taught:
+                professorcourse.update(semester_taught=semester_taught)
+
+            # if there's no professorcourse entries at all that match
+            # the prof/course combo or if there are matching records but
+            # none of them have recent semester = `semester`, create a new
+            # professor course entry.
+            elif professorcourse.count() == 0 or not professorcourse.filter(semester_taught=semester_taught).exists():
+                ProfessorCourse.objects.create(
+                    course=pt_course,
+                    professor=professor,
+                    semester_taught=semester_taught
+                )
