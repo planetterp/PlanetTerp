@@ -24,12 +24,39 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         t_start = datetime.now()
+
+        self.update_courses()
         self.update_and_link_professors()
 
         print(f"\n** New Courses Created: {self.total_num_new_courses} **")
         print(f"** New Professors Created: {self.total_num_new_professors} **")
         runtime = datetime.now() - t_start
         print(f"Runtime: {round(runtime.seconds / 60, 2)} minutes")
+
+    def update_courses(self):
+        print("Updating courses...")
+        courses_to_create = []
+
+        #TODO: use semester comparator when that gets fixed
+        kwargs = {"per_page": 100, "page": 1}
+        umdio_courses = requests.get("https://api.umd.io/v1/courses", params=kwargs).json()
+
+        last_course = ""
+        while umdio_courses:
+            for umdio_course in umdio_courses:
+                course_name = umdio_course['course_id'].strip("\n\t\r ")
+                print(" "*len(last_course), end='\r')
+                print(course_name, end='\r')
+                last_course = course_name
+
+                if not Course.unfiltered.filter(name=course_name).exists():
+                    courses_to_create.append(self.umdio_to_pt_course(umdio_course))
+
+            kwargs["page"] += 1
+            umdio_courses = requests.get("https://api.umd.io/v1/courses", params=kwargs).json()
+
+        courses_created = Course.unfiltered.bulk_create(courses_to_create)
+        self.total_num_new_courses += len(courses_created)
 
     def update_and_link_professors(self):
         kwargs = {"per_page": 100, "page": 1}
