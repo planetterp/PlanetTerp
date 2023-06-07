@@ -35,6 +35,8 @@ class Command(BaseCommand):
 
     def update_courses(self):
         print("Updating courses...")
+        # progressively build a list of Courses we don't have then bulk create
+        # them at the end.
         courses_to_create = []
 
         #TODO: use semester comparator when that gets fixed
@@ -49,6 +51,7 @@ class Command(BaseCommand):
                 print(course_name, end='\r')
                 last_course = course_name
 
+                # if we don't have the course, store it to create later
                 if not Course.unfiltered.filter(name=course_name).exists():
                     courses_to_create.append(self.umdio_to_pt_course(umdio_course))
 
