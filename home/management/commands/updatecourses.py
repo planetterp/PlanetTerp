@@ -17,10 +17,6 @@ class Command(BaseCommand):
         super().__init__()
         self.total_num_new_courses = 0
         self.total_num_new_professors = 0
-        self.verified_professors = Professor.verified.all()
-        self.non_rejected_professors = Professor.unfiltered.exclude(status=Professor.Status.REJECTED)
-        self.aliases = ProfessorAlias.objects.all()
-        self.professor_courses = ProfessorCourse.objects.all()
 
     def handle(self, *args, **options):
         t_start = datetime.now()
@@ -79,8 +75,11 @@ class Command(BaseCommand):
                 print(professor_name, end='\r')
                 last_professor = professor_name
 
-                professor = self.non_rejected_professors.filter(name=professor_name)
-                alias = self.aliases.filter(alias=professor_name)
+                # all professors who are either pending or verified
+                professor = (Professor.unfiltered
+                            .exclude(status=Professor.Status.REJECTED)
+                            .filter(name=professor_name))
+                alias = ProfessorAlias.objects.filter(alias=professor_name)
 
                 # if there's only one matching professor, use that professor.
                 if professor.count() == 1:
@@ -102,11 +101,13 @@ class Command(BaseCommand):
                     new_slug = split_name[-1].lower()
                     valid_slug = True
 
+                    verified_professors = Professor.verified.all()
+
                     # Try the lastname
-                    if self.verified_professors.filter(slug=new_slug).exists():
+                    if verified_professors.filter(slug=new_slug).exists():
                         # If that exists, try lastname_firstname
                         new_slug = f"{split_name[-1]}_{split_name[0]}".lower()
-                        if self.verified_professors.filter(slug=new_slug).exists():
+                        if verified_professors.filter(slug=new_slug).exists():
                             # If that exists, this professor will be waiting for us in the admin panel
                             valid_slug = False
 
@@ -160,7 +161,7 @@ class Command(BaseCommand):
             pt_course = self.get_or_create_course(course_name, semester)
 
             # get all professorcourse entries that match the professor and course
-            professorcourse = self.professor_courses.filter(
+            professorcourse = ProfessorCourse.objects.filter(
                 course=pt_course,
                 professor=professor
             )
