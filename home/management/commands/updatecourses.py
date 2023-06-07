@@ -119,6 +119,17 @@ class Command(BaseCommand):
     def get_or_create_course(self, course_name, semester):
         # get the course if we have the course
         course = Course.unfiltered.filter(name=course_name).first()
+    def umdio_to_pt_course(self, umdio_course):
+        course_name = umdio_course['course_id'].strip("\n\t\r ")
+
+        return Course(
+            name=course_name,
+            department=umdio_course['dept_id'].strip("\n\t\r "),
+            course_number=course_name[4:],
+            title=umdio_course['name'].strip("\n\t\r "),
+            credits=umdio_course['credits'].strip("\n\t\r "),
+            description=umdio_course["description"].strip("\n\t\r ")
+        )
 
         # if we don't have the course...
         if not course:
@@ -126,14 +137,8 @@ class Command(BaseCommand):
             request_url = f"https://api.umd.io/v1/courses/{course_name}"
             umdio_course = requests.get(request_url, params={"semester": semester}).json()[0]
 
-            course = Course.unfiltered.create(
-                name=course_name,
-                department=umdio_course['dept_id'].strip("\n\t\r "),
-                course_number=umdio_course['course_id'].strip("\n\t\r ")[4:],
-                title=umdio_course['name'].strip("\n\t\r "),
-                credits=umdio_course['credits'].strip("\n\t\r "),
-                description=umdio_course["description"].strip("\n\t\r ")
-            )
+            course = self.umdio_to_pt_course(umdio_course)
+            course.save()
 
             self.total_num_new_courses += 1
 
