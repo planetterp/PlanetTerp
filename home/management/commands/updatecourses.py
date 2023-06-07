@@ -93,9 +93,6 @@ class Command(BaseCommand):
             kwargs["page"] += 1
             umdio_professors = requests.get("https://api.umd.io/v1/professors", params=kwargs).json()
 
-    def get_or_create_course(self, course_name, semester):
-        # get the course if we have the course
-        course = Course.unfiltered.filter(name=course_name).first()
     def umdio_to_pt_course(self, umdio_course):
         course_name = umdio_course['course_id'].strip("\n\t\r ")
 
@@ -108,9 +105,12 @@ class Command(BaseCommand):
             description=umdio_course["description"].strip("\n\t\r ")
         )
 
-        # if we don't have the course...
-        if not course:
-            # create a new course using the course info from umdio
+    def get_or_create_course(self, course_name, semester):
+        try:
+            # try to get the course
+            course = Course.unfiltered.get(name=course_name)
+        except Course.DoesNotExist:
+            # if we don't have the course, create it using the info from umdio
             request_url = f"https://api.umd.io/v1/courses/{course_name}"
             umdio_course = requests.get(request_url, params={"semester": semester}).json()[0]
 
