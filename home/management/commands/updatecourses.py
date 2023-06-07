@@ -43,6 +43,8 @@ class Command(BaseCommand):
         while umdio_courses:
             for umdio_course in umdio_courses:
                 course_name = umdio_course['course_id'].strip("\n\t\r ")
+
+                # print enough spaces to overwrite the last printed course
                 print(" "*len(last_course), end='\r')
                 print(course_name, end='\r')
                 last_course = course_name
@@ -71,6 +73,7 @@ class Command(BaseCommand):
                 if re.search("instructor:?\s*tba", professor_name):
                     continue
 
+                # print enough spaces to overwrite the last printed name
                 print(" "*len(last_professor), end='\r')
                 print(professor_name, end='\r')
                 last_professor = professor_name
