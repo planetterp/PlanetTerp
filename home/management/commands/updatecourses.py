@@ -24,14 +24,14 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         t_start = datetime.now()
-        self.update_professors_and_courses()
+        self.update_and_link_professors()
 
         print(f"\n** New Courses Created: {self.total_num_new_courses} **")
         print(f"** New Professors Created: {self.total_num_new_professors} **")
         runtime = datetime.now() - t_start
         print(f"Runtime: {round(runtime.seconds / 60, 2)} minutes")
 
-    def update_professors_and_courses(self):
+    def update_and_link_professors(self):
         kwargs = {"per_page": 100, "page": 1}
         umdio_professors = requests.get("https://api.umd.io/v1/professors", params=kwargs).json()
 
