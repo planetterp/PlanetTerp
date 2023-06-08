@@ -162,4 +162,4 @@ class UserProfile(UserPassesTestMixin, View):
             "profile_owner": user.username
         }
 
-        return render(request, "profile_view.html", context)
+        return render(request, "user_profile.html", context)
