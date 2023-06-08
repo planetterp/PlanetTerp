@@ -146,8 +146,8 @@ class UserProfile(UserPassesTestMixin, View):
         return self.request.user.is_staff
 
     def get(self, request, user_id):
-        # if a user clicks on a link to their own profile, redirect them to their
-        # view of their profile
+        # if a user clicks on a link to their own profile, redirect them to
+        # their view of their profile
         if user_id == request.user.id:
             return redirect('profile')
 
