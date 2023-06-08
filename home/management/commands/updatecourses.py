@@ -67,10 +67,9 @@ class Command(BaseCommand):
         last_professor = ""
         while umdio_professors:
             for umdio_professor in umdio_professors:
-                professor_name = umdio_professor['name'].strip("\n\t\r ").lower()
+                professor_name = self.clean_professor_name(umdio_professor['name'])
 
-                # skip placeholder professors
-                if re.search("instructor:?\s*tba", professor_name):
+                if not professor_name:
                     continue
 
                 # print enough spaces to overwrite the last printed name
@@ -127,6 +126,20 @@ class Command(BaseCommand):
 
             kwargs["page"] += 1
             umdio_professors = requests.get("https://api.umd.io/v1/professors", params=kwargs).json()
+
+    def clean_professor_name(self, name):
+        professor_name = (name.lower()
+                            .replace('/', '-')
+                            .replace('\n', '')
+                            .replace('\r', '')
+                            .replace('\t', '')
+                        )
+
+        # skip placeholder professors
+        if re.search("instructor:?\s*tba", professor_name):
+            return None
+
+        return professor_name
 
     def umdio_to_pt_course(self, umdio_course):
         course_name = umdio_course['course_id'].strip("\n\t\r ")
