@@ -128,8 +128,8 @@ class Command(BaseCommand):
             umdio_professors = requests.get("https://api.umd.io/v1/professors", params=kwargs).json()
 
     def clean_professor_name(self, name):
-        professor_name = (name.lower()
-                            .replace('/', '-')
+        # get rid of unwanted characters anywhere in the name
+        professor_name = (name.replace('/', '-')
                             .replace('\n', '')
                             .replace('\r', '')
                             .replace('\t', '')
