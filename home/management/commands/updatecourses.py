@@ -133,6 +133,7 @@ class Command(BaseCommand):
                             .replace('\n', '')
                             .replace('\r', '')
                             .replace('\t', '')
+                            .strip()
                         )
 
         # skip placeholder professors
