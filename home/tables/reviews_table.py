@@ -106,9 +106,11 @@ class UnverifiedReviewsTable(BaseReviewsTable):
 class ProfileReviewsTable(BaseReviewsTable):
     action = ProfileReviewsActionColumn()
 
-    def __init__(self, reviews, request, *args, **kwargs):
+    def __init__(self, reviews, request, editable=True, *args, **kwargs):
         empty_text = mark_safe('<h4 class="text-center">You haven\'t written any reviews! Why not start now?</h4>')
-        self.columns = [ReviewsTableColumn.INFORMATION, ReviewsTableColumn.REVIEW, ReviewsTableColumn.STATUS, ReviewsTableColumn.ACTION]
+        self.columns = [ReviewsTableColumn.INFORMATION, ReviewsTableColumn.REVIEW, ReviewsTableColumn.STATUS]
+        if editable:
+            self.columns.append(ReviewsTableColumn.ACTION)
 
         kwargs = {"empty_text": empty_text}
         super().__init__(self.columns, reviews, request, *args, **kwargs)

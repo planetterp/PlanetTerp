@@ -158,7 +158,7 @@ class UserProfile(UserPassesTestMixin, View):
         reviews = user.review_set.order_by("created_at")
 
         context = {
-            "reviews_table": ProfileReviewsTable(reviews, request),
+            "reviews_table": ProfileReviewsTable(reviews, request, editable=False),
             "profile_owner": user.username
         }
 
