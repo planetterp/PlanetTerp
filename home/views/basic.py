@@ -7,7 +7,6 @@ from django.contrib.auth.mixins import UserPassesTestMixin
 
 from home.models import Organization, Professor, Course, Review, Grade, User
 from home.tables.reviews_table import VerifiedReviewsTable, ProfileReviewsTable
-from home.forms.basic import ProfileForm
 from home.utils import recompute_ttl_cache, ttl_cache
 
 class About(View):
@@ -142,14 +141,16 @@ class UserProfile(UserPassesTestMixin, View):
     # allow admins to view individual user profiles for now.
     #
     # We may want to allow people to view a subset of other user's profiles
-    # in the future, which would show only the public reviews of that user, and
-    # definitely not their settings. We would probably want to move to an
-    # entirely different template at that point instead of hijacking
-    # profile.html.
+    # in the future, which would show only the public reviews of that user.
     def test_func(self):
         return self.request.user.is_staff
 
     def get(self, request, user_id):
+        # if a user clicks on a link to their own profile, redirect them to
+        # their view of their profile
+        if user_id == request.user.id:
+            return redirect('profile')
+
         user = User.objects.filter(pk=user_id).first()
         if not user:
             raise Http404()
@@ -158,8 +159,7 @@ class UserProfile(UserPassesTestMixin, View):
 
         context = {
             "reviews_table": ProfileReviewsTable(reviews, request),
-            "form": ProfileForm(instance=user, allow_edits=False),
-            "edit_form": None
+            "profile_owner": user.username
         }
 
-        return render(request, "profile.html", context)
+        return render(request, "user_profile.html", context)
