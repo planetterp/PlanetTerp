@@ -323,11 +323,9 @@ class Admin(UserPassesTestMixin, View):
 
                 if new_slug is None:
                     modal_msg = (
-                        f"The name '{professor.name}' is too long and "
-                            "can't be slugged automatcially. Please enter a slug below."
+                        f"The name '{professor.name}' cannot be slugged "
+                          "automatically. Please enter a slug below."
                         )
-                elif Professor.verified.filter(slug=new_slug).exists():
-                    modal_msg = mark_safe(f"The slug <b>{new_slug}</b> already belongs to a professor. Please enter a slug below.")
 
                 if modal_msg:
                     # Create the modal form to manualy enter a slug and add it
