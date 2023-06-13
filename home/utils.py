@@ -15,6 +15,8 @@ from discord_webhook.webhook import DiscordEmbed
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
 
+from home.models import Professor
+
 from planetterp.config import (WEBHOOK_URL_UPDATE, EMAIL_HOST_USER,
     EMAIL_SERVICE_ACCOUNT_CREDENTIALS, WEBHOOK_FREQUENCY)
 
@@ -283,3 +285,14 @@ def send_mail_sync(user, subject, message_text):
             message_text,
             html_message=message_text
         )
+
+def create_autoslug(professor_name):
+    split_name = professor.name.strip().split()
+    new_slug = split_name[-1].lower()
+
+    if Professor.verified.filter(slug=new_slug).exists():
+        new_slug = f"{split_name[-1]}_{split_name[0]}".lower()
+        if Professor.verified.filter(slug=new_slug).exists():
+            return None
+    
+    return new_slug
