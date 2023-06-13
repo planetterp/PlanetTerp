@@ -122,8 +122,8 @@ class Command(BaseCommand):
                 similar_professors = Professor.find_similar(professor.name, 70)
                 new_slug = create_autoslug(professor.name)
 
-                # if there are no similarly named professors and there's no
-                # issues with the auto generated slug, verify the professor.
+                # if there are no similarly named professors and we have a valid
+                # slug, verify the professor.
                 if len(similar_professors) == 0 and new_slug is not None:
                     professor.slug = new_slug
                     professor.status = Professor.Status.VERIFIED
