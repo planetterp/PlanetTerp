@@ -25,7 +25,7 @@ class Autocomplete(View):
                 value_dict['name'] = result.name
 
             data = {
-                "label": f"{result}" if request.user.is_staff else f"{result.name}",
+                "label": f"{result}" if request.user.has_perm("home.admin") else f"{result.name}",
                 "result": value_dict
             }
 

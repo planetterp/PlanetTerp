@@ -90,7 +90,7 @@
 							django can't handle parenthesis in if statements for order of operations :/ so
 							split into multiple cases
 						 -->
-						{% if user.is_staff and review.user %}
+						{% if perms.home.admin and review.user %}
 							{{ review.user.username }}
 						{% elif review.user and not review.anonymous %}
 							{{ review.user.username }}

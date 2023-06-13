@@ -5,7 +5,7 @@ from django.shortcuts import render
 from django.views import View
 from django.http import JsonResponse
 from django.template.context_processors import csrf
-from django.contrib.auth.mixins import UserPassesTestMixin
+from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.urls import reverse
 from django.utils.safestring import mark_safe
 
@@ -21,10 +21,8 @@ from home.forms.admin_forms import (ProfessorMergeForm, ProfessorSlugForm,
 from home.utils import send_email, _ttl_cache
 from planetterp import config
 
-class Admin(UserPassesTestMixin, View):
-
-    def test_func(self):
-        return self.request.user.is_staff
+class Admin(PermissionRequiredMixin, View):
+    permission_required = "home.admin"
 
     def get(self, request):
         reviews = (
