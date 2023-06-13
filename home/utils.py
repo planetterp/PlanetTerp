@@ -287,12 +287,12 @@ def send_mail_sync(user, subject, message_text):
         )
 
 def create_autoslug(professor_name):
-    split_name = professor.name.strip().split()
+    split_name = professor_name.strip().split()
     new_slug = split_name[-1].lower()
 
     if Professor.verified.filter(slug=new_slug).exists():
         new_slug = f"{split_name[-1]}_{split_name[0]}".lower()
         if Professor.verified.filter(slug=new_slug).exists():
             return None
-    
+
     return new_slug
