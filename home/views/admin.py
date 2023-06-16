@@ -18,7 +18,7 @@ from home.tables.reviews_table import UnverifiedReviewsTable
 from home.tables.basic import ProfessorsTable
 from home.forms.admin_forms import (ProfessorMergeForm, ProfessorSlugForm,
     ProfessorUpdateForm, ActionForm, ProfessorInfoModal)
-from home.utils import send_email, _ttl_cache
+from home.utils import send_email, _ttl_cache, create_autoslug
 from planetterp import config
 
 class Admin(UserPassesTestMixin, View):
@@ -318,20 +318,13 @@ class Admin(UserPassesTestMixin, View):
                     response["success_msg"] = "#info-modal-container"
                     return JsonResponse(response)
 
-                split_name = str(professor.name).strip().split(" ")
-                new_slug = split_name[-1].lower()
+                new_slug = create_autoslug(professor.name)
                 modal_msg = None
 
-                professors = Professor.verified.all()
-                if professors.filter(slug=new_slug).exists():
-                    new_slug = "_".join(reversed(split_name)).lower()
-                    if professors.filter(slug=new_slug).exists():
-                        modal_msg = mark_safe(f"The slug <b>{new_slug}</b> already belongs to a professor. Please enter a slug below.")
-
-                    if len(split_name) > 2:
-                        modal_msg = (
-                            f"The name '{professor.name}' is too long and "
-                            "can't be slugged automatcially. Please enter a slug below."
+                if new_slug is None:
+                    modal_msg = (
+                        f"The name '{professor.name}' cannot be slugged "
+                          "automatically. Please enter a slug below."
                         )
 
                 if modal_msg:
