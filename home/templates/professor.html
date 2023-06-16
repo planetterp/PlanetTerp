@@ -20,7 +20,7 @@
 <div class="container mw-100 px-5">
 	<div class="row">
 		<div class="col-xs-12 col-sm-6 col-md-6 offset-md-1">
-			{% if perms.home.admin %}
+			{% if perms.home.mod %}
 				<div class="professor-header input-group">
 					<h1 class="input-group">
 						<span id="professor-name"><strong>{{ professor.name }}</strong></span>
@@ -130,7 +130,7 @@
 <script type="text/javascript">
 	var num_reviews = parseInt("{{ num_reviews }}");
 	var average_rating = {% if professor.average_rating %} {{ professor.average_rating }} {% else %} null {% endif %};
-	var is_admin = {{ perms.home.admin|yesno:"true,false" }};
+	var is_mod = {{ perms.home.mod|yesno:"true,false" }};
 
 	$(function() {
 		initializeRateYo(3, "review");
@@ -141,7 +141,7 @@
 			generateProfessorStats();
 		}
 
-		if (is_admin) {
+		if (is_mod) {
 			initalizeAutoComplete('{{ csrf_token }}');
 		}
 	});

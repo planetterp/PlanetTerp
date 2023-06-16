@@ -10,6 +10,6 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AlterModelOptions(
             name='user',
-            options={'permissions': [('admin', 'Can take any planetterp admin actions')]},
+            options={'permissions': [('mod', 'Can take any planetterp site moderator actions')]},
         ),
     ]

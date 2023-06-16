@@ -59,7 +59,7 @@ class BaseReviewsTable(tables.Table):
             if ReviewsTableColumn.INFORMATION in self.columns:
                 formatted_data['information'] = {
                     "review": review,
-                    "is_planetterp_admin": self.request.user.has_perm("home.admin")
+                    "is_planetterp_admin": self.request.user.has_perm("home.mod")
                 }
             if ReviewsTableColumn.REVIEW in self.columns:
                 formatted_data['review'] = {"review": review}
@@ -87,7 +87,7 @@ class VerifiedReviewsTable(BaseReviewsTable):
         )
 
         self.columns = [ReviewsTableColumn.INFORMATION, ReviewsTableColumn.REVIEW]
-        if request.user.has_perm("home.admin"):
+        if request.user.has_perm("home.mod"):
             self.columns.append(ReviewsTableColumn.ACTION)
 
         kwargs = {"empty_text": empty_text}

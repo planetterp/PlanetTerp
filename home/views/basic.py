@@ -129,7 +129,7 @@ class SortReviewsTable(View):
         return JsonResponse(context)
 
 class RecomputeTTLCache(PermissionRequiredMixin, View):
-    permission_required = "home.admin"
+    permission_required = "home.mod"
 
     def post(self, _request):
         recompute_ttl_cache()
@@ -141,7 +141,7 @@ class UserProfile(PermissionRequiredMixin, View):
     #
     # We may want to allow people to view a subset of other user's profiles
     # in the future, which would show only the public reviews of that user.
-    permission_required = "home.admin"
+    permission_required = "home.mod"
 
     def get(self, request, user_id):
         # if a user clicks on a link to their own profile, redirect them to

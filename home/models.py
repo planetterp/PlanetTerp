@@ -381,7 +381,7 @@ class User(AbstractUser):
         # to the prod db, which the django admin panel grants to a moderate
         # degree.
         permissions = [
-            ("admin", "Can take any planetterp admin actions")
+            ("mod", "Can take any planetterp site moderator actions")
         ]
 
     # Workaround to force CharField to store empty values as NULL instead of ''

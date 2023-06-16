@@ -22,7 +22,7 @@ from home.utils import send_email, _ttl_cache
 from planetterp import config
 
 class Admin(PermissionRequiredMixin, View):
-    permission_required = "home.admin"
+    permission_required = "home.mod"
 
     def get(self, request):
         reviews = (
