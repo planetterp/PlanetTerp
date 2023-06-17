@@ -54,9 +54,9 @@ class LoginForm(ModelForm):
             Div(
                 Div(
                     HTML('<a href="" data-toggle="modal" data-target="#password-reset-modal" style="color: blue;">Forgot password?</a>'),
-                    css_class="text-right"
                 ),
-                css_class="pb-2 justify"
+                css_class="pb-2",
+                style="padding-right: 25%; text-align: right;"
             ),
             Submit(
                 "submit",
