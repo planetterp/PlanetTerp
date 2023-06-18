@@ -76,6 +76,7 @@ class Admin(UserPassesTestMixin, View):
             professor_id = professor.id
             grade = review.grade if review.grade else "N/A"
             review_text = review.content
+            api_response = "Help request sent"
 
             if channel_url:
                 webhook = DiscordWebhook(url=channel_url)
@@ -93,7 +94,10 @@ class Admin(UserPassesTestMixin, View):
 
                 webhook.add_embed(embed)
                 webhook.execute()
-            return JsonResponse({"response": "Help request sent", "success": True})
+            else:
+                api_response = "Can't send help request because WEBHOOK_URL_HELP is not set"
+
+            return JsonResponse({"response": api_response, "success": True})
 
         elif action_type is AdminAction.PROFESSOR_VERIFY:
             verified_status = Professor.Status(data["verified"])
