@@ -52,18 +52,18 @@ class LoginForm(ModelForm):
                 css_class="password-container mb-1"
             ),
             Div(
+                Submit(
+                    "submit",
+                    "Login",
+                    css_class="btn-primary",
+                    css_id="submit_login",
+                    style="margin-right:40%;",
+                    onclick="submitLoginForm(event)"
+                ),
                 Div(
                     HTML('<a href="" data-toggle="modal" data-target="#password-reset-modal" style="color: blue;">Forgot password?</a>'),
                 ),
-                style="padding-right: 25%; text-align: right;"
             ),
-            Submit(
-                "submit",
-                "Login",
-                css_class="btn-primary",
-                css_id="submit_login",
-                onclick="submitLoginForm(event)"
-            )
         )
 
     def create_field_errors(self):
