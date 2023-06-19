@@ -95,7 +95,7 @@ class Admin(UserPassesTestMixin, View):
                 webhook.add_embed(embed)
                 webhook.execute()
             else:
-                api_response = "Can't send help request because WEBHOOK_URL_HELP is not set"
+                api_response = "Didn't send help request because WEBHOOK_URL_HELP is not set in config.py"
 
             return JsonResponse({"response": api_response, "success": True})
 
