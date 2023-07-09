@@ -1,5 +1,5 @@
 {% extends "base_main.html" %} {% load static %} {% load utils %} {% block title
-%}Course Difficulty | PlanetTerp{% endblock %} {% block head %}
+%}Course Difficulty | PlanetTerp {% block head %}
 <link
   rel="stylesheet"
   type="text/css"
@@ -31,10 +31,6 @@
 <meta property="og:url" content="{% full_url 'tools-course-difficulty' %}" />
 
 <style>
-  .dataTables_filter {
-    float: left !important;
-  }
-
   .table-container {
     max-width: 800px;
     margin-left: auto;
