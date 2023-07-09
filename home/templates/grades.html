@@ -192,7 +192,7 @@
 			}
 		});
 	}
-	
+
 	function generate_graph(grade_data, course, semester=null, section=null) {
 		course = course.toUpperCase();
 		// Create a new row for every third graph
@@ -218,7 +218,7 @@
 		grades_text += `<br>Average GPA: ${grade_data.average_gpa.toFixed(2)} between ${grade_data.num_students.toLocaleString()} students`
 		$("#grades-text" + canvasCount).html(grades_text);
 		canvasCount++;
-		
+
 		let graph = document.getElementById('grades' + (canvasCount - 1)).getContext("2d");
 		gradesGraph = new Chart(graph, {
 			type: 'bar',
@@ -340,9 +340,7 @@
 				}
 			},
 			success: function(data) {
-				$("html").find('.graph-wrapper').remove(); // Remove all previously created graphs
-				$("html").find('.grades-info').remove(); // Remove all previously created course information
-				$("#grades-graphs").find('.row').remove(); // Remove previously created rows
+				$("#grades-graphs").html("")
 				$("#grades-information").html("");
 				$("#course-lookup-form-container").html(data.course_form);
 				$("#professor-search").val("");
@@ -381,16 +379,15 @@
 				'pf_semesters': $('#includePFSemesters').is(':checked')
 			},
 			success: function(data) {
+				$("#grades-graphs").html("")
 				clearCourseSearchForm()
-				$("#grades-information").html("");
-				$("#grades-information-error").html("");
 				$("html").find('.graph-wrapper').remove(); // Remove all previously created graphs
 				$("html").find('.grades-info').remove(); // Remove all previously created course information
 				$("#professor-lookup-form-container").html(data.professor_form);
 				initalizeKeypressEvent("#course-search");
 				initalizeKeypressEvent("#professor-search");
 				initializeProfessorSearchAutoComplete();
-				canvasCount = 0; 
+				canvasCount = 0;
 				if (data['professor_search_success'] && Object.keys(data.professor_data.data).length > 0) {
 					$(".lookup-error").hide();
 					var name = $("#professor-search").val();
@@ -400,7 +397,6 @@
 					var grade_data = data.professor_data.data
 					$("#grades-information").html(`<h1><strong><a href="/professor/${slug}" target="_blank"> ${name} </a></strong></h1> <h4>Average GPA: ${averageGpa.toFixed(2)} between ${numStudents.toLocaleString()} students</h4>`);
 					$("#grades-information").append(`<em> ${name} grade distribution for ${Object.keys(grade_data).length} course(s):</em>`);
-					$("#grades-graphs").find('.row').remove(); // Remove previously created rows
 					for (var [course_name, course_data] of Object.entries(grade_data)) {
 						generate_graph(course_data, course_name);
 					}

@@ -5,7 +5,7 @@ from django.shortcuts import render
 from django.views import View
 from django.http import JsonResponse
 from django.template.context_processors import csrf
-from django.contrib.auth.mixins import UserPassesTestMixin
+from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.urls import reverse
 from django.utils.safestring import mark_safe
 
@@ -18,13 +18,11 @@ from home.tables.reviews_table import UnverifiedReviewsTable
 from home.tables.basic import ProfessorsTable
 from home.forms.admin_forms import (ProfessorMergeForm, ProfessorSlugForm,
     ProfessorUpdateForm, ActionForm, ProfessorInfoModal)
-from home.utils import send_email, _ttl_cache
+from home.utils import send_email, _ttl_cache, create_autoslug
 from planetterp import config
 
-class Admin(UserPassesTestMixin, View):
-
-    def test_func(self):
-        return self.request.user.is_staff
+class Admin(PermissionRequiredMixin, View):
+    permission_required = "home.mod"
 
     def get(self, request):
         reviews = (
@@ -76,6 +74,7 @@ class Admin(UserPassesTestMixin, View):
             professor_id = professor.id
             grade = review.grade if review.grade else "N/A"
             review_text = review.content
+            api_response = "Help request sent"
 
             if channel_url:
                 webhook = DiscordWebhook(url=channel_url)
@@ -93,7 +92,10 @@ class Admin(UserPassesTestMixin, View):
 
                 webhook.add_embed(embed)
                 webhook.execute()
-            return JsonResponse({"response": "Help request sent", "success": True})
+            else:
+                api_response = "Didn't send help request because WEBHOOK_URL_HELP is not set in config.py"
+
+            return JsonResponse({"response": api_response, "success": True})
 
         elif action_type is AdminAction.PROFESSOR_VERIFY:
             verified_status = Professor.Status(data["verified"])
@@ -318,20 +320,13 @@ class Admin(UserPassesTestMixin, View):
                     response["success_msg"] = "#info-modal-container"
                     return JsonResponse(response)
 
-                split_name = str(professor.name).strip().split(" ")
-                new_slug = split_name[-1].lower()
+                new_slug = create_autoslug(professor.name)
                 modal_msg = None
 
-                professors = Professor.verified.all()
-                if professors.filter(slug=new_slug).exists():
-                    new_slug = "_".join(reversed(split_name)).lower()
-                    if professors.filter(slug=new_slug).exists():
-                        modal_msg = mark_safe(f"The slug <b>{new_slug}</b> already belongs to a professor. Please enter a slug below.")
-
-                    if len(split_name) > 2:
-                        modal_msg = (
-                            f"The name '{professor.name}' is too long and "
-                            "can't be slugged automatcially. Please enter a slug below."
+                if new_slug is None:
+                    modal_msg = (
+                        f"The name '{professor.name}' cannot be slugged "
+                          "automatically. Please enter a slug below."
                         )
 
                 if modal_msg:
