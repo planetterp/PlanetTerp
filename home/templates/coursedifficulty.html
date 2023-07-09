@@ -32,7 +32,9 @@
     align-items: center;
   }
 </style>
-{% endblock %} {% block content %}
+{% endblock %} 
+
+{% block content %}
 <div class="tools-header">Course Difficulty</div>
 
 <div class="tools-article">
@@ -84,24 +86,14 @@
 <hr />
 
 <div class="tools-article">
-  <p>
-    GPA calculations are done according to
-    <a
-      href="https://registrar.umd.edu/current/Policies/acadregs.html#plusminus"
-      target="_blank"
-      >UMD's grade to quality points rules</a
-    >. All withdrawals (W) are considered to be 0.0 quality points. "Other"
-    grades are not factored into GPA calculation. Only departments and courses
-    with 100 or more students are included. Courses and departments which can
-    only be taken pass/fail are not included in this list.
-  </p>
+	<p>GPA calculations are done according to <a href="https://registrar.umd.edu/current/Policies/acadregs.html#plusminus" target="_blank">UMD's 
+		grade to quality points rules</a>. All withdrawals (W) are considered to be 0.0 quality points. "Other" grades are not factored into GPA calculation. 
+		Only departments and courses with 100 or more students are included. Courses and departments which can only be taken pass/fail are not included in this 
+		list.</p>
 
-  <p></p>
+	<p></p>
 
-  <p class="pb-3">
-    Data is not guaranteed to be correct. The source of the data can be found
-    <a href="/about#credits">here</a>.
-  </p>
+	<p class="pb-3">Data is not guaranteed to be correct. The source of the data can be found <a href="/about#credits">here</a>.</p>
 </div>
 
 <script>
