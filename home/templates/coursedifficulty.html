@@ -1,34 +1,18 @@
-{% extends "base_main.html" %} {% load static %} {% load utils %} {% block title
-%}Course Difficulty | PlanetTerp {% block head %}
-<link
-  rel="stylesheet"
-  type="text/css"
-  href="{% static 'css/datatables.min.css' %}"
-/>
-<script
-  type="text/javascript"
-  charset="utf8"
-  src="{% static 'js/datatables.min.js' %}"
-></script>
+{% extends "base_main.html" %}
+{% load static %}
+{% load utils %}
 
-<meta
-  property="og:title"
-  content="Easiest &amp; Hardest Courses &amp; Departments at UMD | PlanetTerp"
-/>
-<meta
-  property="og:description"
-  name="description"
-  content="A list of the easiest and hardest courses and departments by GPA at the University of Maryland &mdash; College Park."
-/>
-<meta
-  property="og:image"
-  content="{% full_static 'images/tools/coursedifficulty.png' %}"
-/>
-<meta
-  property="og:image:alt"
-  content='A screenshot of a page titled "Easiest &amp; Hardest Courses &amp; Departments". It is for courses and departments at the University of Maryland. There are two tables with headers "Difficulty by department" and "Difficulty by course". These list each department and course on PlanetTerp as well as their average GPA and the number of students in each.'
-/>
-<meta property="og:url" content="{% full_url 'tools-course-difficulty' %}" />
+{% block title %}Course Difficulty | PlanetTerp{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/datatables.min.css' %}">
+<script type="text/javascript" charset="utf8" src="{% static 'js/datatables.min.js' %}"></script>
+
+<meta property="og:title" content="Easiest &amp; Hardest Courses &amp; Departments at UMD | PlanetTerp">
+<meta property="og:description" name="description" content="A list of the easiest and hardest courses and departments by GPA at the University of Maryland &mdash; College Park.">
+<meta property="og:image" content="{% full_static 'images/tools/coursedifficulty.png' %}">
+<meta property="og:image:alt" content="A screenshot of a page titled &quot;Easiest &amp; Hardest Courses &amp; Departments&quot;. It is for courses and departments at the University of Maryland. There are two tables with headers &quot;Difficulty by department&quot; and &quot;Difficulty by course&quot;. These list each department and course on PlanetTerp as well as their average GPA and the number of students in each.">
+<meta property="og:url" content="{% full_url 'tools-course-difficulty' %}">
 
 <style>
   .table-container {
