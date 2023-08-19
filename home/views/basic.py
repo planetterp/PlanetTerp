@@ -3,7 +3,7 @@ from django.shortcuts import redirect, render
 from django.views import View
 from django.views.generic import TemplateView, RedirectView, ListView
 from django.http import HttpResponse, Http404
-from django.contrib.auth.mixins import UserPassesTestMixin
+from django.contrib.auth.mixins import PermissionRequiredMixin
 
 from home.models import Organization, Professor, Course, Review, Grade, User
 from home.tables.reviews_table import VerifiedReviewsTable, ProfileReviewsTable
@@ -128,22 +128,20 @@ class SortReviewsTable(View):
 
         return JsonResponse(context)
 
-class RecomputeTTLCache(UserPassesTestMixin, View):
-    def test_func(self):
-        return self.request.user.is_staff
+class RecomputeTTLCache(PermissionRequiredMixin, View):
+    permission_required = "home.mod"
 
     def post(self, _request):
         recompute_ttl_cache()
         return HttpResponse()
 
-class UserProfile(UserPassesTestMixin, View):
+class UserProfile(PermissionRequiredMixin, View):
     # as all accounts have the option to still leave anonymous reviews, only
     # allow admins to view individual user profiles for now.
     #
     # We may want to allow people to view a subset of other user's profiles
     # in the future, which would show only the public reviews of that user.
-    def test_func(self):
-        return self.request.user.is_staff
+    permission_required = "home.mod"
 
     def get(self, request, user_id):
         # if a user clicks on a link to their own profile, redirect them to

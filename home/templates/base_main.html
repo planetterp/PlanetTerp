@@ -33,7 +33,7 @@
         <link rel="stylesheet" type="text/css" href="{% static 'css/progressbar.css' %}">
         <link rel="stylesheet" type="text/css" href="{% static 'fontawesome-5.15.3/css/all.min.css' %}">
 
-        {% if user and user.is_staff %}
+        {% if user and perms.home.mod %}
             <script type="text/javascript" src="{% static 'js/admin-action.js' %}"></script>
         {% endif %}
 
@@ -151,7 +151,7 @@
                         </ul>
 
                         <ul class="navbar-nav navbar-right mr-3">
-                            {% if user.is_staff %}
+                            {% if perms.home.mod %}
                                 <li class="nav-item">
                                     <a style="color: #ffc107;" class="nav-link" href="{% url 'admin' %}#reviews" title="Admin Page">
                                         <span id="unverified_count" class="badge badge-pill badge-warning">{% unverified_count %}</span>

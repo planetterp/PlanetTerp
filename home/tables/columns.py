@@ -50,7 +50,7 @@ class InformationColumn(tables.Column):
 
     def render(self, value: dict):
         review = value.pop("review")
-        is_staff = value.pop("is_staff")
+        is_planetterp_admin = value.pop("is_planetterp_admin")
 
         column_html = ""
         if review.professor.slug:
@@ -88,7 +88,7 @@ class InformationColumn(tables.Column):
 
         # wrap long usernames to avoid increasing the information column width
         column_html += '<span id="anonymous-{review_id}" style="white-space: normal; word-break: break-all;">'
-        if is_staff and review.user:
+        if is_planetterp_admin and review.user:
             if review.anonymous:
                 column_html += '''
                      <span class="noselect" data-toggle="tooltip" data-placement="right" title="This reviewer posted anonymously">
@@ -118,12 +118,12 @@ class InformationColumn(tables.Column):
         if review.created_at.date() >= date(2020, 3, 10) and review.created_at.date() <= date(2021, 8, 30):
             column_html += ' <i class="fas fa-head-side-mask" data-toggle="tooltip" data-placement="right" title="This review was submitted while most classes were online during the COVID-19 pandemic. It may not be indicative of a regular semester."></i>'
 
-        if not review.user or (review.anonymous and not is_staff):
+        if not review.user or (review.anonymous and not is_planetterp_admin):
             username = "Anonymous"
         else:
             username = review.user.username
 
-        if is_staff:
+        if is_planetterp_admin:
             column_html += '''
                 <br/ >
                 <span>

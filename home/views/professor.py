@@ -68,7 +68,7 @@ class Professor(View):
             "num_reviews": reviews.count()
         }
 
-        if request.user.is_staff:
+        if request.user.has_perm("home.mod"):
             edit_professor_form = ProfessorUpdateForm(professor, instance=professor)
             unverify_professor_form = ProfessorUnverifyForm(professor.pk)
             merge_professor_form = ProfessorMergeForm(request)
