@@ -116,9 +116,11 @@ function submitProfessorForm(form_id, form_type) {
                     }
 
                     var grade_el = $(`#grade-${review_id}`);
-                    if (data["grade"] && grade_el.next("br").length == 0) {
+                    if (data["grade"]) {
                         grade_el.html(grade(data["grade"]));
-                        grade_el.after("<br>");
+
+                        if (grade_el.next("br").length == 0)
+                            grade_el.after("<br>");
                     }
 
                     delete data["unverify"];
