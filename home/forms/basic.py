@@ -34,13 +34,10 @@ class ProfileForm(ModelForm):
             "username": User._meta.get_field("username").help_text
         }
 
-    def __init__(self, allow_edits=True, **kwargs):
+    def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.user = kwargs.get("instance")
         email = self.fields['email']
-        # we may want this form to be viewable, but not submittable. Currently
-        # used for when an admin is viewing another user's profile.
-        self.allow_edits = allow_edits
 
         if self.user.email:
             email.disabled = True
@@ -104,8 +101,7 @@ class ProfileForm(ModelForm):
                         'save',
                         'Save',
                         css_class="btn-primary",
-                        onClick="updateProfile()",
-                        disabled=not self.allow_edits
+                        onClick="updateProfile()"
                     ),
                     Div(
                         css_id="profile-form-success",

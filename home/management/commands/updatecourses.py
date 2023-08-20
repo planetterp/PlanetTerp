@@ -5,7 +5,7 @@ from datetime import datetime
 from django.core.management import BaseCommand
 
 from home.models import Course, Professor, ProfessorCourse, ProfessorAlias
-from home.utils import Semester
+from home.utils import Semester, create_autoslug
 
 class Command(BaseCommand):
     help = (
