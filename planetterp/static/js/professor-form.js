@@ -75,8 +75,19 @@ function submitProfessorForm(form_id, form_type) {
                 $(`${form_id} div.invalid-feedback`).hide();
                 $(`${form_id} div.form-group .is-invalid`).removeClass("is-invalid");
 
-                if (show_banner)
+                if (show_banner) {
+                    if (form_type == "edit") {
+                        let success_text = "Review updated successfully!";
+                        let close_btn = "<button type=\"button\" class=\"close\">&times;</button>";
+
+                        if (data["unverify"])
+                            success_text = "Changes have been submitted for verification!";
+
+                        $("#success-banner-text").html(success_text + close_btn);
+                    }
+
                     $(`#success-banner-${form_type}`).removeClass("d-none");
+                }
 
                 $(':input', form_id).not(':button, :submit, :reset, :hidden, :checkbox').val('');
                 $(`${form_id} :input[type=checkbox]`).prop('checked', false);
