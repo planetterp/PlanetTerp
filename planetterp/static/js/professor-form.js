@@ -109,10 +109,10 @@ function submitProfessorForm(form_id, form_type) {
                             status_el.next("i").remove();
                     }
 
-                    var el = $(`#course-${review_id}`);
-                    if (data["course"] && el.next("br").length == 0) {
-                        el.html(course(data["course"]["name"]));
-                        el.after("<br>");
+                    var course_el = $(`#course-${review_id}`);
+                    if (data["course"] && course_el.next("br").length == 0) {
+                        course_el.html(course(data["course"]["name"]));
+                        course_el.after("<br>");
                     }
 
                     var grade_el = $(`#grade-${review_id}`);
