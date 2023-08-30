@@ -1,3 +1,5 @@
+from urllib.parse import parse_qs
+
 from django.http import JsonResponse
 from django.db.models import Sum
 from django.views import View
@@ -234,28 +236,36 @@ class CourseDifficultyData(View):
 
 class GenedData(View):
     def get(self, request):
-        geneds = request.GET["geneds"].replace("&", "").split("=on")
+        form_data = parse_qs(request.GET["geneds"])
+        # make sure to pop off any options such as mode, so all we're left with
+        # is the gened queries.
+        mode = form_data.pop("mode")[0]
+        geneds = form_data.keys()
         geneds = set(gened for gened in geneds if gened in Gened.GENEDS)
-
         if not geneds:
             return JsonResponse({"data": []})
 
         geneds = tuple(geneds)
-        courses = Course.recent.raw("""
-            SELECT GROUP_CONCAT(name) AS geneds, course_id AS id
-            FROM home_gened
-            GROUP BY course_id
-            HAVING SUM(name IN %s) = %s
-            """, [geneds, len(geneds)])
+        if mode == "all":
+            courses = Course.recent.raw("""
+                    SELECT GROUP_CONCAT(name) AS gened, course_id AS id
+                    FROM home_gened
+                    GROUP BY course_id
+                    HAVING SUM(name IN %s) = %s
+                    """, [geneds, len(geneds)]
+                )
+        else:
+            geneds = Gened.objects.select_related('course').exclude(course__geneds=None).filter(name__in=geneds)
+            courses = [g.course for g in geneds]
 
         data = []
         for course in courses:
-            geneds = course.geneds.replace(",", ", ")
-            average_gpa = course.average_gpa()
-            average_gpa = f"{average_gpa:.2f}" if average_gpa else "No grade data available"
-            course_name = f"<a href='{course.get_absolute_url()}'>{course.name}</a>"
-            entry = [course_name, course.title, course.credits, average_gpa,
-                geneds]
-            data.append(entry)
+            if course.geneds:
+                average_gpa = course.average_gpa()
+                average_gpa = f"{average_gpa:.2f}" if average_gpa else "N/A"
+                course_name = f"<a href='{course.get_absolute_url()}'>{course.name}</a>"
+                entry = [course_name, course.title, course.credits, average_gpa,
+                    course.gened_str()]
+                data.append(entry)
 
         return JsonResponse({"data": data})
