@@ -1,6 +1,7 @@
 from django.http import JsonResponse
 from django.views import View
-from django.shortcuts import render
+# from django.shortcuts import render
+from django.http import Http404
 
 from home import queries
 
@@ -9,7 +10,8 @@ class Autocomplete(View):
         data = request.GET
         
         if "query" not in data:
-            return render(request, "404.html")
+            # return render(request, "404.html")
+            raise Http404()
         
         query = data["query"]
         types = data.getlist("types[]")
