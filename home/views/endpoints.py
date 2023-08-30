@@ -1,11 +1,16 @@
 from django.http import JsonResponse
 from django.views import View
+from django.shortcuts import render
 
 from home import queries
 
 class Autocomplete(View):
     def get(self, request):
         data = request.GET
+        
+        if "query" not in data:
+            return render(request, "404.html")
+        
         query = data["query"]
         types = data.getlist("types[]")
         professors = "professor" in types
