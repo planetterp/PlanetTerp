@@ -51,19 +51,20 @@ class LoginForm(ModelForm):
                 self.field_errors['password'],
                 css_class="password-container mb-1"
             ),
+            
             Div(
-                Div(
-                    HTML('<a href="" data-toggle="modal" data-target="#password-reset-modal" style="color: blue;">Forgot password?</a>')
-                ),
-                css_class="pb-2"
-            ),
-            Submit(
+                Submit(
                 "submit",
                 "Login",
                 css_class="btn-primary",
                 css_id="submit_login",
+                style="margin-right:40%;",
                 onclick="submitLoginForm(event)"
-            )
+            ),
+                Div(
+                    HTML('<a href="" data-toggle="modal" data-target="#password-reset-modal" style="color: blue;">Forgot password?</a>'),
+                ),
+            ), 
         )
 
     def create_field_errors(self):
