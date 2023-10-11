@@ -18,7 +18,7 @@ $(document).ready(function() {
 		},
 		select: function(e, ui) {
 			var course = ui.item.label;
-			
+
 			createSelectedCourse(course);
 
 			this.value = "";
@@ -128,7 +128,7 @@ function createSelectedCourse (course) {
 			data += "<span><a href='/course/" + escapeHTML(course).match(/[^\(]*/)[0] + "' target='_blank'>" + escapeHTML(course) + "</a></span>";
 			data += "<span class='remove-course'><i class='fas fa-times-circle'></i></span>";
 			data += "</span>"
-			
+
 			document.getElementById('selected-courses').innerHTML += data;
 
 			$('.fa-times-circle').on('click', function(e) {
@@ -152,6 +152,3 @@ function escapeHTML(str) {
     div.appendChild(document.createTextNode(str));
     return div.innerHTML;
 }
-
-
-
