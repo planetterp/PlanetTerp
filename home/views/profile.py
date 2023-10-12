@@ -19,7 +19,7 @@ class Profile(LoginRequiredMixin, View):
     template = "profile.html"
 
     def get(self, request):
-        reviews = request.user.review_set.order_by('-created_at')
+        reviews = request.user.review_set.order_by("-created_at")
 
         context = {
             "reviews_table": ProfileReviewsTable(reviews, request),
