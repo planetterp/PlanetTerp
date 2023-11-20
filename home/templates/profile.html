@@ -7,20 +7,20 @@
 
 {% block content %}
 
-{% crispy edit_form %}
+{% if edit_form %}
+	{% crispy edit_form %}
+{% endif %}
 
 <br />
 <div id="success-banner-edit"  class="container fixed-top d-none" style="margin-top: 5rem;">
 	<div class="row">
 		<div class="col">
-			<div class="alert alert-dismissable alert-success text-center" style="margin-left: 12rem; margin-right: 12rem">
+			<div id="success-banner-text" class="alert alert-dismissable alert-success text-center" style="margin-left: 12rem; margin-right: 12rem">
 				Review updated successfully! <button type="button" class="close">&times;</button>
 			</div>
 		</div>
 	</div>
-
 </div>
-
 
 <ul class="nav nav-tabs" role="tablist">
 	<li class="nav-item">

@@ -75,8 +75,19 @@ function submitProfessorForm(form_id, form_type) {
                 $(`${form_id} div.invalid-feedback`).hide();
                 $(`${form_id} div.form-group .is-invalid`).removeClass("is-invalid");
 
-                if (show_banner)
+                if (show_banner) {
+                    if (form_type == "edit") {
+                        let success_text = "Review updated successfully!";
+                        let close_btn = "<button type=\"button\" class=\"close\">&times;</button>";
+
+                        if (data["unverify"])
+                            success_text = "Changes have been submitted for verification!";
+
+                        $("#success-banner-text").html(success_text + close_btn);
+                    }
+
                     $(`#success-banner-${form_type}`).removeClass("d-none");
+                }
 
                 $(':input', form_id).not(':button, :submit, :reset, :hidden, :checkbox').val('');
                 $(`${form_id} :input[type=checkbox]`).prop('checked', false);
@@ -109,16 +120,18 @@ function submitProfessorForm(form_id, form_type) {
                             status_el.next("i").remove();
                     }
 
-                    var el = $(`#course-${review_id}`);
-                    if (data["course"] && el.next("br").length == 0) {
-                        el.html(course(data["course"]["name"]));
-                        el.after("<br>");
+                    var course_el = $(`#course-${review_id}`);
+                    if (data["course"] && course_el.next("br").length == 0) {
+                        course_el.html(course(data["course"]["name"]));
+                        course_el.after("<br>");
                     }
 
                     var grade_el = $(`#grade-${review_id}`);
-                    if (data["grade"] && grade_el.next("br").length == 0) {
-                        $(`#grade-${review_id}`).html(grade(data["grade"]));
-                        grade_el.after("<br>");
+                    if (data["grade"]) {
+                        grade_el.html(grade(data["grade"]));
+
+                        if (grade_el.next("br").length == 0)
+                            grade_el.after("<br>");
                     }
 
                     delete data["unverify"];

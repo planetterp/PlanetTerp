@@ -59,7 +59,7 @@ class BaseReviewsTable(tables.Table):
             if ReviewsTableColumn.INFORMATION in self.columns:
                 formatted_data['information'] = {
                     "review": review,
-                    "is_staff": self.request.user.is_staff
+                    "is_planetterp_admin": self.request.user.has_perm("home.mod")
                 }
             if ReviewsTableColumn.REVIEW in self.columns:
                 formatted_data['review'] = {"review": review}
@@ -87,7 +87,7 @@ class VerifiedReviewsTable(BaseReviewsTable):
         )
 
         self.columns = [ReviewsTableColumn.INFORMATION, ReviewsTableColumn.REVIEW]
-        if request.user.is_staff:
+        if request.user.has_perm("home.mod"):
             self.columns.append(ReviewsTableColumn.ACTION)
 
         kwargs = {"empty_text": empty_text}
@@ -106,9 +106,11 @@ class UnverifiedReviewsTable(BaseReviewsTable):
 class ProfileReviewsTable(BaseReviewsTable):
     action = ProfileReviewsActionColumn()
 
-    def __init__(self, reviews, request, *args, **kwargs):
+    def __init__(self, reviews, request, editable=True, *args, **kwargs):
         empty_text = mark_safe('<h4 class="text-center">You haven\'t written any reviews! Why not start now?</h4>')
-        self.columns = [ReviewsTableColumn.INFORMATION, ReviewsTableColumn.REVIEW, ReviewsTableColumn.STATUS, ReviewsTableColumn.ACTION]
+        self.columns = [ReviewsTableColumn.INFORMATION, ReviewsTableColumn.REVIEW, ReviewsTableColumn.STATUS]
+        if editable:
+            self.columns.append(ReviewsTableColumn.ACTION)
 
         kwargs = {"empty_text": empty_text}
         super().__init__(self.columns, reviews, request, *args, **kwargs)

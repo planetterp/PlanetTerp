@@ -6,7 +6,7 @@ from django.core.management import BaseCommand
 from argparse import RawTextHelpFormatter
 
 from home.models import Course, Professor, ProfessorCourse, ProfessorAlias
-from home.utils import Semester
+from home.utils import Semester, create_autoslug
 
 class Command(BaseCommand):
     help = '''Updates the database with new courses and professors during the provided semester.
@@ -120,18 +120,11 @@ class Command(BaseCommand):
             else:
                 professor = Professor(name=professor_name, type=Professor.Type.PROFESSOR)
                 similar_professors = Professor.find_similar(professor.name, 70)
-                split_name = professor.name.strip().split()
-                new_slug = split_name[-1].lower()
-                valid_slug = True
+                new_slug = create_autoslug(professor.name)
 
-                if self.verified_professors.filter(slug=new_slug).exists():
-                    new_slug = f"{split_name[-1]}_{split_name[0]}".lower()
-                    if self.verified_professors.filter(slug=new_slug).exists():
-                        valid_slug = False
-
-                # if there are no similarly named professors and there's no
-                # issues with the auto generated slug, verify the professor.
-                if len(similar_professors) == 0 and valid_slug:
+                # if there are no similarly named professors and we have a valid
+                # slug, verify the professor.
+                if len(similar_professors) == 0 and new_slug is not None:
                     professor.slug = new_slug
                     professor.status = Professor.Status.VERIFIED
 

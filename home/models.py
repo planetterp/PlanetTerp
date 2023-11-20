@@ -331,11 +331,9 @@ class User(AbstractUser):
     objects = UserManager()
 
     send_review_email = BooleanField(default=True)
-
     # accounts which are from ourumd are given an unusable password so nobody
     # can log in to the accounts
     from_ourumd = BooleanField(default=False)
-
     username = CharField(
         max_length=22,
         unique=True,
@@ -351,7 +349,6 @@ class User(AbstractUser):
             "unique": "A user with that username already exists."
         }
     )
-
     email = EmailField(
         unique=True,
         null=True,
@@ -366,7 +363,6 @@ class User(AbstractUser):
                 )
         }
     )
-
     password = CharField(
         max_length=128,
         validators=[
@@ -376,6 +372,17 @@ class User(AbstractUser):
             "required": "You must enter a password"
         }
     )
+
+    class Meta:
+        # planetterp admins are a level between staff users and normal users:
+        # admins can view the admin panel and take all actions theiren, but
+        # cannot view the django admin panel.
+        # Essentially, this role is for site admins which should not have access
+        # to the prod db, which the django admin panel grants to a moderate
+        # degree.
+        permissions = [
+            ("mod", "Can take any planetterp site moderator actions")
+        ]
 
     # Workaround to force CharField to store empty values as NULL instead of ''
     # https://stackoverflow.com/a/38621160
