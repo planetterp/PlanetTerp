@@ -1,5 +1,6 @@
 from django.http import JsonResponse
 from django.db.models import Sum
+from django.http import Http404
 from django.views import View
 from django.urls import reverse
 
@@ -234,6 +235,9 @@ class CourseDifficultyData(View):
 
 class GenedData(View):
     def get(self, request):
+        if "geneds" not in request.GET:
+            raise Http404()
+        
         geneds = request.GET["geneds"].replace("&", "").split("=on")
         geneds = set(gened for gened in geneds if gened in Gened.GENEDS)
 

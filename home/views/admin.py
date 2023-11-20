@@ -7,7 +7,6 @@ from django.http import JsonResponse
 from django.template.context_processors import csrf
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.urls import reverse
-from django.utils.safestring import mark_safe
 
 from crispy_forms.utils import render_crispy_form
 from discord_webhook import DiscordWebhook, DiscordEmbed
