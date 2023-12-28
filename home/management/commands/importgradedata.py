@@ -14,6 +14,7 @@
 
 import csv
 from pathlib import Path
+from requests import get
 
 from django.core.management import BaseCommand, CommandError
 
@@ -30,6 +31,17 @@ class Command(BaseCommand):
         self.grades = []
         self.reject_rows = []
         self.semester = None
+        self.section_prof_lookup = {}
+
+    def get_instructor_data(self):
+        next_url = f"https://api.umd.io/v1/courses/sections?semester={self.semester}&per_page=30"
+
+        while next_url is not None:
+            page_data = get(next_url)
+            page_dict = {section["section_id"]: section["instructors"] for section in page_data.json()}
+            self.section_prof_lookup.update(page_dict)
+            self.stdout.write(f"Got page {next_url[-3:]}")
+            next_url = page_data.headers.get("X-Next-Page")
 
     def add_arguments(self, parser):
         parser.add_argument("-s", "--semester", required=True)
@@ -37,6 +49,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         self.semester = Semester(options["semester"])
+        self.get_instructor_data()
         file_path = Path(options["file"])
 
         if file_path.suffix != ".csv":
@@ -74,13 +87,16 @@ class Command(BaseCommand):
             raise ValidationError(f"Course {name} doesn't exist")
         return courses.get()
 
-    def parse_professor(self, name: str):
-        if name is None or name == "":
-            return None
-
-        name = name.strip()
-        lastname, firstname = name.split(", ")
-        name = f"{firstname.strip()} {lastname.strip()}"
+    def parse_professor(self, course:str, section:str, existing_name:str):
+        lookup_name = self.section_prof_lookup.get(f"{course}-{section:0>4}")
+        if lookup_name is not None and len(lookup_name) > 0:
+            name = lookup_name[0]
+        elif existing_name is not None and "," in existing_name:
+            name = existing_name.strip()
+            lastname, firstname = name.split(", ")
+            name = f"{firstname.strip()} {lastname.strip()}"
+        else:
+            raise ValidationError(f"No valid professor names for {course}-{section:0>4}")
 
         # .first() is ok here because at most one record will be returned
         alias = ProfessorAlias.objects.filter(alias=name).first()
@@ -114,7 +130,7 @@ class Command(BaseCommand):
                 semester=self.semester,
                 course=self.parse_course(row[0]),
                 section=row[1],
-                professor=self.parse_professor(row[2]),
+                professor=self.parse_professor(row[0], row[1], row[2]),
                 num_students=row[3],
                 a_plus=row[4],
                 a=row[5],
