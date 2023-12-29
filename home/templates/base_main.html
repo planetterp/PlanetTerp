@@ -176,7 +176,7 @@
 
 
                             <li class="nav-item">
-                                <form action="{% url 'search' %}" class="form-inline">
+                                <form class="form-inline" id="header-search-form">
                                     <label for="header-search" style="display: none;">Search for a professor or course</label>
                                     <input id="header-search" class="form-control" type="search" name="query" placeholder="Search..." aria-label="Search for a course, professor, or teaching assistant">
                                     <button class="btn btn-primary" type="submit">Search</button>
@@ -228,7 +228,9 @@
                     minLength: 3,
                     delay: 100,
                     source: function(request, response) {
-                        $.get("{% url 'autocomplete' %}", {"query": request.term, "types[]": ["professor", "course"], "return_attrs[]": ["url"]},  function(data) {
+                        // copy pasting professor names can sometimes introduce unwanted whitespace
+                        var query = request.term.trim();
+                        $.get("{% url 'autocomplete' %}", {"query": query, "types[]": ["professor", "course"], "return_attrs[]": ["url"]},  function(data) {
                             response(data);
                         });
                     },
@@ -238,6 +240,14 @@
                         // prevent autocomplete from handling the event
                         return false;
                     }
+                });
+
+                $("#header-search-form").submit(function(e) {
+                    // match autocomplete functionality by trimming whitespace
+                    var query = $("#header-search").val().trim()
+                    var params = {"query": query}
+                    window.location.href = `{% url 'search' %}?${$.param(params)}`;
+                    e.preventDefault();
                 });
 
                 $(".anonymous-checkbox > div.form-group").addClass("mb-0");
