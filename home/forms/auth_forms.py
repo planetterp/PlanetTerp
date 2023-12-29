@@ -55,11 +55,11 @@ class LoginForm(ModelForm):
                 Submit(
                     "submit",
                     "Login",
-                    css_class="btn-primary",
+                    css_class="btn-primary mt-2",
                     css_id="submit_login",
                     onclick="submitLoginForm(event)",
                 ),
-                HTML('<a href="" data-toggle="modal" data-target="#password-reset-modal" style="color: blue; float: right;">Forgot password?</a>'),
+                HTML('<a href="" data-toggle="modal" data-target="#password-reset-modal" class="mt-2" style="color: blue; float: right;">Forgot password?</a>'),
                 css_class="w-75"
 
             ),
