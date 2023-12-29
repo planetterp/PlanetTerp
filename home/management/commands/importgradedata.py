@@ -1,16 +1,17 @@
 # Expected input is a csv file of grade data from umd.
 #
 # Before running:
-# * update professors and courses for any new entries
+# * run updatecourses for the corresponding semester
 # * ensure the spreadsheet has only the following grades listed, in this order:
 #   `A+, A, A-, B+, B, B-, C+, C, C-, D+, D, D-, F, W, OTHER`
 # * remove the header row at the top of the spreadsheet and check the data for
 #   invalid entries (at the bottom of the spreadsheet).
 #
 # After running:
-# * go through /admin and deal with any ambiguous professors from the grade data
-#   - ie, determing which professor they actually map to and merge them into
-#   that professor.
+# * go through /admin and deal with any new pending professors. These professors
+#   may be created when the spreadsheet has courses which are not on umdio,
+#   perhaps because they were added late (after umdio scraped), or they were never
+#   put on SOC at all (such as some administrative or graduate courses).
 
 import csv
 from pathlib import Path
@@ -33,27 +34,18 @@ class Command(BaseCommand):
         self.semester = None
         self.section_prof_lookup = {}
 
-    def get_instructor_data(self):
-        next_url = f"https://api.umd.io/v1/courses/sections?semester={self.semester}&per_page=30"
-
-        while next_url is not None:
-            page_data = get(next_url)
-            page_dict = {section["section_id"]: section["instructors"] for section in page_data.json()}
-            self.section_prof_lookup.update(page_dict)
-            self.stdout.write(f"Got page {next_url[-3:]}")
-            next_url = page_data.headers.get("X-Next-Page")
-
     def add_arguments(self, parser):
         parser.add_argument("-s", "--semester", required=True)
         parser.add_argument("-f", "--file", required=True)
 
     def handle(self, *args, **options):
         self.semester = Semester(options["semester"])
-        self.get_instructor_data()
+        self.debug = options["verbosity"] > 1
         file_path = Path(options["file"])
-
         if file_path.suffix != ".csv":
-            raise CommandError("File must be a .csv")
+            raise CommandError("Input file must be a .csv")
+
+        self.get_instructor_data()
 
         with open(file_path, newline="") as file:
             reader = csv.reader(file, delimiter=',', quotechar="\"")
@@ -62,20 +54,32 @@ class Command(BaseCommand):
             for row in reader:
                 self.add_grade(row)
 
+        self.stdout.write(f"Adding {len(self.grades)} grades to database...")
         grades = Grade.unfiltered.bulk_create(self.grades)
         self.stdout.write(f"Done, added {len(grades)} grades")
 
         if self.reject_rows:
-            print(f"Exporting {len(self.reject_rows)} rejected rows...")
+            self.stdout.write(f"Exporting {len(self.reject_rows)} rejected rows...")
             with open("rejected_imports.csv", "w+") as f:
 
                 writer = csv.writer(f)
                 for row in self.reject_rows:
                     writer.writerow(row)
 
-            print("**** Some data could not be imported and was stored in "
-                "rejected_imports.csv ****\n")
+            self.stderr.write("Some data could not be imported and was stored in "
+                "rejected_imports.csv")
 
+    def get_instructor_data(self):
+        # umdio goes up to 50, but can take a while per request and we want to
+        # ensure we don't time out.
+        next_url = f"https://api.umd.io/v1/courses/sections?semester={self.semester}&per_page=30"
+
+        while next_url is not None:
+            page_data = get(next_url)
+            page_dict = {section["section_id"]: section["instructors"] for section in page_data.json()}
+            self.section_prof_lookup.update(page_dict)
+            self.stdout.write(f"Requesting {next_url}")
+            next_url = page_data.headers.get("X-Next-Page")
 
     def parse_course(self, name: str):
         if name is None:
@@ -84,20 +88,31 @@ class Command(BaseCommand):
         name = name.strip()
         courses = Course.unfiltered.filter(name=name)
         if not courses.exists():
-            raise ValidationError(f"Course {name} doesn't exist")
+            raise ValidationError(f"Unknown course {name}")
         return courses.get()
 
     def parse_professor(self, course:str, section:str, existing_name:str):
-        lookup_name = self.section_prof_lookup.get(f"{course}-{section:0>4}")
-        if lookup_name is not None and len(lookup_name) > 0:
-            name = lookup_name[0]
-        elif existing_name is not None and "," in existing_name:
+        key = f"{course}-{section:0>4}"
+        names = self.section_prof_lookup.get(key)
+        if names:
+            # we don't handle courses with multiple profs right now. assign
+            # these grades to the first listed professor.
+            name = names[0]
+        elif existing_name not in {None, ""}:
+            self.stdout.write(f"Could not find section {key} on umdio. "
+                f"Using professor {existing_name} from umd's spreadsheet")
+            # pray we don't encounter a prof without a last name.
+            assert "," in existing_name
             name = existing_name.strip()
             lastname, firstname = name.split(", ")
             name = f"{firstname.strip()} {lastname.strip()}"
         else:
-            raise ValidationError(f"No valid professor names for {course}-{section:0>4}")
+            # this case may be hit because we don't properly propagate professor
+            # names downward in the csvs umd provides us.
+            raise ValidationError(f"Could not find section {key} on umdio, and "
+                "umd did not provide a professor in the spreadsheet.")
 
+        # respect any aliases for this professor name.
         # .first() is ok here because at most one record will be returned
         alias = ProfessorAlias.objects.filter(alias=name).first()
         if alias:
@@ -107,21 +122,17 @@ class Command(BaseCommand):
         if professors.count() == 1:
             return professors.first()
 
-        similar_professors = Professor.find_similar(name, 70)
-        if professors.count() > 1 or similar_professors:
-            # if 'name' matches more than one professor or is similar to more
-            # than one professor, create a new pending professor for us to
-            # manually decide which professor the data belongs to.
-            # We'll go through the admin panel right after running this script
-            # to deal with any ambiguous professors.
-            new_professor = Professor(
-                name=name,
-                type=Professor.Type.PROFESSOR
-            )
-            new_professor.save()
-            return new_professor
-
-        raise ValidationError(f"Professor {name} doesn't exist")
+        # if we still don't recognize this professor, submit it as a new pending
+        # professor. It may just need an alias created via merging in the admin
+        # panel.
+        self.stdout.write(f"Unknown professor {name}. Creating corresponding "
+            "pending professor")
+        new_professor = Professor(
+            name=name,
+            type=Professor.Type.PROFESSOR
+        )
+        new_professor.save()
+        return new_professor
 
 
     def add_grade(self, row):
@@ -148,8 +159,10 @@ class Command(BaseCommand):
                 w=row[17],
                 other=row[18]
             )
+            if self.debug:
+                self.stdout.write(f"processed {grade.course}-{grade.section} by {grade.professor} ({grade})")
         except ValidationError as e:
-            print(e)
+            self.stderr.write(str(e))
             self.reject_rows.append(row)
         else:
             self.grades.append(grade)
