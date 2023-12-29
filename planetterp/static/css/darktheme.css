@@ -110,8 +110,12 @@ hr {
 	background-color: black;
 }
 
+.card {
+	background-color: #282828;
+}
+
 .professor-card .card-text {
-	color: black;
+	color: white;
 }
 
 .days-of-week label {
