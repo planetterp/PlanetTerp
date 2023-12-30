@@ -31,6 +31,19 @@
 					<option value="asc">Rating</option>
 				</select>
 			</div>
+
+			<div class="input-group-prepend ml-3">
+				<label class="input-group-text" for="professor-filter" style="border-bottom-left-radius: 0;">Professor Filter:</label>
+			</div>
+			
+			<div class="dropdown">
+				<select class="form-control text-white custom-select" name="professor-filter" id="professor-filter">
+					<option selected value="">All Professors</option>
+					{% for professor in professors %} 
+						<option value={{professor.id}}>{{professor.name}}</option>
+					{% endfor%}
+				  </select>
+			  </div>
 		</div>
 	</div>
 {% endif %}
@@ -49,10 +62,11 @@
 		color_2: "secondary",
 	});
 
-	function sortReviews(direction) {
+	function sortReviews(direction, professor) {
 		var data = {
 			"csrfmiddlewaretoken": "{{ csrf_token }}",
 			"direction": direction,
+			"professor": professor,
 			"type": "course",
 			"obj_id": "{{ course.pk }}"
 		}
@@ -67,9 +81,10 @@
 		});
 	}
 
-	$("#rating-select").on("change", function() {
-		var selectedRating = $(this).val();
-		sortReviews(selectedRating);
+	$("#rating-select, #professor-filter").on("change", function() {
+		var selectedRating = $("#rating-select").val();
+		var professorId = $("#professor-filter").val();
+		sortReviews(selectedRating, professorId);
 	});
 </script>
 {% endblock %}
