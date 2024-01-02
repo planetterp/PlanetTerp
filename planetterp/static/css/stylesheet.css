@@ -224,6 +224,14 @@ body {
 	font-size: 18px;
 }
 
+#professor-filter {
+	background: #6c757d; 
+	border-bottom-left-radius: 0;
+	border-top-left-radius: 0;
+	border-bottom-right-radius: 0; 
+	border:1px solid #6c757d; 
+}
+
 .card-header-gened {
 	text-align: center;
 }

@@ -63,9 +63,11 @@ class CourseReviews(View):
             raise Http404()
 
         reviews = course.review_set(manager="verified").order_by("-created_at")
-
+        professors = { review.professor for review in reviews }
+        
         context = {
             "course": course,
+            "professors": professors,
             "num_reviews": reviews.count(),
             "reviews_table": VerifiedReviewsTable(reviews, request)
         }
@@ -116,7 +118,10 @@ class SortReviewsTable(View):
         if data_type == "professor":
             reviews = Review.verified.filter(professor__id=obj_id)
         elif data_type == "course":
-            reviews = Review.verified.filter(course__id=obj_id)
+            if(data["professor"]==""):
+                reviews = Review.verified.filter(course__id=obj_id)
+            else:
+                reviews = Review.verified.filter(course__id=obj_id).filter(professor__id=int(data["professor"]))
         else:
             raise ValueError(f"Unknown type: {data_type}")
 
