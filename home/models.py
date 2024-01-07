@@ -470,13 +470,14 @@ class Review(Model):
     
     def get_content_with_course_links(self):
         content = escape(self.content)
-        course_code_format = '^([A-Z]{4}(?:[A-Z]|[0-9]){3,6})$'
         courses_replaced = []
 
-        for original_word in re.split(r' |\.', content):
-            word = re.sub(r'[\W_]+', '', original_word).upper()
-            if not word in courses_replaced and re.match(course_code_format, word) and Course.recent.filter(name=word).first():
-                content = content.replace(original_word, '<a href="/course/{0}">{1}</a>'.format(word, original_word))
+        course_code_format = '[A-Za-z]{4}(?:[A-Za-z]|[0-9]){3,6}'
+        matches = re.findall(course_code_format,content)
+
+        for word in matches:
+            if not word in courses_replaced and Course.recent.filter(name=word).first():
+                content = content.replace(word, '<a href="/course/{0}">{0}</a>'.format(word))
                 courses_replaced.append(word)
 
         return mark_safe(content)

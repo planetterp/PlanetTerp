@@ -72,16 +72,15 @@ class Course(View):
                 past_professors.append(professor)
 
         course_description = course.description
-        course_code_format = '^([A-Z]{4}(?:[A-Z]|[0-9]){3,6})$'
         courses_replaced = []
 
-        if course_description is not None:
-            for word in re.split(r' |\.', course_description):
-                # remove any character that is not a letter or number
-                word = re.sub(r'[\W_]+', '', word)
-                if not word in courses_replaced and re.match(course_code_format, word) and CourseModel.recent.filter(name=word).first():
-                    course_description = course_description.replace(word, '<a href="/course/{0}">{0}</a>'.format(word))
-                    courses_replaced.append(word)
+        course_code_format = '[A-Za-z]{4}(?:[A-Za-z]|[0-9]){3,6}'
+        matches = re.findall(course_code_format,course_description)
+
+        for word in matches:
+            if not word in courses_replaced and CourseModel.recent.filter(name=word).first():
+                course_description = course_description.replace(word, '<a href="/course/{0}">{0}</a>'.format(word))
+                courses_replaced.append(word)
         course.description = course_description
 
         def key(item):
