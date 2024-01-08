@@ -54,6 +54,8 @@ class BaseReviewsTable(tables.Table):
     def get_data(self, reviews: QuerySet[Review]):
         data = []
         for review in reviews:
+            review.content=review.get_content_with_course_links()
+
             formatted_data = {}
 
             if ReviewsTableColumn.INFORMATION in self.columns:

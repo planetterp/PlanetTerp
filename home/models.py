@@ -1,9 +1,12 @@
+import re
+
 from enum import Enum
 
 from django.contrib.auth.models import (AbstractUser,
     UserManager as DjangoUserManager)
 from django.utils.safestring import mark_safe
 from django.utils.functional import cached_property
+from django.utils.html import escape
 from django.urls import reverse
 from django.core import validators
 from django.db.models import (Model, CharField, DateTimeField, TextField,
@@ -464,6 +467,20 @@ class Review(Model):
         indexes = [
             Index(fields=["status"])
         ]
+    
+    def get_content_with_course_links(self):
+        content = escape(self.content)
+        courses_replaced = []
+
+        course_code_format = '[A-Za-z]{4}(?:[A-Za-z]|[0-9]){3,6}'
+        matches = re.findall(course_code_format,content)
+
+        for word in matches:
+            if not word in courses_replaced and Course.recent.filter(name=word).first():
+                content = content.replace(word, '<a href="/course/{0}">{0}</a>'.format(word))
+                courses_replaced.append(word)
+
+        return mark_safe(content)
 
 class Grade(Model):
     POSSIBLE_GRADES = [choice[0] for choice in Review.Grades.choices]
