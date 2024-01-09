@@ -74,7 +74,7 @@ class Course(View):
         course_description = course.description
         courses_replaced = []
 
-        course_code_format = '[A-Za-z]{4}(?:[A-Za-z]|[0-9]){3,6}'
+        course_code_format = CourseModel.course_code_format
         matches = re.findall(course_code_format,course_description)
 
         for word in matches:
