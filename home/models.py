@@ -200,6 +200,8 @@ class Course(Model):
     recent = RecentCourseManager()
     unfiltered = Manager()
 
+    course_code_format = '[A-Za-z]{4}(?:[A-Za-z]|[0-9]){3,6}'
+
     def save(self, *args, **kwargs):
         # `name` is essentially a computed field, and will never have a value
         # other than CONCAT("department", "course_number"). Ensure that this
@@ -471,8 +473,7 @@ class Review(Model):
     def get_content_with_course_links(self):
         content = escape(self.content)
         courses_replaced = []
-
-        course_code_format = '[A-Za-z]{4}(?:[A-Za-z]|[0-9]){3,6}'
+        course_code_format = Course.course_code_format
         matches = re.findall(course_code_format,content)
 
         for word in matches:
