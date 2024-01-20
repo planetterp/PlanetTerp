@@ -1,11 +1,11 @@
 from django.views import View
 from django.http import JsonResponse
 
-from home.forms.professor_forms import ProfessorFormAdd
+from home.forms.professor_forms import ProfessorFormAdd, EditReviewForm
 from home.models import Professor, Review, Course
 from home.utils import send_updates_webhook
 
-class AddProfessor(View):
+class AddProfessorAndReview(View):
     def post(self, request):
         user = request.user
         form = ProfessorFormAdd(user, data=request.POST)
@@ -32,13 +32,65 @@ class AddProfessor(View):
                 anonymous=cleaned_data['anonymous']
             )
             new_review.save()
-
             send_updates_webhook(request)
 
             form = ProfessorFormAdd(user)
 
             context = {
                 "success": True
+            }
+        else:
+            context = {
+                "success": False,
+                "errors": form.errors.as_json()
+            }
+
+        return JsonResponse(context)
+
+class EditReview(View):
+    def post(self, request):
+        user = request.user
+        review = Review.unfiltered.get(pk=request.POST['review_id'])
+        initial = {
+            'content': review.content,
+            'course': review.course.name if review.course else None,
+            'rating': review.rating,
+            'grade': review.grade,
+            'anonymous': review.anonymous,
+            "review_id": review.pk
+        }
+        form = EditReviewForm(user, data=request.POST, initial=initial)
+
+        if form.is_valid():
+            if 'content' in form.changed_data:
+                review.status = Review.Status.PENDING
+                review.content = form.cleaned_data['content']
+
+            course = form.cleaned_data['course']
+            if course != '' and 'course' in form.changed_data:
+                new_course = Course.unfiltered.filter(name=course).first()
+                review.course = new_course
+
+            review.rating = int(form.cleaned_data['rating'])
+            review.grade = form.cleaned_data['grade']
+            review.anonymous = form.cleaned_data['anonymous']
+
+            review.save()
+            send_updates_webhook(request)
+
+            context = {
+                "success": True,
+                "has_changed": form.has_changed(),
+                "unverify": 'content' in form.changed_data,
+                "is_staff": request.user.is_staff,
+                "username": request.user.username,
+                "professor": review.professor.name,
+                "rating": review.rating,
+                "anonymous": review.anonymous,
+                "course": {"id" : review.course.pk, "name": review.course.name} if review.course else None,
+                "grade": review.grade,
+                "id": review.pk,
+                "content": review.content
             }
         else:
             context = {
