@@ -74,14 +74,15 @@ class Course(View):
         course_description = course.description
         courses_replaced = []
 
-        course_code_format = CourseModel.course_code_format
-        matches = re.findall(course_code_format,course_description)
+        if course_description:
+            course_code_format = CourseModel.course_code_format
+            matches = re.findall(course_code_format,course_description)
 
-        for word in matches:
-            if not word in courses_replaced and CourseModel.recent.filter(name=word).first():
-                course_description = course_description.replace(word, '<a href="/course/{0}">{0}</a>'.format(word))
-                courses_replaced.append(word)
-        course.description = course_description
+            for word in matches:
+                if not word in courses_replaced and CourseModel.recent.filter(name=word).first():
+                    course_description = course_description.replace(word, '<a href="/course/{0}">{0}</a>'.format(word))
+                    courses_replaced.append(word)
+            course.description = course_description
 
         def key(item):
             return item[0].number()
