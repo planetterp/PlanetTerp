@@ -51,7 +51,8 @@ class ProfessorForm(Form):
     anonymous = BooleanField(
         required=False,
         widget=CheckboxInput,
-        label="Post Anonymously"
+        label="Post Anonymously",
+        initial=True
     )
 
     def __init__(self, user: QuerySet, form_type: Review.ReviewType, **kwargs):
