@@ -186,8 +186,11 @@ class ProfessorForm(Form):
 # The review form that contains fields specific to the review form
 class ProfessorFormReview(ProfessorForm):
     course = ChoiceField(
-        required=False,
-        label=False
+        required=True,
+        label=False,
+        error_messages={
+            "required": "You must select a course"
+        }
     )
 
     other_course = CharField(
@@ -236,8 +239,6 @@ class ProfessorFormReview(ProfessorForm):
         return self.cleaned_data
 
     def validate_course(self, course, other_course):
-        clean_course = None
-
         if course =='other':
             if other_course == '' or other_course.isspace():
                 error_msg = "Please specify a course or select one from the dropdown above"
@@ -245,12 +246,10 @@ class ProfessorFormReview(ProfessorForm):
                 self.add_error("other_course", error)
             else:
                 clean_course = other_course
-        elif course == '':
-            clean_course = None
         else:
             clean_course = course
 
-        if clean_course and not Course.unfiltered.filter(name=clean_course.replace(" ", "")).exists():
+        if not Course.unfiltered.filter(name=clean_course.replace(" ", "")).exists():
             error_msg = '''The course you specified is not in our database.
                 If you think it should be, please email us at admin@planetterp.com.'''
             error = ValidationError(error_msg, code='Not Found')
@@ -275,9 +274,12 @@ class ProfessorFormAdd(ProfessorForm):
     )
 
     course = CharField(
-        required=False,
+        required=True,
         widget=TextInput,
-        label=False
+        label=False,
+        error_messages={
+            "required": "You must enter a course"
+        }
     )
 
     def __init__(self, user, **kwargs):
