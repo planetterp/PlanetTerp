@@ -126,12 +126,13 @@
 		});
 	});
 
-	function writeStat(id, totalCount, randomIncrement) {
+	function writeStat(id, totalCount, time) {
 		var el = document.getElementById(id);
 		var i = 0;
+		var timeIncrement = totalCount / (time * 240);
 
 		var fn = function() {
-			i += Math.floor(Math.random() * 31) + randomIncrement; /* random number randomIncrement -> randomIncrement + 30 */
+			i += Math.floor(timeIncrement) 
 
 			var isDone = i > totalCount;
 
@@ -149,10 +150,10 @@
 		window.requestAnimationFrame(fn);
 	}
 
-	writeStat("numCourses", {{ num_courses }}, 50);
-	writeStat("numProfessors", {{ num_professors }}, 30);
-	writeStat("numReviews", {{ num_reviews }}, 40);
-	writeStat("numCourseGrades", {{ num_course_grades }}, 400);
+	writeStat("numCourses", {{ num_courses }}, 4);
+	writeStat("numProfessors", {{ num_professors }}, 4);
+	writeStat("numReviews", {{ num_reviews }}, 4);
+	writeStat("numCourseGrades", {{ num_course_grades }}, 4);
 
 
 	function sleep(ms) {
