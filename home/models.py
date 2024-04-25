@@ -200,7 +200,7 @@ class Course(Model):
     recent = RecentCourseManager()
     unfiltered = Manager()
 
-    course_code_format = '[A-Za-z]{4}(?:[A-Za-z]|[0-9]){3,6}'
+    course_code_format = '[A-Za-z]{4}(?:[0-9]){3,6}'
 
     def save(self, *args, **kwargs):
         # `name` is essentially a computed field, and will never have a value
