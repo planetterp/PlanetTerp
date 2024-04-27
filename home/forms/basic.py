@@ -160,10 +160,17 @@ class HistoricCourseGradeForm(Form):
             course = Course.recent.filter(name=self.course_name).first()
             grades = Grade.unfiltered.filter(
                 course=course, semester=Semester(self.semester)
-            ).values('section').distinct()
-
-            section_choices = [(grade['section'], grade['section']) for grade in grades]
+            ).values("section", "professor").distinct()
+            section_choices = []
+            for grade in grades:
+                choice_text = grade['section']
+                if grade["professor"]:
+                    prof_name = Professor.verified.get(pk=grade["professor"]).name
+                    choice_text += f" ({prof_name})"
+                section_choices.append((grade['section'], choice_text))
+            # section_choices = [(grade['section'], grade['section'] + str(grade["professor"])) for grade in grades]
             self.fields['section'].widget.choices = [("", "All sections")] + section_choices
+            #section_choices = [(grade['section'], grade['section']) for grade in grades]
 
     def create_field_errors(self):
         field_errors = {}
