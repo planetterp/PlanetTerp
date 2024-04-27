@@ -193,7 +193,7 @@
 		});
 	}
 
-	function generate_graph(grade_data, course, semester=null, section=null) {
+	function generate_graph(grade_data, course, semester=null, section=null, professorName=null) {
 		course = course.toUpperCase();
 		// Create a new row for every third graph
 		if (canvasCount % 2 == 0) {
@@ -213,6 +213,9 @@
 		}
 		if ($("#section-search").is(':visible') && $("#section-search").val()) {
 			grades_text += ` (Section ${section})`
+			if (professorName != null){
+				grades_text += `<br>Taught by: ${professorName}`
+			}			
 		}
 
 		grades_text += `<br>Average GPA: ${grade_data.average_gpa.toFixed(2)} between ${grade_data.num_students.toLocaleString()} students`
@@ -321,6 +324,7 @@
 		var course = params.course;
 		var semester = params.semester;
 		var section = params.section;
+		var professorName = "Unknown Professor"
 		var pf_semesters = ["Spring 2020", "Fall 2020", "Spring 2021"];
 
 		$.ajax({
@@ -357,14 +361,41 @@
 					}
 					if ($("#semester-search").val()) {
 						$("#section-search-input").show();
+						
+					}
+					if ($("#section-search").val()){
+						professorName = getProfessorNameFromSection(section);
 					}
 					canvasCount = 0;
-					generate_graph(data.course_data, course, semester, section);
+					generate_graph(data.course_data, course, semester, section, professorName);
+
+					
 				} else {
 					$(".lookup-error").show();
 				}
 			}
 		})
+	}
+
+
+	function getProfessorNameFromSection(section) {
+		if (!section) {
+			return null;
+		}
+
+		var option = $("#section-search").find("option[value='" + section + "']");
+		if (!option.length) {
+			return null;
+		}
+
+		var optionText = option.text();
+		console.log(option.text)
+		var matches = optionText.match(/\((.*?)\)/);
+		if (matches && matches.length > 1) {
+			return matches[1];
+		} else {
+			return null;
+		}
 	}
 
 	function professorGrades() {
