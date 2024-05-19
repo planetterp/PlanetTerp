@@ -6,7 +6,42 @@
 {% block description %}View professor reviews and grade data for {{ course.name }} at the University of Maryland &mdash; College Park{% endblock %}
 
 {% block head %}
+
 <script type="text/javascript" src="{% static 'js/chart.min.js' %}"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+	function professorGrades(professor, elementId) {
+		
+		var lastSearch = "professor";
+		$.ajax({
+			url: "{% url 'grades' %}",
+			type: "POST",
+			dataType: 'json',
+			data: {
+				'professor': professor,
+				'elementId': elementId,
+			},
+			success: function(data) {
+				var grade_data = data.professor_data.data;
+				for (var [course_name, course_data] of Object.entries(grade_data)) {
+						if (course_name == "{{ course.name }}") {
+							var averageGpa = course_data.average_gpa;
+							break;
+						} else {
+							var averageGpa = "N/A";
+						}
+					}
+				averageGpa = averageGpa.toFixed(2);
+				$("#gpa-information-"+ elementId).html(`${averageGpa}`);
+			},
+			error: function(xhr, status, error) {
+				
+                console.error("Error occurred:", error);
+            }
+		});
+	}
+</script>
+
 {% endblock %}
 
 {% block content %}
@@ -68,21 +103,26 @@
 								<div class="card-body">
 									<p class="card-text">
 										{% if professor.num_reviews == 1 %}
-											{{ professor.num_reviews }} review
+											{{ professor.num_reviews }} review for {{course.name}}
 										{% else %}
-											{{ professor.num_reviews }} reviews
+											{{ professor.num_reviews }} reviews for {{course.name}}
 										{% endif %}
 										<br />
-										Average rating:
+										Average {{course.name}} rating:
 										{% if professor.average_rating_ %}
 											{{ professor.average_rating_|floatformat:2 }}
 										{% else %}
 											N/A
 										{% endif %}
+										<br />
+										Average {{course.name}} GPA: <span id="gpa-information-{{ professor.id }}">N/A</span>
 									</p>
 								</div>
 							</div>
 						</div>
+						<script>
+							professorGrades("{{ professor.name }}", "{{ professor.id }}");
+						</script>
 					{% endfor %}
 				</div>
 			{% endfor %}
@@ -92,4 +132,6 @@
 		</div>
 	</div>
 </div>
+
+
 {% endblock %}
