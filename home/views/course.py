@@ -43,16 +43,16 @@ class Course(View):
             .annotate(
                 # TODO consolidate this with the Professor#average_rating
                 # method, will likely require a new Professors queryset
-                average_rating_= (
+                average_rating_ = (
                     Sum(
                         "review__rating",
                         output_field=FloatField(),
-                        filter=Q(review__status=Review.Status.VERIFIED)
+                        filter=Q(review__status=Review.Status.VERIFIED, review__course__id=course.id)
                     )
                     /
                     Count(
                         "review",
-                        filter=Q(review__status=Review.Status.VERIFIED)
+                        filter=Q(review__status=Review.Status.VERIFIED, review__course__id=course.id)
                     )
                 )
             )
