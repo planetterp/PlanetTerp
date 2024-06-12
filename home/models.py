@@ -421,6 +421,7 @@ class Review(Model):
     class ReviewType(Enum):
         ADD = "add"
         REVIEW = "review"
+        EDIT = "edit"
 
     class Grades(TextChoices):
         A_PLUS = ("A+", "A+")

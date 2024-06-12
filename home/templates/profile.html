@@ -6,7 +6,21 @@
 {% block description %}View your profile.{% endblock %}
 
 {% block content %}
+
+{% if edit_form %}
+	{% crispy edit_form %}
+{% endif %}
+
 <br />
+<div id="success-banner-edit"  class="container fixed-top d-none" style="margin-top: 5rem;">
+	<div class="row">
+		<div class="col">
+			<div id="success-banner-text" class="alert alert-dismissable alert-success text-center" style="margin-left: 12rem; margin-right: 12rem">
+				Review updated successfully! <button type="button" class="close">&times;</button>
+			</div>
+		</div>
+	</div>
+</div>
 
 <ul class="nav nav-tabs" role="tablist">
 	<li class="nav-item">
@@ -19,9 +33,10 @@
 
 <div class="tab-content" id="profilePageContent">
 	<div class="tab-pane fade show active" id="reviews-noscroll" role="tabpanel" aria-labelledby="your-reviews-tab">
-	<h1 class="text-center my-4">Your Reviews</h1>
-	<div id="reviews-table-container" style="width: 80%; margin-left: auto; margin-right: auto; min-width: 600px; overflow-x: auto;">
-		{% render_table reviews_table %}
+		<h1 class="text-center my-4">Your Reviews</h1>
+		<div id="reviews-table-container" style="width: 80%; margin-left: auto; margin-right: auto; min-width: 600px; overflow-x: auto;">
+			{% render_table reviews_table %}
+		</div>
 	</div>
 </div>
 
@@ -49,7 +64,14 @@
 			$('.nav-tabs a[href="' + hash + '-noscroll"]').tab('show');
 		}
 
+		$("#professor-form-edit div.modal-lg").removeClass("modal-lg").addClass("modal-xl");
+		initializeRateYo(2.4, "edit");
 	});
+
+	$("#rateYo_edit").on('shown.bs.modal', function() {
+		setRateYoSize("#review-left-wrapper-edit", "#rateYo_edit");
+	});
+
 
 	// when a user changes tabs, change url hash as well
 	$('.nav-tabs a').on('shown.bs.tab', function (e) {
@@ -78,6 +100,33 @@
 				}
 			}
 		});
+	}
+
+	function editReview(review) {
+		var course_val = review["course"] == null ? '' : review["course"]["name"];
+
+		if (!$("#success-banner-edit").hasClass("d-none"))
+			$("#success-banner-edit").addClass("d-none");
+
+		$("#review_id_edit").val(review["id"]);
+		$("#id_name_edit").val(review["professor"]);
+		$("#id_content_edit").val(review["content"]);
+		$("#id_grade_edit").val(review["grade"]);
+		$("#id_anonymous_edit").prop("checked", review["anonymous"]);
+
+		$("#id_rating_edit").val(review["rating"]);
+		$("#rateYo_edit").rateYo("option", "rating", review["rating"]);
+
+		$("#id_course_edit").val(course_val);
+		if (review["course"] != null)
+			$("#id_course_edit").prop("disabled", true);
+		else
+			$("#id_course_edit").prop("disabled", false);
+
+		$("#edit-professor-modal div.invalid-feedback").hide();
+		$("#edit-professor-modal div.form-group .is-invalid").removeClass("is-invalid");
+		$("#id_content_edit").removeClass("is-invalid");
+		$("#edit-professor-modal").modal('show');
 	}
 </script>
 {% endblock %}

@@ -76,15 +76,18 @@ class ProfessorForm(Form):
     def get_content_styles(self):
         pass
 
+    # Ordering the fields/elements and assigning css styles
+    # https://django-crispy-forms.readthedocs.io/en/latest/layouts.html#universal-layout-objects
     def generate_layout(self):
-        # Ordering the fields/elements and assigning css styles
-        # https://django-crispy-forms.readthedocs.io/en/latest/layouts.html#universal-layout-objects
+        btn_name = ("submit", "Submit")
+        if self.form_type is Review.ReviewType.EDIT:
+            btn_name = ("update", "Update")
+
         submit_button = Button(
-            "submit",
-            "Submit",
+            *btn_name,
             css_id=f"submit-{self.form_type.value}-form",
             css_class="btn-warning w-100 mt-3",
-            onClick=f'submitProfessorForm("#{self.form_html_id}")'
+            onClick=f'submitProfessorForm("#{self.form_html_id}", "{self.form_type.value}")'
         )
 
         rateYo = HTML(f'<div id="div_id_rating"><div id="rateYo_{self.form_type.value}" class="rateYo" class="p-0"></div></div>')
@@ -101,13 +104,6 @@ class ProfessorForm(Form):
             style=self.get_content_styles()
         )
         content_errors = self.field_errors["content"]
-
-        success_banner = Div(
-            HTML('Review submitted successfully! <button type="button" class="close">&times;</button>'),
-            css_id=f"success-banner-{self.form_type.value}",
-            css_class="alert alert-dismissable alert-success text-center w-100 rounded-0 d-none position-absolute",
-            style="z-index: 1;"
-        )
 
         login_banner = None
         anonymous = None
@@ -132,7 +128,6 @@ class ProfessorForm(Form):
             )
 
         layout = Layout(
-            success_banner,
             login_banner,
             Fieldset(
                 None,
@@ -164,7 +159,8 @@ class ProfessorForm(Form):
         field_errors = {}
 
         for field in self.fields:
-            error_html = f'<div id="{{{{ form.{field}.name }}}}_errors" class="invalid-feedback text-center mb-3" style="font-size: 15px"></div>'
+            form_template_name = "form" if self.form_type is Review.ReviewType.ADD else f"{self.form_type.value}_form"
+            error_html = f'<div id="{{{{ {form_template_name}.{field}.name }}}}_errors" class="invalid-feedback text-center mb-3" style="font-size: 15px"></div>'
             field_errors[field] = HTML(error_html)
 
         return field_errors
@@ -227,6 +223,19 @@ class ProfessorFormReview(ProfessorForm):
         left_side = (course, course_errors, other_course_container, 'slug')
         return left_side
 
+    def generate_layout(self):
+        success_banner = Div(
+            HTML('Review submitted successfully! <button type="button" class="close">&times;</button>'),
+            css_id=f"success-banner-{self.form_type.value}",
+            css_class="alert alert-dismissable alert-success text-center w-100 rounded-0 d-none position-absolute",
+            style="z-index: 1;"
+        )
+
+        return Layout(
+            success_banner,
+            super().generate_layout()
+        )
+
     def clean(self):
         super().clean()
         course = self.cleaned_data.get('course')
@@ -268,15 +277,15 @@ class ProfessorFormAdd(ProfessorForm):
         label=False
     )
 
-    type_ = ChoiceField(
-        required=False,
-        widget=RadioSelect,
-        label=False
-    )
-
     course = CharField(
         required=False,
         widget=TextInput,
+        label=False
+    )
+
+    type_ = ChoiceField(
+        required=False,
+        widget=RadioSelect,
         label=False
     )
 
@@ -290,11 +299,10 @@ class ProfessorFormAdd(ProfessorForm):
     def get_content_styles(self):
         if self.user.is_authenticated:
             return "height: 15.8rem; margin: auto; border-bottom-left-radius: 0rem;"
-        else:
-            return "height: 18rem;"
+        return "height: 18rem;"
 
     def left_side_layout(self):
-        name = Field('name', placeholder="Instructor Name")
+        name = Field('name', placeholder="Instructor Name", id=f"id_name_{self.form_type.value}")
         name_errors = self.field_errors["name"]
 
         type_ = InlineRadios('type_')
@@ -312,19 +320,26 @@ class ProfessorFormAdd(ProfessorForm):
         return left_side
 
     def generate_layout(self):
+        success_banner = Div(
+            HTML('Review submitted successfully! <button type="button" class="close">&times;</button>'),
+            css_id=f"success-banner-{self.form_type.value}",
+            css_class="alert alert-dismissable alert-success text-center rounded-0 d-none position-absolute",
+            style="z-index: 1;"
+        )
+
         layout = Layout(
             Modal(
+                success_banner,
                 super().generate_layout(),
                 css_id="add-professor-modal",
                 title_id="add-professor-label",
-                title="Add a new Professor/TA"
+                title="Add a New Professor/TA"
             )
         )
         return layout
 
     def clean(self):
         super().clean()
-
         name = self.cleaned_data.get('name')
         type_ = self.cleaned_data.get('type_')
         course = self.cleaned_data.get('course')
@@ -336,6 +351,76 @@ class ProfessorFormAdd(ProfessorForm):
         if type_ == '' or type_.isspace():
             error = ValidationError(self.error_message('type'), code='Empty')
             self.add_error("type_", error)
+
+        if course and not Course.unfiltered.filter(name=course).exists():
+            error_msg = '''The course you specified is not in our database.
+                If you think it should be, please email us at admin@planetterp.com.'''
+            error = ValidationError(error_msg, code='Not Found')
+            self.add_error("course", error)
+        else:
+            self.cleaned_data['course'] = course
+
+        return self.cleaned_data
+
+class EditReviewForm(ProfessorForm):
+    name = CharField(
+        required=False,
+        widget=TextInput,
+        label=False,
+        disabled=True
+    )
+
+    course = CharField(
+        required=False,
+        widget=TextInput,
+        label=False
+    )
+
+    review_id = IntegerField(
+        required=True,
+        widget=HiddenInput
+    )
+
+    def __init__(self, user, **kwargs):
+        super().__init__(user, Review.ReviewType.EDIT, **kwargs)
+
+    def left_side_layout(self):
+        name = Field(
+            'name',
+            placeholder="Instructor Name",
+            id=f"id_name_{self.form_type.value}"
+        )
+        name_errors = self.field_errors["name"]
+
+        course = Field(
+            'course',
+            placeholder="Course",
+            id=f"id_course_{self.form_type.value}"
+        )
+        crispy_course_errors = self.field_errors["course"]
+
+        left_side = (name, name_errors, course, crispy_course_errors)
+        return left_side
+
+    def get_content_styles(self):
+        return "height: 13.2rem; margin: auto; border-bottom-left-radius: 0rem;"
+
+    def generate_layout(self):
+        layout = Layout(
+            Modal(
+                Field('review_id', id=f"review_id_{self.form_type.value}"),
+                super().generate_layout(),
+                css_id="edit-professor-modal",
+                title_id="edit-professor-label",
+                title="Edit your review below"
+            )
+        )
+        return layout
+
+    def clean(self):
+        super().clean()
+
+        course = self.cleaned_data.get('course')
 
         if course and not Course.unfiltered.filter(name=course).exists():
             error_msg = '''The course you specified is not in our database.

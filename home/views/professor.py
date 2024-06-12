@@ -60,7 +60,7 @@ class Professor(View):
         context = {
             "user": user,
             "professor": professor,
-            "form": review_form,
+            "review_form": review_form,
             "courses_taught": courses_taught,
             "courses_reviewed": courses_reviewed,
             "courses_graded": courses_graded,

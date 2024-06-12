@@ -8,7 +8,7 @@ import django_tables2 as tables
 
 from home.utils import ReviewsTableColumn
 from home.models import Review
-from home.tables.columns import InformationColumn, ReviewColumn, StatusColumn, VerifiedReviewsActionColumn, UnverifiedReviewsActionColumn
+from home.tables.columns import InformationColumn, ReviewColumn, StatusColumn, VerifiedReviewsActionColumn, UnverifiedReviewsActionColumn, ProfileReviewsActionColumn
 
 class BaseReviewsTable(tables.Table):
     '''
@@ -39,7 +39,7 @@ class BaseReviewsTable(tables.Table):
         kwargs = {
             "exclude": [column.name.lower() for column in ReviewsTableColumn if column not in self.columns],
             "attrs": {"class": "table table-striped reviews-table"},
-            "sequence": (column.name.lower() for column in ReviewsTableColumn if column in self.columns),
+            "sequence": [column.name.lower() for column in self.columns],
             **kwargs
         }
 
@@ -106,9 +106,13 @@ class UnverifiedReviewsTable(BaseReviewsTable):
         super().__init__(self.columns, reviews, request, *args, **kwargs)
 
 class ProfileReviewsTable(BaseReviewsTable):
-    def __init__(self, reviews, request, *args, **kwargs):
+    action = ProfileReviewsActionColumn()
+
+    def __init__(self, reviews, request, editable=True, *args, **kwargs):
         empty_text = mark_safe('<h4 class="text-center">You haven\'t written any reviews! Why not start now?</h4>')
         self.columns = [ReviewsTableColumn.INFORMATION, ReviewsTableColumn.REVIEW, ReviewsTableColumn.STATUS]
+        if editable:
+            self.columns.append(ReviewsTableColumn.ACTION)
 
         kwargs = {"empty_text": empty_text}
         super().__init__(self.columns, reviews, request, *args, **kwargs)

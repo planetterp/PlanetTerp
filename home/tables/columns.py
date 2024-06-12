@@ -1,7 +1,8 @@
+import json
 from datetime import date
 from abc import abstractmethod
 
-from django.utils.html import format_html
+from django.utils.html import format_html, escape
 from django.utils.safestring import mark_safe
 from django.template.context_processors import csrf
 from django.urls import reverse
@@ -9,7 +10,7 @@ from django.urls import reverse
 import django_tables2 as tables
 
 from planetterp.settings import DATE_FORMAT
-from home.models import Review, Grade
+from home.models import Review, Grade, Course, Professor
 
 class InformationColumn(tables.Column):
     def __init__(self, *args, **kwargs):
@@ -22,8 +23,8 @@ class InformationColumn(tables.Column):
         }
         super().__init__(verbose_name="Information", orderable=False, attrs=attrs, *args, **kwargs)
 
-    def rating_to_element(self, rating: int):
-        rating_html = '<span class="rating">'
+    def rating_to_element(self, rating, review_id):
+        rating_html = f'<span id="rating-{review_id}" class="rating">'
 
         for _ in range(rating): # filled stars
             rating_html += '<i style="margin-top:4px;" class="fas fa-star"></i>\n'
@@ -35,13 +36,17 @@ class InformationColumn(tables.Column):
         rating_html += '</span> <br />'
         return mark_safe(rating_html)
 
-    def grade_to_element(self, grade):
+    def grade_to_element(self, grade, review_id):
+        if not grade:
+            return f'<span id="grade-{review_id}" class="grade"></span>'
+
         a_str = "an" if grade in Grade.VOWEL_GRADES else "a"
         kwargs = {
             "a_str": a_str,
-            "grade": grade
+            "grade": grade,
+            "review_id": review_id
         }
-        return format_html('<span class="grade">Expecting {a_str} {grade}</span> <br />', **kwargs)
+        return format_html('<span id="grade-{review_id}" class="grade">Expecting {a_str} {grade}</span> <br />', **kwargs)
 
     def render(self, value: dict):
         review = value.pop("review")
@@ -50,7 +55,7 @@ class InformationColumn(tables.Column):
         column_html = ""
         if review.professor.slug:
             column_html += '''
-                <span>
+                <span id="professor-{review_id}" class="professor">
                     <a href="/professor/{professor_slug}">
                         <strong>{professor_name}</strong>
                     </a>
@@ -59,7 +64,7 @@ class InformationColumn(tables.Column):
             '''
         else:
             column_html += '''
-                <span>
+                <span id="professor-{review_id}" class="professor">
                     <strong>{professor_name}</strong>
                 </span>
                 <br />
@@ -67,19 +72,22 @@ class InformationColumn(tables.Column):
 
         if review.course:
             column_html += '''
-                <span class="course">
+                <span id="course-{review_id}" class="course">
                     <a href="/course/{course_name}">{course_name}</a>
                 </span>
                 <br />
             '''
+        else:
+            column_html += '''
+                <span id="course-{review_id}" class="course">
+                </span>
+            '''
 
-        column_html += self.rating_to_element(review.rating)
-
-        if review.grade:
-            column_html += self.grade_to_element(review.grade)
+        column_html += self.rating_to_element(review.rating, review.pk)
+        column_html += self.grade_to_element(review.grade, review.pk)
 
         # wrap long usernames to avoid increasing the information column width
-        column_html += '<span style="white-space: normal; word-break: break-all;">'
+        column_html += '<span id="anonymous-{review_id}" style="white-space: normal; word-break: break-all;">'
         if is_planetterp_admin and review.user:
             if review.anonymous:
                 column_html += '''
@@ -153,7 +161,7 @@ class StatusColumn(tables.Column):
     def __init__(self, *args, **kwargs):
         attrs = {
             "th": {"class": "status"},
-            "td": {"class": "status"}
+            "td": {"class": "status w-100"}
         }
         super().__init__(verbose_name="Status", orderable=False, attrs=attrs, *args, **kwargs)
 
@@ -163,14 +171,14 @@ class StatusColumn(tables.Column):
         column_html = ''
 
         if review_status is Review.Status.PENDING:
-            column_html += '<p style="color: darkgoldenrod;">Under Review</p>'
+            column_html += f'<p id="status-{review.pk}" style="color: darkgoldenrod;">Under Review</p>'
         elif review_status is Review.Status.REJECTED:
-            column_html += '''
-                <p style="color: red; display: inline;">Rejected</p>
+            column_html += f'''
+                <p id="status-{review.pk}" style="color: red; display: inline;">Rejected</p>
                 <i class="fas fa-info-circle" data-toggle="tooltip" data-placement="right" title="Check the about page to see our standards for accepting reviews."></i>
             '''
         elif review_status is Review.Status.VERIFIED:
-            column_html += '<p style="color: green;">Accepted</p>'
+            column_html += f'<p id="status-{review.pk}" style="color: green;">Accepted</p>'
         else:
             # For testing only; Will be removed after testing
             raise ValueError("Invalid status!")
@@ -184,6 +192,9 @@ class ActionColumn(tables.Column):
             "td": {"class": "action"}
         }
         super().__init__(verbose_name="Action", orderable=False, attrs=attrs, *args, **kwargs)
+
+    def header(self):
+        return ''
 
     @abstractmethod
     def render(self, value: dict):
@@ -258,3 +269,24 @@ class UnverifiedProfessorsActionColumn(ActionColumn):
             "args": {"merge_subject": model_obj.name, "subject_id": model_obj.pk}
         }
         return format_html(column_html, **kwargs)
+
+class ProfileReviewsActionColumn(ActionColumn):
+    def render(self, value: dict):
+        request = value.pop("request")
+        model_obj = value.pop("model_obj")
+
+        ctx = {}
+        ctx.update(csrf(request))
+
+        review = {
+            "professor": escape(Professor.unfiltered.get(pk=model_obj.professor_id).name),
+            "rating": model_obj.rating,
+            "anonymous": model_obj.anonymous,
+            "course": None if not model_obj.course_id else {"id": model_obj.course_id, "name": Course.unfiltered.get(pk=model_obj.course_id).name},
+            "grade": None if not model_obj.grade else model_obj.grade,
+            "id": model_obj.pk,
+            "content": escape(model_obj.content)
+        }
+
+        column_html = f'''<button id="update-{model_obj.pk}" class="btn btn-primary" onclick='editReview({json.dumps(review)})'>Edit</button>'''
+        return mark_safe(column_html)
