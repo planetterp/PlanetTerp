@@ -245,21 +245,20 @@ class GenedData(View):
             return JsonResponse({"data": []})
 
         geneds = tuple(geneds)
-        courses = Course.recent.raw("""
-            SELECT GROUP_CONCAT(name) AS geneds, course_id AS id
-            FROM home_gened
-            GROUP BY course_id
-            HAVING SUM(name IN %s) = %s
-            """, [geneds, len(geneds)])
-
+        courses = (
+            Gened.objects
+            .filter(name__in=geneds, course__is_recent=True)
+            .exclude(course__geneds=None)
+            .select_related('course')
+        )
+        courses = [c.course for c in courses]
         data = []
         for course in courses:
-            geneds = course.geneds.replace(",", ", ")
             average_gpa = course.average_gpa()
-            average_gpa = f"{average_gpa:.2f}" if average_gpa else "No grade data available"
+            average_gpa = f"{average_gpa:.2f}" if average_gpa else "N/A"
             course_name = f"<a href='{course.get_absolute_url()}'>{course.name}</a>"
             entry = [course_name, course.title, course.credits, average_gpa,
-                geneds]
+                course.gened_str()]
             data.append(entry)
 
         return JsonResponse({"data": data})
