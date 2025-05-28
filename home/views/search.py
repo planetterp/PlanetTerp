@@ -1,3 +1,5 @@
+import re
+
 from django.shortcuts import redirect, render
 from django.views import View
 from django.http import HttpResponse
@@ -20,6 +22,8 @@ class Search(View):
 
         if any(character.isdigit() for character in query):
             query = query.replace(" ", "")
+
+        query = re.sub(r"\s+", " ", query).strip()
 
         results = queries.search(query, 30, courses=True, professors=True)
 
