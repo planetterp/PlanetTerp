@@ -8,6 +8,7 @@ from django.contrib.auth.mixins import PermissionRequiredMixin
 from home.models import Organization, Professor, Course, Review, Grade, User
 from home.tables.reviews_table import VerifiedReviewsTable, ProfileReviewsTable
 from home.utils import recompute_ttl_cache, ttl_cache
+from home.views.data_sources import GradeData
 
 class About(View):
     def get(self, request):
@@ -103,6 +104,7 @@ class Index(View):
             "num_professors": num_professors,
             "num_reviews": num_reviews,
             "num_course_grades": num_course_grades,
+            "grade_data": GradeData.graph_data(),
             "recent_reviews": recent_reviews,
             "random_organization": random_organization
         }

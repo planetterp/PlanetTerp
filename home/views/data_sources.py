@@ -8,38 +8,24 @@ from home.models import Professor, Grade, Course, Gened
 from home.utils import ttl_cache, Semester
 
 
-class GradeData(View):
-    def get(self, request):
-        data = request.GET
-        professor = data.get("professor", None)
-        professor_courses = data.get("professor_courses", False)
-        course = data.get("course", None)
-        semester = data.get("semester", None)
-        section = data.get("section", None)
-        pf_semesters = data.get("pf_semesters", False) == "true"
+class GradeData():
+    @staticmethod
+    def graph_data(course=None):
+        return {
+            "no_pf": GradeData.compose_grade_data(None, course, None, None, False),
+            "pf": GradeData.compose_grade_data(None, course, None, None, True)
+        }
 
-        if professor_courses:
-            grade_data = GradeData._course_grade_data(professor, pf_semesters)
-            data = {
-                "professor_slug": grade_data.pop("professor_slug"),
-                "average_gpa": grade_data.pop("average_gpa"),
-                "num_students": grade_data.pop("num_students"),
-                "data": {}
+    @staticmethod
+    def professor_graph_data(slug, courses):
+        data = {}
+        for course in ["All courses", *courses]:
+            course_temp = None if course == "All courses" else course
+            data[course] = {
+                "no_pf": GradeData.compose_grade_data(slug, course_temp, None, None, False),
+                "pf": GradeData.compose_grade_data(slug, course_temp, None, None, True)
             }
-
-            for course_name, course_data in grade_data.items():
-                (course_average_gpa, course_num_students, course_grades) = course_data
-
-                if course_num_students and course_average_gpa:
-                    data['data'][course_name] = GradeData._get_data(
-                        course_average_gpa, course_num_students, course_grades)
-        else:
-            (average_gpa, num_students, grades) = GradeData._grade_data(professor,
-                course, semester, section, pf_semesters)
-
-            data = GradeData._get_data(average_gpa, num_students, grades)
-
-        return JsonResponse(data)
+        return data
 
     @staticmethod
     def _get_data(average_gpa, num_students, grades):

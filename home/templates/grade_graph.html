@@ -37,6 +37,8 @@
     </div>
 </div>
 
+{{ grade_data|json_script:"grade-data" }}
+
 <script type="text/javascript">
     const graph = $("#grades")[0].getContext("2d");
     const chart = new Chart(graph, {
@@ -135,49 +137,33 @@
         }
     });
 
-    function updateGraph(params) {
-        $.get("{% url 'grade-data' %}", params, function(grade_data) {
-            var average_gpa = grade_data.average_gpa ?? 0;
-            var num_students = grade_data.num_students ?? 0;
-
-            $("#average-gpa-text").html(`Average GPA of ${average_gpa.toFixed(2)} between ${num_students.toLocaleString()} students*`);
-            chart.data.datasets[0].data = grade_data.data_minus
-            chart.data.datasets[1].data = grade_data.data_flat
-            chart.data.datasets[2].data = grade_data.data_plus
-            chart.update();
-
-            {% if callback %}
-                {{ callback }}(chart);
-            {% endif %}
-        });
-    }
-
-    var params = {
-        course: "{{ course }}",
-        professor: "{{ professor }}",
-        pf_semesters: $("#includePFSemesters").is(":checked")
+    const gradeData = JSON.parse(document.getElementById("grade-data").textContent);
+    function updateGraph() {
+        var pf = $("#includePFSemesters").is(":checked") ? "pf" : "no_pf";
+        var data = gradeData;
+        console.log(gradeData);
+        if ("All courses" in gradeData) {
+            data = gradeData[$("#grades-by-course").val() || "All courses"];
+        }
+        var grade_data = data[pf];
+        var average_gpa = grade_data.average_gpa ?? 0;
+        var num_students = grade_data.num_students ?? 0;
+        $("#average-gpa-text").html(`Average GPA of ${average_gpa.toFixed(2)} between ${num_students.toLocaleString()} students*`);
+        chart.data.datasets[0].data = grade_data.data_minus
+        chart.data.datasets[1].data = grade_data.data_flat
+        chart.data.datasets[2].data = grade_data.data_plus
+        chart.update();
+        {% if callback %}
+            {{ callback }}(chart);
+        {% endif %}
     }
 
     $(function() {
-        updateGraph(params);
+        updateGraph();
 
-        if ($("#grades-by-course").length) {
-            $("#grades-by-course").on("change", function() {
-                if (this.value == "All courses") {
-                    // unset filter if user reselects "all courses"
-                    params.course = "";
-                } else {
-                    // otherwise, filter to only the specified course
-                    params.course = this.value;
-                }
-                updateGraph(params);
-            });
-        }
+        $("#grades-by-course").on("change", updateGraph);
     });
 
-    $("#includePFSemesters").on("change", function() {
-        params.pf_semesters = $("#includePFSemesters").is(":checked");
-        updateGraph(params);
-    });
+    $("#includePFSemesters").on("change", updateGraph);
 
 </script>
