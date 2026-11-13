@@ -280,6 +280,12 @@ class ProfessorFormAdd(ProfessorForm):
         label=False
     )
 
+    professor = IntegerField(
+        required=False,
+        widget=HiddenInput,
+        label=False
+    )
+
     def __init__(self, user, **kwargs):
         super().__init__(user, Review.ReviewType.ADD, **kwargs)
         self.fields['type_'].choices = Professor.Type.choices
@@ -308,7 +314,7 @@ class ProfessorFormAdd(ProfessorForm):
         crispy_course_errors = self.field_errors["course"]
 
         left_side = (name, name_errors, type_,
-            type_errors, course, crispy_course_errors)
+            type_errors, course, crispy_course_errors, 'professor')
         return left_side
 
     def generate_layout(self):
@@ -328,6 +334,13 @@ class ProfessorFormAdd(ProfessorForm):
         name = self.cleaned_data.get('name')
         type_ = self.cleaned_data.get('type_')
         course = self.cleaned_data.get('course')
+        professor_id = self.cleaned_data.get('professor')
+
+        self.cleaned_data['existing_professor'] = None
+        if professor_id is not None and name:
+            professor = Professor.verified.filter(pk=professor_id).first()
+            if professor is not None and professor.name == name.strip():
+                self.cleaned_data['existing_professor'] = professor
 
         if name == '' or name.isspace():
             error = ValidationError(self.error_message('name'), code='Empty')
