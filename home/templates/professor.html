@@ -121,7 +121,7 @@
 						}
 					}
 				</script>
-				{% include "grade_graph.html" with professor=professor.slug lookup_by_courses=courses_graded callback="callback" only %}
+				{% include "grade_graph.html" with professor=professor.slug grade_data=grade_data lookup_by_courses=courses_graded callback="callback" only %}
 			</div>
 		</div>
 	</div>

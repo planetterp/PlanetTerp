@@ -10,7 +10,7 @@ from home.views.basic import (About, Contact, PrivacyPolicy, TermsOfUse,
     Index, SortReviewsTable, RecomputeTTLCache, UserProfile, Ads)
 from home.views.grades import Grades
 from home.views.course import Course
-from home.views.data_sources import GradeData, CourseDifficultyData, GenedData
+from home.views.data_sources import CourseDifficultyData, GenedData
 from home.views.endpoints import Autocomplete
 from home.views.professor import Professor
 from home.views.profile import Profile, ResetPassword
@@ -114,7 +114,6 @@ urlpatterns = [
     path("ads.txt", Ads.as_view(), name="ads"),
 
     # data sources
-    path('data_sources/grade_data', GradeData.as_view(), name='grade-data'),
     path("data_sources/course_difficulty_data/<str:type_>", CourseDifficultyData.as_view(), name="course-difficulty-data"),
     path("data_sources/gened_data", GenedData.as_view(), name="gened-data"),
 

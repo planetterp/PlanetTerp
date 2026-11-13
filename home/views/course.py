@@ -7,6 +7,7 @@ from django.views import View
 from django.db.models import Count, Q, Sum, FloatField, F
 
 from home.models import Course as CourseModel, Review
+from home.views.data_sources import GradeData
 
 class Course(View):
     template = "course.html"
@@ -100,6 +101,7 @@ class Course(View):
         context = {
             "course": course,
             "sister_courses": sister_courses,
-            "grouped_professors": grouped_professors
+            "grade_data": GradeData.graph_data(course.name),
+            "grouped_professors": grouped_professors,
         }
         return render(request, self.template, context)

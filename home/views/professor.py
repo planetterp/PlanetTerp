@@ -7,7 +7,7 @@ from home.forms.professor_forms import ProfessorFormReview
 from home.models import Professor as ProfessorModel, Review, Course
 from home.tables.reviews_table import VerifiedReviewsTable
 from home.forms.admin_forms import ProfessorUpdateForm, ProfessorUnverifyForm, ProfessorMergeForm, ReviewUnverifyForm
-
+from home.views.data_sources import GradeData
 
 class Professor(View):
     template = "professor.html"
@@ -64,6 +64,7 @@ class Professor(View):
             "courses_taught": courses_taught,
             "courses_reviewed": courses_reviewed,
             "courses_graded": courses_graded,
+            "grade_data": GradeData.professor_graph_data(professor.slug, courses_graded),
             "reviews_table": reviews_table,
             "num_reviews": reviews.count()
         }
