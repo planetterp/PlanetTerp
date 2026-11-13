@@ -88,7 +88,11 @@
 			{% endfor %}
 		</div>
 		<div class="col-md-6" id="course-grades">
-			{% include "grade_graph.html" with grade_data=grade_data only %}
+			{% if grade_data %}
+				{% include "grade_graph.html" with grade_data=grade_data only %}
+			{% else %}
+				<h5 class="text-center">No grade data available for this course</h5>
+			{% endif %}
 		</div>
 	</div>
 </div>
