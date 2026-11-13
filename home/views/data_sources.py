@@ -11,10 +11,14 @@ from home.utils import ttl_cache, Semester
 class GradeData():
     @staticmethod
     def graph_data(course=None):
-        return {
+        data = {
             "no_pf": GradeData.compose_grade_data(None, course, None, None, False),
             "pf": GradeData.compose_grade_data(None, course, None, None, True)
         }
+
+        if not data["pf"]["num_students"]:
+            return None
+        return data
 
     @staticmethod
     def professor_graph_data(slug, courses):
@@ -25,6 +29,9 @@ class GradeData():
                 "no_pf": GradeData.compose_grade_data(slug, course_temp, None, None, False),
                 "pf": GradeData.compose_grade_data(slug, course_temp, None, None, True)
             }
+
+        if not data["All courses"]["pf"]["num_students"]:
+            return None
         return data
 
     @staticmethod

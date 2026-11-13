@@ -53,9 +53,12 @@
 				{% endfor %}
 			{% endif %}
 			<br />
-			<div class="text-center">
-				<button id="grades-button" class="btn btn-primary btn-sm btn-info mt-3" data-toggle="modal" data-target="#grades-modal">View grade data for this {{ professor.type }}</button>
-			</div>
+
+			{% if grade_data %}
+				<div class="text-center">
+					<button id="grades-button" class="btn btn-primary btn-sm btn-info mt-3" data-toggle="modal" data-target="#grades-modal">View grade data for this {{ professor.type }}</button>
+				</div>
+			{% endif %}
 		</div>
 	</div>
 </div>
@@ -96,36 +99,38 @@
 	{% render_table reviews_table %}
 </div>
 
-<div class="modal fade" id="grades-modal" tabindex="-1" role="dialog" aria-labelledby="grades-modal-label">
-	<div class="modal-dialog modal-lg" role="document">
-		<div class="modal-content">
-			<div class="modal-header">
-				<h4 class="modal-title" id="grades-modal-label">Grades</h4>
-				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-					<span aria-hidden="true" style="float: left">&times;</span>
-				</button>
-			</div>
-			<div class="modal-body text-center">
-				<script>
-					function callback(chart) {
-						// hack to make graphs look better on mobile devices. On mobile you have more vertical real estate
-						// than horizontal, so when we generate our graph and stop when we reach the horizontal limit, it's
-						// still not very tall. By making the aspect ratio 1:1 we get a taller graph which looks better.
-						// The default aspect ratio for chartjs is, I believe, 2, so this is what we get on all other devices
-						// (when aspectRatio is null).
-						var aspectRatio = $(window).width() > 800 ? null : 1;
-						if (aspectRatio) {
-							// https://stackoverflow.com/a/58816740
-							chart.aspectRatio = aspectRatio;
-							chart.resize();
+{% if grade_data %}
+	<div class="modal fade" id="grades-modal" tabindex="-1" role="dialog" aria-labelledby="grades-modal-label">
+		<div class="modal-dialog modal-lg" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h4 class="modal-title" id="grades-modal-label">Grades</h4>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true" style="float: left">&times;</span>
+					</button>
+				</div>
+				<div class="modal-body text-center">
+					<script>
+						function callback(chart) {
+							// hack to make graphs look better on mobile devices. On mobile you have more vertical real estate
+							// than horizontal, so when we generate our graph and stop when we reach the horizontal limit, it's
+							// still not very tall. By making the aspect ratio 1:1 we get a taller graph which looks better.
+							// The default aspect ratio for chartjs is, I believe, 2, so this is what we get on all other devices
+							// (when aspectRatio is null).
+							var aspectRatio = $(window).width() > 800 ? null : 1;
+							if (aspectRatio) {
+								// https://stackoverflow.com/a/58816740
+								chart.aspectRatio = aspectRatio;
+								chart.resize();
+							}
 						}
-					}
-				</script>
-				{% include "grade_graph.html" with professor=professor.slug grade_data=grade_data lookup_by_courses=courses_graded callback="callback" only %}
+					</script>
+					{% include "grade_graph.html" with professor=professor.slug grade_data=grade_data lookup_by_courses=courses_graded callback="callback" only %}
+				</div>
 			</div>
 		</div>
 	</div>
-</div>
+{% endif %}
 
 <script type="text/javascript">
 	var num_reviews = parseInt("{{ num_reviews }}");
